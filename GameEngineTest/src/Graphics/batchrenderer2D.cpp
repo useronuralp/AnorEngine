@@ -13,7 +13,7 @@ namespace GameEngineTest {
 			delete m_IBO;
 			glDeleteBuffers(1, &m_VBO);
 		}
-
+		
 		void BatchRenderer2D::begin()
 		{
 			glBindBuffer(GL_ARRAY_BUFFER, m_VBO);
