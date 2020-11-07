@@ -24,7 +24,7 @@ namespace GameEngineTest {
 		}
 		void Layer::render()
 		{
-			m_Shader->enable();
+			//m_Shader->enable();
 			m_Renderer->begin();
 
 			for (const Renderable2D* renderable : m_Renderables)

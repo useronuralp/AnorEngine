@@ -26,32 +26,71 @@ namespace GameEngineTest {
 			const Math::vec4 &color = renderable->getColor();
 			const Math::vec3 &startPosition = renderable->getPosition();
 			const std::vector<Math::vec2>& uv = renderable->getUV();
+			const GLuint TID = renderable->getTextureID();
 
-			int r = color.x * 255.0f;
-			int g = color.y * 255.0f;  //faster color operations, study this later.
-			int b = color.z * 255.0f;
-			int a = color.w * 255.0f;
+			unsigned int c = 0;
+			float ts = 0.0f;
 
-			unsigned int c = a << 24 | b << 16 | g << 8 | r;
+			if (TID > 0) 
+			{
+				bool found = false;
+				for (int i = 0; i < m_TextureSlots.size(); i++)
+				{
+					if (TID == m_TextureSlots[i])
+					{
+						ts = (float)(i+1);
+						found = true;
+						break;
+					}
+				}
+
+				if (!found)
+				{
+					if (m_TextureSlots.size() >= 32)
+					{
+						end();
+						flush();
+						begin();
+					}
+
+					m_TextureSlots.push_back(TID);
+					ts = (float)(m_TextureSlots.size());
+				}
+			}
+			else
+			{
+				int r = color.x * 255.0f;
+				int g = color.y * 255.0f;  //faster color operations, study this later.
+				int b = color.z * 255.0f;
+				int a = color.w * 255.0f;
+
+
+				c = a << 24 | b << 16 | g << 8 | r;
+
+			}
 
 
 			m_GiantBuffer->vertex = *m_TransformationBack * startPosition;
 			m_GiantBuffer->uv = uv[0];
+			m_GiantBuffer->tid = float(TID);
 			m_GiantBuffer->color = c;
 			m_GiantBuffer++;
 
 			m_GiantBuffer->vertex = *m_TransformationBack * Math::vec3(startPosition.x, startPosition.y + size.y, startPosition.z);
 			m_GiantBuffer->uv = uv[1];
+			m_GiantBuffer->tid = float(TID);
 			m_GiantBuffer->color = c;
 			m_GiantBuffer++;
 
 			m_GiantBuffer->vertex = *m_TransformationBack * Math::vec3(startPosition.x + size.x, startPosition.y + size.y, startPosition.z);
 			m_GiantBuffer->uv = uv[2];
+			m_GiantBuffer->tid = float(TID);
 			m_GiantBuffer->color = c;
 			m_GiantBuffer++;
 
 			m_GiantBuffer->vertex = *m_TransformationBack * Math::vec3(startPosition.x + size.x, startPosition.y, startPosition.z);
 			m_GiantBuffer->uv = uv[3];
+			m_GiantBuffer->tid = float(TID);
 			m_GiantBuffer->color = c;
 			m_GiantBuffer++;
 
@@ -60,7 +99,13 @@ namespace GameEngineTest {
 		}
 
 		void BatchRenderer2D::flush()
-		{
+		{	
+			for (int i = 0; i < m_TextureSlots.size(); i++)
+			{
+				glActiveTexture(GL_TEXTURE0 + i);
+				glBindTexture(GL_TEXTURE_2D, m_TextureSlots[i]);
+			}
+
 			glBindVertexArray(m_VAO);
 			m_IBO->bind();
 
@@ -89,10 +134,12 @@ namespace GameEngineTest {
 
 			glEnableVertexAttribArray(SHADER_VERTEX_INDEX);
 			glEnableVertexAttribArray(SHADER_UV_INDEX);
+			glEnableVertexAttribArray(SHADER_TID_INDEX);
 			glEnableVertexAttribArray(SHADER_COLOR_INDEX);
 
 			glVertexAttribPointer(SHADER_VERTEX_INDEX, 3, GL_FLOAT, GL_FALSE, RENDERER_VERTEX_SIZE, (const GLvoid*) 0);
 			glVertexAttribPointer(SHADER_UV_INDEX, 2, GL_FLOAT, GL_FALSE, RENDERER_VERTEX_SIZE, (const GLvoid*)(offsetof(VertexData, VertexData::uv)));
+			glVertexAttribPointer(SHADER_TID_INDEX, 1, GL_FLOAT, GL_FALSE, RENDERER_VERTEX_SIZE, (const GLvoid*)(offsetof(VertexData, VertexData::tid)));
 			glVertexAttribPointer(SHADER_COLOR_INDEX, 4, GL_UNSIGNED_BYTE, GL_TRUE, RENDERER_VERTEX_SIZE, (const GLvoid*)(offsetof(VertexData, VertexData::color)));
 			glBindBuffer(GL_ARRAY_BUFFER, 0);
 

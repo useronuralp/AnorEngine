@@ -19,7 +19,9 @@ namespace GameEngineTest {
 			~Shader();
 			
 			void setUniform1f(const GLchar* name, const float value);
+			void setUniform1fv(const GLchar* name, float* value,int count);
 			void setUniform1i(const GLchar* name, const int value);
+			void setUniform1iv(const GLchar* name, int* value, int count);
 			void setUniform2f(const GLchar* name, const Math::vec2 &vector);
 			void setUniform3f(const GLchar* name, const Math::vec3 &vector);
 			void setUniform4f(const GLchar* name, const Math::vec4 &vector);
