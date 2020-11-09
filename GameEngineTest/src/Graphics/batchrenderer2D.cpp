@@ -72,25 +72,25 @@ namespace GameEngineTest {
 
 			m_GiantBuffer->vertex = *m_TransformationBack * startPosition;
 			m_GiantBuffer->uv = uv[0];
-			m_GiantBuffer->tid = float(TID);
+			m_GiantBuffer->tid = ts;
 			m_GiantBuffer->color = c;
 			m_GiantBuffer++;
 
 			m_GiantBuffer->vertex = *m_TransformationBack * Math::vec3(startPosition.x, startPosition.y + size.y, startPosition.z);
 			m_GiantBuffer->uv = uv[1];
-			m_GiantBuffer->tid = float(TID);
+			m_GiantBuffer->tid = ts;
 			m_GiantBuffer->color = c;
 			m_GiantBuffer++;
 
 			m_GiantBuffer->vertex = *m_TransformationBack * Math::vec3(startPosition.x + size.x, startPosition.y + size.y, startPosition.z);
 			m_GiantBuffer->uv = uv[2];
-			m_GiantBuffer->tid = float(TID);
+			m_GiantBuffer->tid = ts;
 			m_GiantBuffer->color = c;
 			m_GiantBuffer++;
 
 			m_GiantBuffer->vertex = *m_TransformationBack * Math::vec3(startPosition.x + size.x, startPosition.y, startPosition.z);
 			m_GiantBuffer->uv = uv[3];
-			m_GiantBuffer->tid = float(TID);
+			m_GiantBuffer->tid = ts;
 			m_GiantBuffer->color = c;
 			m_GiantBuffer++;
 

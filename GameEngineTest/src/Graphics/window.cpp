@@ -76,7 +76,7 @@ namespace GameEngineTest {
 
 
 			glfwSetWindowUserPointer(m_Window, this);// need this to access the currently active window. This is very important.
-			glfwSwapInterval(0.0f);// Vsync
+			glfwSwapInterval(1);// Vsync
 
 			std::cout << "OpenGl" << glGetString(GL_VERSION) << std::endl;
 			return true;

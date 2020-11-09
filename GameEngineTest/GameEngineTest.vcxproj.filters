@@ -139,12 +139,22 @@
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <None Include="src\shaders\basic.vert" />
-    <None Include="src\shaders\basic.frag" />
     <None Include="src\shaders\Test.shader" />
+    <None Include="src\shaders\lightsourceFrag.shader" />
+    <None Include="src\shaders\fragment.shader" />
+    <None Include="src\shaders\vertex.shader" />
   </ItemGroup>
   <ItemGroup>
     <Image Include="textures\sample_gigatextures_4096_seamless2.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="textures\381f5a63791945.5abc4ccf1297d.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="textures\tileable-grass_clover_tt7010116-sample_1.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="vertexLayoutExample.PNG">
       <Filter>Resource Files</Filter>
     </Image>
   </ItemGroup>

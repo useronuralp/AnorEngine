@@ -32,6 +32,8 @@ namespace GameEngineTest {
 		private:
 			GLuint load();
 			GLint getUniformLocation(const GLchar* name);
+		public:
+			inline GLuint getShaderID() const { return m_ShaderID; }
 		};
 
 	}

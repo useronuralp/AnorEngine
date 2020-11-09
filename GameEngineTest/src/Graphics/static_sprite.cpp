@@ -28,7 +28,7 @@ namespace GameEngineTest {
 				getUV()[0].x, getUV()[0].y,
 				getUV()[1].x, getUV()[1].y,
 				getUV()[2].x, getUV()[2].y,
-				getUV()[3].x, getUV()[3].y,
+				getUV()[3].x, getUV()[3].y
 			};
 
 			m_VertexArray->bindBuffer(new Buffer(vertices, 3 * 4, 3), 0);
