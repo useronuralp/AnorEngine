@@ -300,6 +300,7 @@ int main()
 
 
 		shader3.enable();
+
 		glBindVertexArray(VAO);
 		model = glm::rotate(model, 0.005f * glm::radians(50.0f), glm::vec3(0.0, 0.5f, 1.0f));
 		glUniformMatrix4fv(modelLocation1, 1, GL_FALSE, glm::value_ptr(model));
