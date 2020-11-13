@@ -146,6 +146,7 @@ int main()
 	};
 
 	float vertices[] = {
+		//position						UV						Normals
 	-0.5f, -0.5f, -0.5f,			 0.0f, 0.0f,			0.0f, 0.0f, -1.0f,
 	 0.5f, -0.5f, -0.5f,			 1.0f, 0.0f,			0.0f, 0.0f, -1.0f,
 	 0.5f,  0.5f, -0.5f,			 1.0f, 1.0f,			0.0f, 0.0f, -1.0f,
@@ -189,6 +190,35 @@ int main()
 	-0.5f,  0.5f, -0.5f,			 0.0f, 1.0f,			0.0f, 1.0f,  0.0f
 	};
 
+
+
+
+
+	vec2 translations[36];
+	int index = 0;
+	float offset = 0.01;
+
+	for (int i = -3; i < 3; i++)
+	{
+		for (int j = -3; j < 3; j++)
+		{
+			vec2 translation;
+			translation.x = (float)i * (1  + offset);
+			translation.y = (float)j * (1  + offset);
+			translations[index++] = translation;
+
+		}
+
+	}
+
+	shader3.enable();
+	for (unsigned int i = 0; i < 36; i++)
+	{
+		shader3.setUniform2f("offsets[" + std::to_string(i) + "]", translations[i]);
+	}
+	shader3.disable();
+
+
 	GLuint VAO_LS;
 	GLuint VBO_LS;
 	glGenBuffers(1, &VBO_LS);
@@ -228,12 +258,13 @@ int main()
 	projection = glm::perspective(glm::radians(45.0f), 1920.0f / 1080.0f, 0.1f, 100.0f);
 
 	
+
 	int modelLocation1 = glGetUniformLocation(shader3.getShaderID(), "ml_matrix");
 	glUniformMatrix4fv(modelLocation1, 1, GL_FALSE, glm::value_ptr(model));
-
+	
 	int viewLocation1 = glGetUniformLocation(shader3.getShaderID(), "vw_matrix");
 	glUniformMatrix4fv(viewLocation1, 1, GL_FALSE, glm::value_ptr(view));
-
+	
 	int projectionlLocation1 = glGetUniformLocation(shader3.getShaderID(), "pr_matrix");
 	glUniformMatrix4fv(projectionlLocation1, 1, GL_FALSE, glm::value_ptr(projection));
 
@@ -245,12 +276,14 @@ int main()
 	lightX = LightPosCoor.x;
 	lightY = LightPosCoor.y;
 	model2 = glm::scale(model2, glm::vec3(0.3f, 0.3f, 0.3f));
+
+
 	int modelLocation2 = glGetUniformLocation(shader4.getShaderID(), "ml_matrix");
 	glUniformMatrix4fv(modelLocation2, 1, GL_FALSE, glm::value_ptr(model2));
-
+	
 	int viewLocation2= glGetUniformLocation(shader4.getShaderID(), "vw_matrix");
 	glUniformMatrix4fv(viewLocation2, 1, GL_FALSE, glm::value_ptr(view));
-
+	
 	int projectionLocation2 = glGetUniformLocation(shader4.getShaderID(), "pr_matrix");
 	glUniformMatrix4fv(projectionLocation2, 1, GL_FALSE, glm::value_ptr(projection));
 
@@ -265,20 +298,19 @@ int main()
 		window.getMousePosition(x, y);
 		gravity += 0.01f;
 
-		
-		
 
 		shader3.enable();
 		glBindVertexArray(VAO);
-		model = glm::rotate(model, 0.005f * glm::radians(50.0f), glm::vec3(0.0, 0.5f, 1.0f));;
+		model = glm::rotate(model, 0.005f * glm::radians(50.0f), glm::vec3(0.0, 0.5f, 1.0f));
 		glUniformMatrix4fv(modelLocation1, 1, GL_FALSE, glm::value_ptr(model));
+		shader3.setUniform3f("cameraPos", vec3(0.3f, 0.3f, 0.3f));
 		shader3.setUniform2f("light_pos", vec2(lightX, lightY));
 		glUniformMatrix4fv(viewLocation1, 1, GL_FALSE, glm::value_ptr(view));
 		glUniformMatrix4fv(projectionlLocation1, 1, GL_FALSE, glm::value_ptr(projection));
-		glDrawArrays(GL_TRIANGLES, 0, 36);
+		glDrawArraysInstanced(GL_TRIANGLES, 0, 36, 36);
 		glBindVertexArray(0);
 		shader3.disable();
-
+		
 		shader4.enable();
 		glBindVertexArray(VAO_LS);
 		glUniformMatrix4fv(modelLocation2, 1, GL_FALSE, glm::value_ptr(model2));
@@ -289,12 +321,7 @@ int main()
 		glBindVertexArray(0);
 		shader4.disable();
 
-
-
-
-
-
-
+	
 		//batch.begin();
 		//for(int i= 0; i < sprites.size(); i++)
 		//{

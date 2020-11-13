@@ -12,6 +12,11 @@ uniform mat4 ml_matrix = mat4(1.0);
 
 
 
+
+
+uniform vec2 offsets[36];
+
+
 out DATA
 {
 	vec4 position;
@@ -25,12 +30,15 @@ out DATA
 
 void main()
 {	
+
+	
+	vec2 offset = offsets[gl_InstanceID];
 	vs_out.Normal = mat3(transpose(inverse(ml_matrix))) * aNormal;
 	//vs_out.Normal = aNormal;
-	gl_Position = (pr_matrix * vw_matrix * ml_matrix ) * position; 
+	gl_Position = (pr_matrix * vw_matrix * ml_matrix) * (position + vec4(offset, 0.0, 1.0)); 
 	vs_out.uv = uv;
 	vs_out.tid = tid;
-	vs_out.position = ml_matrix * position;
+	//vs_out.position = ml_matrix * position;
 	vs_out.color = color;
 	vs_out.FragPos = vec3(ml_matrix * position);
 	//vs_out.v_TexCoord = texCoord;

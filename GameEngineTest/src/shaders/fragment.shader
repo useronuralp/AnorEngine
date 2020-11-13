@@ -9,6 +9,7 @@ uniform vec2 light_pos;
 uniform vec3 objectColor;
 uniform vec3 lightColor;
 
+uniform vec3 cameraPos;
 
 in DATA
 {
@@ -25,14 +26,19 @@ uniform sampler2D tex;
 
 void main()
 {	
-
+	//float specularStrength = 0.5f;
 	float ambientStrength = 0.1f;
+	vec3 norm = normalize(fs_out.Normal);
+	vec3 lightDir = normalize(vec3(light_pos, 1.0f) - fs_out.FragPos);
+
+	//vec3 viewDir = normalize(cameraPos - fs_out.FragPos);
+	//vec3 reflectDir = reflect(-lightDir, fs_out.Normal);		//specular lighting calculations. It doesn't work though. Look into this.
+	//float spec = pow(max(dot(cameraPos, reflectDir), 0.0), 32);
+	//vec3 specular = specularStrength * spec * lightColor;
     vec3 ambient = ambientStrength * lightColor;
 		
 
     
-	vec3 norm = normalize(fs_out.Normal);
-	vec3 lightDir = normalize(vec3(light_pos, 1.0f) - fs_out.FragPos);
 	float diff = max(dot(norm, lightDir), 0.0);
 	vec3 diffuse = diff * lightColor;
 	
@@ -49,7 +55,7 @@ void main()
 		texColor = texture(u_Textures[tid], fs_out.uv);
 	}*/
 	texColor = texture(tex, fs_out.uv);
-	//color =  texColor * intensity * 1.8; 
+	//color =  texColor * intensity ; 
 
 	vec3 result = (ambient + diffuse) * vec3(texColor);
 	color = vec4(result, 1.0);

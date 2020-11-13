@@ -1,5 +1,4 @@
 #include "shader.h"
-
 namespace GameEngineTest {
 	namespace Graphics {
 		
@@ -98,6 +97,13 @@ namespace GameEngineTest {
 		{
 			return glGetUniformLocation(m_ShaderID, name);
 		}
+
+		GLint Shader::getUniformLocation(std::string name)
+		{
+			char* arr;
+			arr = &name[0];
+			return glGetUniformLocation(m_ShaderID, arr);
+		}
 		void Shader::setUniform1f(const GLchar* name, const float value)
 		{
 			glUniform1f(getUniformLocation(name), value);
@@ -118,7 +124,15 @@ namespace GameEngineTest {
 		{
 			glUniform2f(getUniformLocation(name), vector.x, vector.y);
 		}
+		void Shader::setUniform2f(const std::string name , const Math::vec2& vector)
+		{
+			glUniform2f(getUniformLocation(name), vector.x, vector.y);
+		}
 		void Shader::setUniform3f(const GLchar* name, const Math::vec3& vector)
+		{
+			glUniform3f(getUniformLocation(name), vector.x, vector.y, vector.z);
+		}
+		void Shader::setUniform3f(const std::string name, const Math::vec3& vector)
 		{
 			glUniform3f(getUniformLocation(name), vector.x, vector.y, vector.z);
 		}

@@ -23,7 +23,9 @@ namespace GameEngineTest {
 			void setUniform1i(const GLchar* name, const int value);
 			void setUniform1iv(const GLchar* name, int* value, int count);
 			void setUniform2f(const GLchar* name, const Math::vec2 &vector);
+			void setUniform2f(const std::string name, const Math::vec2& vector);
 			void setUniform3f(const GLchar* name, const Math::vec3 &vector);
+			void setUniform3f(const std::string name, const Math::vec3& vector);
 			void setUniform4f(const GLchar* name, const Math::vec4 &vector);
 			void setUniformMat4(const GLchar* name, const Math::mat4 &matrix);
 			void enable() const;
@@ -32,6 +34,7 @@ namespace GameEngineTest {
 		private:
 			GLuint load();
 			GLint getUniformLocation(const GLchar* name);
+			GLint getUniformLocation(std::string name);
 		public:
 			inline GLuint getShaderID() const { return m_ShaderID; }
 		};

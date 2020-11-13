@@ -8,7 +8,7 @@
 namespace GameEngineTest {
 	namespace Graphics {
 		
-		class Renderer2D
+		class Renderer2D 
 		{
 		protected:
 			std::vector<Math::mat4> m_TransformationStack;
