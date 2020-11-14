@@ -22,6 +22,7 @@ using namespace GameEngineTest;
 using namespace Math;
 using namespace Graphics;
 
+
 int main()
 {
 
@@ -194,15 +195,15 @@ int main()
 
 
 
-	vec2 translations[36];
+	vec2 *translations = new vec2[900];
 	int index = 0;
-	float offset = 0.01;
-
-	for (int i = -3; i < 3; i++)
+	float offset = 0.00;
+	vec2 translation;
+	for (int i = -15; i < 15; i++)
 	{
-		for (int j = -3; j < 3; j++)
+		for (int j = -15; j < 15; j++)
 		{
-			vec2 translation;
+			
 			translation.x = (float)i * (1  + offset);
 			translation.y = (float)j * (1  + offset);
 			translations[index++] = translation;
@@ -210,13 +211,14 @@ int main()
 		}
 
 	}
-
+	//delete[] translations;
 	shader3.enable();
-	for (unsigned int i = 0; i < 36; i++)
+	for (unsigned int i = 0; i < 900; i++)
 	{
 		shader3.setUniform2f("offsets[" + std::to_string(i) + "]", translations[i]);
 	}
 	shader3.disable();
+
 
 
 	GLuint VAO_LS;
@@ -250,14 +252,14 @@ int main()
 
 	glm::mat4 model = glm::mat4(1.0f);
 	glm::mat4 model2 = glm::mat4(1.0f);
-	model = glm::rotate(model, glm::radians(-55.0f), glm::vec3(1.0f, 0.0f, 0.0f));
+	model = glm::rotate(model, glm::radians(-90.0f), glm::vec3(1.0f, 0.0f, 0.0f));
 	glm::mat4 view = glm::mat4(1.0f);
-	// note that we're translating the scene in the reverse direction of where we want to move
-	view = glm::translate(view, glm::vec3(0.0f, 0.0f, -5.0f));
+
+
 	glm::mat4 projection;
 	projection = glm::perspective(glm::radians(45.0f), 1920.0f / 1080.0f, 0.1f, 100.0f);
 
-	
+
 
 	int modelLocation1 = glGetUniformLocation(shader3.getShaderID(), "ml_matrix");
 	glUniformMatrix4fv(modelLocation1, 1, GL_FALSE, glm::value_ptr(model));
@@ -288,27 +290,25 @@ int main()
 	glUniformMatrix4fv(projectionLocation2, 1, GL_FALSE, glm::value_ptr(projection));
 
 	//glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-
-
+	
 	texture3.Bind(0);
 	glEnable(GL_DEPTH_TEST);
 	while (!window.closed()) {
 
 		window.clear();
-		window.getMousePosition(x, y);
-		gravity += 0.01f;
+		view = glm::lookAt(window.cameraPos, window.cameraPos + window.cameraFront, window.cameraUp);// camera movement operations on view matrix each frame.
 
 
 		shader3.enable();
 
 		glBindVertexArray(VAO);
-		model = glm::rotate(model, 0.005f * glm::radians(50.0f), glm::vec3(0.0, 0.5f, 1.0f));
+		//model = glm::rotate(model, 0.005f * glm::radians(50.0f), glm::vec3(0.0, 0.0f, 1.0f));
 		glUniformMatrix4fv(modelLocation1, 1, GL_FALSE, glm::value_ptr(model));
 		shader3.setUniform3f("cameraPos", vec3(0.3f, 0.3f, 0.3f));
 		shader3.setUniform2f("light_pos", vec2(lightX, lightY));
 		glUniformMatrix4fv(viewLocation1, 1, GL_FALSE, glm::value_ptr(view));
 		glUniformMatrix4fv(projectionlLocation1, 1, GL_FALSE, glm::value_ptr(projection));
-		glDrawArraysInstanced(GL_TRIANGLES, 0, 36, 36);
+		glDrawArraysInstanced(GL_TRIANGLES, 0, 36, 900);
 		glBindVertexArray(0);
 		shader3.disable();
 		

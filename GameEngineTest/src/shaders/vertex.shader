@@ -14,7 +14,7 @@ uniform mat4 ml_matrix = mat4(1.0);
 
 
 
-uniform vec2 offsets[36];
+uniform vec2 offsets[900];
 
 
 out DATA
