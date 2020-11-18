@@ -25,17 +25,33 @@ namespace GameEngineTest {
 		void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods) //friend definition
 		{
 			Window* win =  (Window*) glfwGetWindowUserPointer(window);
-			if (key == GLFW_KEY_W && (action == GLFW_PRESS || action == GLFW_REPEAT)) {
-				win->cameraPos += win->cameraSpeed * win->cameraFront;
+			if (key == GLFW_KEY_W && (action == GLFW_PRESS)) {
+				win->m_Keys['W'] = true;
 			}
-			if (key == GLFW_KEY_S && (action == GLFW_PRESS || action == GLFW_REPEAT)) {
-				win->cameraPos -= win->cameraSpeed * win->cameraFront;
+			else if ((key == GLFW_KEY_W && (action == GLFW_RELEASE)))
+			{	
+				win->m_Keys['W'] = false;
 			}
-			if (key == GLFW_KEY_A && (action == GLFW_PRESS || action == GLFW_REPEAT)) {
-				win->cameraPos -= glm::normalize(glm::cross(win->cameraFront, win->cameraUp)) * win->cameraSpeed ;
+			if (key == GLFW_KEY_S && (action == GLFW_PRESS)) {
+				win->m_Keys['S'] = true;
 			}
-			if (key == GLFW_KEY_D && (action == GLFW_PRESS || action == GLFW_REPEAT)) {
-				win->cameraPos += glm::normalize(glm::cross(win->cameraFront, win->cameraUp)) * win->cameraSpeed;
+			else if ((key == GLFW_KEY_S && (action == GLFW_RELEASE)))
+			{
+				win->m_Keys['S'] = false;
+			}
+			if (key == GLFW_KEY_A && (action == GLFW_PRESS)) {
+				win->m_Keys['A'] = true;
+			}
+			else if ((key == GLFW_KEY_A && (action == GLFW_RELEASE)))
+			{
+				win->m_Keys['A'] = false;
+			}
+			if (key == GLFW_KEY_D && (action == GLFW_PRESS)) {
+				win->m_Keys['D'] = true;
+			}
+			else if ((key == GLFW_KEY_D && (action == GLFW_RELEASE)))
+			{
+				win->m_Keys['D'] = false;
 			}
 			if (key == GLFW_KEY_LEFT_CONTROL && action == GLFW_PRESS) {
 				if (!win->isMouseCaptured)
@@ -66,41 +82,45 @@ namespace GameEngineTest {
 		{
 			Window* win =  (Window*) glfwGetWindowUserPointer(window);
 			//glfwSetInputMode(win->m_Window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
-			if (win->firstMouse)
+			if (glfwGetInputMode(win->m_Window, GLFW_CURSOR) == GLFW_CURSOR_DISABLED)
 			{
+
+				if (win->firstMouse)
+				{
+					win->lastX = xpos;
+					win->lastY = ypos;
+					win->firstMouse = false;
+				}
+
+
+				float xoffset = xpos - win->lastX;
+				float yoffset = win->lastY - ypos;
 				win->lastX = xpos;
 				win->lastY = ypos;
-				win->firstMouse = false;
+
+				float sensitivity = 0.1f;
+				xoffset *= sensitivity;
+				yoffset *= sensitivity;
+
+				win->YAW += xoffset;
+				win->PITCH += yoffset;
+
+				if (win->PITCH > 89.0f)
+					win->PITCH = 89.0f;
+				if (win->PITCH < -89.0f)
+					win->PITCH = -89.0f;
+
+				glm::vec3 direction;
+				direction.x = cos(glm::radians(win->YAW)) * cos(glm::radians(win->PITCH));
+				direction.y = sin(glm::radians(win->PITCH));
+				direction.z = sin(glm::radians(win->YAW)) * cos(glm::radians(win->PITCH));
+				win->cameraFront = glm::normalize(direction);
+
+
+
+				win->mousePosition.x = xpos;
+				win->mousePosition.y = ypos;
 			}
-
-
-			float xoffset = xpos - win->lastX;
-			float yoffset = win->lastY - ypos;
-			win->lastX = xpos;
-			win->lastY = ypos;
-
-			float sensitivity = 0.1f;
-			xoffset *= sensitivity;
-			yoffset *= sensitivity;
-
-			win->YAW += xoffset;
-			win->PITCH += yoffset;
-
-			if (win->PITCH > 89.0f)
-				win->PITCH = 89.0f;
-			if (win->PITCH < -89.0f)
-				win->PITCH = -89.0f;
-
-			glm::vec3 direction;
-			direction.x = cos(glm::radians(win->YAW)) * cos(glm::radians(win->PITCH));
-			direction.y = sin(glm::radians(win->PITCH));
-			direction.z = sin(glm::radians(win->YAW)) * cos(glm::radians(win->PITCH));
-			win->cameraFront = glm::normalize(direction);
-
-
-
-			win->mousePosition.x = xpos;
-			win->mousePosition.y = ypos;
 		}
 
 		bool Window::init()
@@ -134,7 +154,7 @@ namespace GameEngineTest {
 
 
 			glfwSetWindowUserPointer(m_Window, this);// need this to access the currently active window. This is very important.
-			glfwSwapInterval(1);// Vsync
+			glfwSwapInterval(0);// Vsync
 
 			std::cout << "OpenGl" << glGetString(GL_VERSION) << std::endl;
 			return true;
@@ -150,6 +170,29 @@ namespace GameEngineTest {
 			GLenum error = glGetError();
 			if (error != GL_NO_ERROR) //shitty error handling. Improve this later.
 				std::cout << "OpenGL ERROR: " << error << std::endl;
+
+
+			for (std::pair<char, bool> key : m_Keys)
+			{
+				if (key.second)
+				{
+					switch (key.first)
+					{
+						case 'W':
+							cameraPos += cameraSpeed * cameraFront;
+							break;
+						case 'S':
+							cameraPos -= cameraSpeed * cameraFront;
+							break;
+						case 'A':
+							cameraPos -= glm::normalize(glm::cross(cameraFront, cameraUp)) * cameraSpeed;
+							break;
+						case 'D':
+							cameraPos += glm::normalize(glm::cross(cameraFront, cameraUp)) * cameraSpeed;
+							break;
+					}
+				}
+			}
 
 
 			glfwPollEvents();

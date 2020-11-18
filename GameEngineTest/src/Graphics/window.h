@@ -3,7 +3,8 @@
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
 #include <glm.hpp>
-
+#include <vector>
+#include <map>
 namespace GameEngineTest {
 	namespace Graphics {
 
@@ -13,14 +14,13 @@ namespace GameEngineTest {
 		};
 
 		class Window {
-		private:	
+		private:
+			std::map<char, bool> m_Keys = {{'W', false }, {'S', false }, {'A', false}, {'D', false}};
 			const char *m_Title;
 			int m_Width, m_Height;
 			GLFWwindow* m_Window;
 			bool m_Closed;
 			MousePosition mousePosition;
-		public:
-
 			bool isMouseCaptured = false;
 			float deltaTime = 0.0f;	// Time between current frame and last frame
 			float lastFrame = 0.0f; // Time of last frame
@@ -28,14 +28,13 @@ namespace GameEngineTest {
 			bool firstMouse = true;
 			float lastY = m_Height / 2;
 			float lastX = m_Width / 2;
-
 			float YAW = -90.0f;
 			float PITCH = 0.0f;
-
+		public:
 			glm::vec3 cameraPos = glm::vec3(0.0f, 2.0f, 5.0f);
 			glm::vec3 cameraFront = glm::vec3(0.0f, 0.0f, -1.0f);
 			glm::vec3 cameraUp = glm::vec3(0.0f, 1.0f, 0.0f);
-			const float cameraSpeed = 0.05f; // adjust accordingly
+			const float cameraSpeed = 0.002f; // adjust accordingly
 		public:
 			Window(const char* name, int width, int height);
 			~Window();

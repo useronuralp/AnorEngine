@@ -299,6 +299,8 @@ int main()
 		view = glm::lookAt(window.cameraPos, window.cameraPos + window.cameraFront, window.cameraUp);// camera movement operations on view matrix each frame.
 
 
+
+
 		shader3.enable();
 
 		glBindVertexArray(VAO);
