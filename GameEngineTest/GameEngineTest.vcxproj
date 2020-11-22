@@ -151,8 +151,10 @@
     <ClCompile Include="src\Graphics\Buffers\vertexarray.cpp" />
     <ClCompile Include="src\Graphics\Layers\layer.cpp" />
     <ClCompile Include="src\Graphics\Layers\tilelayer.cpp" />
+    <ClCompile Include="src\Graphics\renderable3D.cpp" />
     <ClCompile Include="src\Graphics\simpleRenderer2D.cpp" />
     <ClCompile Include="src\Graphics\shader.cpp" />
+    <ClCompile Include="src\Graphics\simplerenderer3D.cpp" />
     <ClCompile Include="src\Graphics\sprite.cpp" />
     <ClCompile Include="src\Graphics\static_sprite.cpp" />
     <ClCompile Include="src\Graphics\texture.cpp" />
@@ -172,9 +174,11 @@
     <ClInclude Include="src\Graphics\Layers\layer.h" />
     <ClInclude Include="src\Graphics\Layers\tilelayer.h" />
     <ClInclude Include="src\Graphics\renderable2D.h" />
+    <ClInclude Include="src\Graphics\renderable3D.h" />
     <ClInclude Include="src\Graphics\renderer2D.h" />
     <ClInclude Include="src\Graphics\shader.h" />
     <ClInclude Include="src\Graphics\simpleRenderer2D.h" />
+    <ClInclude Include="src\Graphics\simplerenderer3D.h" />
     <ClInclude Include="src\Graphics\sprite.h" />
     <ClInclude Include="src\Graphics\static_sprite.h" />
     <ClInclude Include="src\Graphics\texture.h" />
@@ -185,6 +189,7 @@
     <ClInclude Include="src\Math\vec3.h" />
     <ClInclude Include="src\Math\vec4.h" />
     <ClInclude Include="src\utils\fileutils.h" />
+    <ClInclude Include="src\vendor\Models\cube.h" />
     <ClInclude Include="src\vendor\stb_image\stb_image.h" />
   </ItemGroup>
   <ItemGroup>

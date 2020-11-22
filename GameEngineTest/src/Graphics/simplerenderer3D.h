@@ -1,0 +1,26 @@
+#pragma once
+#include <GL/glew.h>
+#include <glm.hpp>
+#include <gtc/type_ptr.hpp>
+#include <gtc/matrix_transform.hpp>
+#include <algorithm> 
+#include "renderable3D.h"
+#include "shader.h"
+namespace GameEngineTest {
+	namespace Graphics {
+
+		class Renderer3D
+		{
+			int modelLocation;
+			int viewLocation;  //these variables grab the locaiton of corresponding matrices from the shader.
+			int projectionLocation;
+		public:
+			void instancedDrawVertex(Renderable3D& object, Shader& shader, const glm::mat4& camera, const int& vertexCount, const int& repeatAmount);
+			void singleDrawVertex(Renderable3D& object, Shader& shader, const glm::mat4& camera, const int& vertexCount);
+
+			//TO DO: implement indexed drawing.
+		private:
+			void updateMVP(Renderable3D& object, Shader& shader, const glm::mat4& camera);
+		};
+	}
+}

@@ -26,15 +26,16 @@ namespace GameEngineTest {
 			float lastFrame = 0.0f; // Time of last frame
 			float currentFrame;
 			bool firstMouse = true;
-			float lastY = m_Height / 2;
-			float lastX = m_Width / 2;
+			float lastY = m_Height / 2.0f;
+			float lastX = m_Width / 2.0f;
 			float YAW = -90.0f;
 			float PITCH = 0.0f;
+			float sensitivity = 0.05f;
 		public:
 			glm::vec3 cameraPos = glm::vec3(0.0f, 2.0f, 5.0f);
 			glm::vec3 cameraFront = glm::vec3(0.0f, 0.0f, -1.0f);
 			glm::vec3 cameraUp = glm::vec3(0.0f, 1.0f, 0.0f);
-			const float cameraSpeed = 0.002f; // adjust accordingly
+			const float cameraSpeed = 0.001f; // adjust accordingly
 		public:
 			Window(const char* name, int width, int height);
 			~Window();

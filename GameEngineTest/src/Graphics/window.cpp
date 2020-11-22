@@ -10,8 +10,8 @@ namespace GameEngineTest {
 			m_Title = title;
 			m_Height = height;
 			m_Width = width;
-			
-			if (!init()) {
+	
+			if (!init()) { // this is how you call init function. Inside an if statemen. It is a little bit tricky.
 				glfwTerminate();
 			}
 		}
@@ -87,20 +87,20 @@ namespace GameEngineTest {
 
 				if (win->firstMouse)
 				{
-					win->lastX = xpos;
-					win->lastY = ypos;
+					win->lastX = (float)xpos;
+					win->lastY = (float)ypos;
 					win->firstMouse = false;
 				}
 
 
-				float xoffset = xpos - win->lastX;
-				float yoffset = win->lastY - ypos;
-				win->lastX = xpos;
-				win->lastY = ypos;
+				float xoffset = (float)(xpos - win->lastX);
+				float yoffset = (float)(win->lastY - ypos);
+				win->lastX = (float)xpos;
+				win->lastY = (float)ypos;
 
-				float sensitivity = 0.1f;
-				xoffset *= sensitivity;
-				yoffset *= sensitivity;
+				
+				xoffset *= win->sensitivity;
+				yoffset *= win->sensitivity;
 
 				win->YAW += xoffset;
 				win->PITCH += yoffset;
