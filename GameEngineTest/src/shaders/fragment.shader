@@ -5,11 +5,15 @@ layout (location = 0) out vec4 color;
 
 uniform vec4 colour;
 uniform vec2 light_pos;
-
+uniform vec3 directionalLight = vec3(-0.2f, -1.0f, -0.3f);
 uniform vec3 objectColor;
 uniform vec3 lightColor;
+uniform vec3 cameraPos = vec3(0.3f, 0.3f, 0.3f); //fixed value for now. You should set this in client side if you want to dynamically change it
 
-uniform vec3 cameraPos;
+float constant = 0.3f;
+float lin = 0.09f;
+float quadratic = 0.032f;
+uniform sampler2D tex;
 
 in DATA
 {
@@ -21,42 +25,33 @@ in DATA
 	vec3 FragPos;
 }fs_out;
 
-//uniform sampler2D u_Textures[32];
-uniform sampler2D tex;
+
+
+#define DIRECTIONAL_LIGHTING 0 //or POINT_LIGHTING
 
 void main()
 {	
-	//float specularStrength = 0.5f;
-	float ambientStrength = 0.1f;
-	vec3 norm = normalize(fs_out.Normal);
-	vec3 lightDir = normalize(vec3(light_pos, 1.0f) - fs_out.FragPos);
 
-	//vec3 viewDir = normalize(cameraPos - fs_out.FragPos);
-	//vec3 reflectDir = reflect(-lightDir, fs_out.Normal);		//specular lighting calculations. It doesn't work though. Look into this.
-	//float spec = pow(max(dot(cameraPos, reflectDir), 0.0), 32);
-	//vec3 specular = specularStrength * spec * lightColor;
+	float distance = length(vec3(light_pos, 0.0f) - fs_out.FragPos);
+	float attenuation = 1.0 / (constant + lin * distance + quadratic * (distance * distance));
+
+	float ambientStrength = 0.2f;
+	vec3 normal = normalize(fs_out.Normal);
+#if DIRECTIONAL_LIGHTING
+	vec3 lightDir = normalize(-directionalLight); // this is for directional light like sun. this function uses a global value directionalLight
+#else
+	vec3 lightDir = normalize(vec3(light_pos, 1.0f) - fs_out.FragPos); // this is used for point light.
+#endif
     vec3 ambient = ambientStrength * lightColor;
-		
-
-    
-	float diff = max(dot(norm, lightDir), 0.0);
+	float diff = max(dot(normal, lightDir), 0.0);
 	vec3 diffuse = diff * lightColor;
-	
 
-
-	float intensity = 1.0 / length(fs_out.position.xy - light_pos);
-	//color = /*fs_out.color */ colour * intensity; // if you uncomment colour here, you use uniform colour that you can set in the CPU. However, if you uncomment "fs_out.color" you use the attribute color of the vertex.
-
-	vec4 texColor = colour;
-
-	/*if(fs_out.tid > 0.0)
-	{	
-		int tid = int(fs_out.tid - 0.5);
-		texColor = texture(u_Textures[tid], fs_out.uv);
-	}*/
-	texColor = texture(tex, fs_out.uv);
-	//color =  texColor * intensity ; 
-
+#if DIRECTIONAL_LIGHTING	
+#else
+	ambient *= attenuation;
+	diffuse *= attenuation;
+#endif
+	vec4 texColor = texture(tex, fs_out.uv);
 	vec3 result = (ambient + diffuse) * vec3(texColor);
 	color = vec4(result, 1.0);
 }

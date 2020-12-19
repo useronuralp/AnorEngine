@@ -15,8 +15,6 @@ namespace GameEngineTest {
 		constexpr auto TID_VALUE = 2;			//layout values, must be matching with the shader values.
 		constexpr auto COLOR_VALUE = 3;
 		constexpr auto NORMAL_VALUE = 4;
-
-
 		class Renderable3D
 		{
 		public:

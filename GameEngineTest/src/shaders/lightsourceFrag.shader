@@ -32,5 +32,5 @@ void main()
 		texColor = texture(u_Textures[tid], fs_out.uv);
 	}*/
 	//texColor = texture(tex, fs_out.uv);
-	color =  vec4(1.0f); //always constant white
+	color =  colour; //always constant white
 }

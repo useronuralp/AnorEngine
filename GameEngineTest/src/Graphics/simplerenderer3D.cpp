@@ -4,7 +4,7 @@
 
 namespace GameEngineTest {
 	namespace Graphics {
-		void Renderer3D::instancedDrawVertex(Renderable3D& object, Shader& shader, const glm::mat4& camera, const int& vertexCount, const int& repeatAmount)
+		void Renderer3D::instancedDraw(Renderable3D& object, Shader& shader, const glm::mat4& camera, const int& vertexCount, const int& repeatAmount)
 		{
 			shader.enable();
 			object.bindVAO();
@@ -15,7 +15,7 @@ namespace GameEngineTest {
 			object.unbindVAO();
 			shader.disable();
 		}
-		void Renderer3D::singleDrawVertex(Renderable3D& object, Shader& shader, const glm::mat4& camera, const int& vertexCount)
+		void Renderer3D::singleDraw(Renderable3D& object, Shader& shader, const glm::mat4& camera, const int& vertexCount)
 		{
 			shader.enable();
 			object.bindVAO();

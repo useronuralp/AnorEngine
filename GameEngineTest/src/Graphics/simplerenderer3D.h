@@ -15,8 +15,8 @@ namespace GameEngineTest {
 			int viewLocation;  //these variables grab the locaiton of corresponding matrices from the shader.
 			int projectionLocation;
 		public:
-			void instancedDrawVertex(Renderable3D& object, Shader& shader, const glm::mat4& camera, const int& vertexCount, const int& repeatAmount);
-			void singleDrawVertex(Renderable3D& object, Shader& shader, const glm::mat4& camera, const int& vertexCount);
+			void instancedDraw(Renderable3D& object, Shader& shader, const glm::mat4& camera, const int& vertexCount, const int& repeatAmount);
+			void singleDraw(Renderable3D& object, Shader& shader, const glm::mat4& camera, const int& vertexCount);
 
 			//TO DO: implement indexed drawing.
 		private:

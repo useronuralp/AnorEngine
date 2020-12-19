@@ -57,13 +57,6 @@ namespace GameEngineTest {
 			return multiply(other);
 		}
 
-
-
-
-
-
-
-
 		vec4 mat4::multiply(const vec4& other) const
 		{
 			return vec4
@@ -127,7 +120,6 @@ namespace GameEngineTest {
 			result.elements[2 + 2 * 4] = b;
 			result.elements[3 + 2 * 4] = -1.0f;
 			result.elements[2 + 0 * 4] = c;
-
 
 			return result;
 		}

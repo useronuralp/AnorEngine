@@ -18,6 +18,8 @@ namespace GameEngineTest {
 			Shader(const char* vertPath, const char* fragPath);
 			~Shader();
 			
+
+		
 			void setUniform1f(const GLchar* name, const float value);
 			void setUniform1fv(const GLchar* name, float* value,int count);
 			void setUniform1i(const GLchar* name, const int value);

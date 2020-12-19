@@ -104,45 +104,66 @@ namespace GameEngineTest {
 			arr = &name[0];
 			return glGetUniformLocation(m_ShaderID, arr);
 		}
+
 		void Shader::setUniform1f(const GLchar* name, const float value)
-		{
+		{	
+			enable();
 			glUniform1f(getUniformLocation(name), value);
+			disable();
 		}
 		void Shader::setUniform1fv(const GLchar* name, float* value ,int count)
-		{
+		{	
+			enable();
 			glUniform1fv(getUniformLocation(name), count, value);
+			disable();
 		}
 		void Shader::setUniform1i(const GLchar* name, const int value) 
-		{
+		{	
+			enable();
 			glUniform1i(getUniformLocation(name), value);
+			disable();
 		}
 		void Shader::setUniform1iv(const GLchar* name, int* value, int count)
-		{
+		{	
+			enable();
 			glUniform1iv(getUniformLocation(name), count, value);
+			disable();
 		}
 		void Shader::setUniform2f(const GLchar* name, const Math::vec2& vector) 
 		{
+			enable();
 			glUniform2f(getUniformLocation(name), vector.x, vector.y);
+			disable();
 		}
 		void Shader::setUniform2f(const std::string name , const Math::vec2& vector)
 		{
+			enable();
 			glUniform2f(getUniformLocation(name), vector.x, vector.y);
+			disable();
 		}
 		void Shader::setUniform3f(const GLchar* name, const Math::vec3& vector)
 		{
+			enable();
 			glUniform3f(getUniformLocation(name), vector.x, vector.y, vector.z);
+			disable();
 		}
 		void Shader::setUniform3f(const std::string name, const Math::vec3& vector)
 		{
+			enable();
 			glUniform3f(getUniformLocation(name), vector.x, vector.y, vector.z);
+			disable();
 		}
 		void Shader::setUniform4f(const GLchar* name, const Math::vec4& vector)
 		{
+			enable();
 			glUniform4f(getUniformLocation(name), vector.x, vector.y, vector.z, vector.w );
+			disable();
 		}
 		void Shader::setUniformMat4(const GLchar* name, const Math::mat4& matrix)
 		{
+			enable();
 			glUniformMatrix4fv(getUniformLocation(name), 1, GL_FALSE, matrix.elements);
+			disable();
 		}
 	}
 }
