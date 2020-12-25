@@ -2,7 +2,7 @@
 
 namespace GameEngineTest 
 {
-	namespace Model
+	namespace Shape
 	{
 		float lightSourceVertx[] =
 		{

@@ -1,0 +1,14 @@
+# CMake generation dependency list for this directory.
+C:/Users/Onuralp/Desktop/Yeni klasör (4)/assimp-5.0.1/contrib/zlib/CMakeLists.txt
+C:/Users/Onuralp/Desktop/Yeni klasör (4)/assimp-5.0.1/contrib/zlib/zconf.h.cmakein
+C:/Users/Onuralp/Desktop/Yeni klasör (4)/assimp-5.0.1/contrib/zlib/zlib.pc.cmakein
+C:/Users/Onuralp/Desktop/Yeni klasör (4)/cmake-3.19.2-win32-x86/share/cmake-3.19/Modules/CheckCSourceCompiles.cmake
+C:/Users/Onuralp/Desktop/Yeni klasör (4)/cmake-3.19.2-win32-x86/share/cmake-3.19/Modules/CheckFunctionExists.c
+C:/Users/Onuralp/Desktop/Yeni klasör (4)/cmake-3.19.2-win32-x86/share/cmake-3.19/Modules/CheckFunctionExists.cmake
+C:/Users/Onuralp/Desktop/Yeni klasör (4)/cmake-3.19.2-win32-x86/share/cmake-3.19/Modules/CheckIncludeFile.c.in
+C:/Users/Onuralp/Desktop/Yeni klasör (4)/cmake-3.19.2-win32-x86/share/cmake-3.19/Modules/CheckIncludeFile.cmake
+C:/Users/Onuralp/Desktop/Yeni klasör (4)/cmake-3.19.2-win32-x86/share/cmake-3.19/Modules/CheckIncludeFileCXX.cmake
+C:/Users/Onuralp/Desktop/Yeni klasör (4)/cmake-3.19.2-win32-x86/share/cmake-3.19/Modules/CheckTypeSize.c.in
+C:/Users/Onuralp/Desktop/Yeni klasör (4)/cmake-3.19.2-win32-x86/share/cmake-3.19/Modules/CheckTypeSize.cmake
+C:/Users/Onuralp/Desktop/Yeni klasör (4)/cmake-3.19.2-win32-x86/share/cmake-3.19/Modules/Internal/CheckSourceCompiles.cmake
+H:/ProgrammingProjects/repos/GameEngineTest/Dependencies/Assimp/CMakeFiles/CheckTypeSize/OFF64_T.c
