@@ -206,16 +206,32 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="assimp-vc142-mtd.dll" />
+    <None Include="Models\Backpack\backpack.mtl" />
     <None Include="src\shaders\fragment.shader" />
     <None Include="src\shaders\vertex.shader" />
     <None Include="src\shaders\lightsourceFrag.shader" />
     <None Include="src\shaders\Test.shader" />
   </ItemGroup>
   <ItemGroup>
+    <Image Include="Models\Backpack\ao.jpg" />
+    <Image Include="Models\Backpack\diffuse.jpg" />
+    <Image Include="Models\Backpack\normal.png" />
+    <Image Include="Models\Backpack\roughness.jpg" />
+    <Image Include="Models\Backpack\specular.jpg" />
     <Image Include="textures\381f5a63791945.5abc4ccf1297d.png" />
     <Image Include="textures\sample_gigatextures_4096_seamless2.png" />
     <Image Include="textures\tileable-grass_clover_tt7010116-sample_1.png" />
     <Image Include="vertexLayoutExample.PNG" />
+  </ItemGroup>
+  <ItemGroup>
+    <Object Include="Models\Backpack\backpack.obj" />
+    <Object Include="Models\gencor\ambulance.obj" />
+    <Object Include="Models\gencor\garbageTruck.obj" />
+    <Object Include="Models\gencor\Home_and_Environment.obj" />
+    <Object Include="Models\gencor\millennium-falcon.obj" />
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="Models\Backpack\source_attribution.txt" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
