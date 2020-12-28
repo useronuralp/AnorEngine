@@ -170,7 +170,6 @@
     <None Include="src\shaders\lightsourceFrag.shader" />
     <None Include="src\shaders\fragment.shader" />
     <None Include="src\shaders\vertex.shader" />
-    <None Include="assimp-vc142-mtd.dll" />
     <None Include="Models\Backpack\backpack.mtl" />
   </ItemGroup>
   <ItemGroup>
@@ -186,28 +185,21 @@
     <Image Include="vertexLayoutExample.PNG">
       <Filter>Resource Files</Filter>
     </Image>
-    <Image Include="Models\Backpack\ao.jpg">
-      <Filter>Resource Files</Filter>
-    </Image>
-    <Image Include="Models\Backpack\diffuse.jpg">
-      <Filter>Resource Files</Filter>
-    </Image>
-    <Image Include="Models\Backpack\normal.png">
+    <Image Include="Models\Backpack\specular.jpg">
       <Filter>Resource Files</Filter>
     </Image>
     <Image Include="Models\Backpack\roughness.jpg">
       <Filter>Resource Files</Filter>
     </Image>
-    <Image Include="Models\Backpack\specular.jpg">
+    <Image Include="Models\Backpack\normal.png">
       <Filter>Resource Files</Filter>
     </Image>
-  </ItemGroup>
-  <ItemGroup>
-    <Object Include="Models\Backpack\backpack.obj" />
-    <Object Include="Models\gencor\ambulance.obj" />
-    <Object Include="Models\gencor\garbageTruck.obj" />
-    <Object Include="Models\gencor\Home_and_Environment.obj" />
-    <Object Include="Models\gencor\millennium-falcon.obj" />
+    <Image Include="Models\Backpack\diffuse.jpg">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="Models\Backpack\ao.jpg">
+      <Filter>Resource Files</Filter>
+    </Image>
   </ItemGroup>
   <ItemGroup>
     <Text Include="Models\Backpack\source_attribution.txt" />

@@ -171,7 +171,10 @@ namespace GameEngineTest {
 			if (error != GL_NO_ERROR) //shitty error handling. Improve this later.
 				std::cout << "OpenGL ERROR: " << error << std::endl;
 
-
+			float currentFrame = glfwGetTime();
+			deltaTime = currentFrame - lastFrame;
+			lastFrame = currentFrame;
+			cameraSpeed = 3 * deltaTime; //adjust speed here.
 			for (std::pair<char, bool> key : m_Keys)
 			{
 				if (key.second)

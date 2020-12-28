@@ -13,7 +13,10 @@ uniform vec3 cameraPos = vec3(0.3f, 0.3f, 0.3f); //fixed value for now. You shou
 float constant = 0.3f;
 float lin = 0.09f;
 float quadratic = 0.032f;
+
+
 uniform sampler2D tex;
+uniform sampler2D textureSampler;
 
 in DATA
 {
@@ -31,11 +34,10 @@ in DATA
 
 void main()
 {	
-
 	float distance = length(vec3(light_pos, 0.0f) - fs_out.FragPos);
 	float attenuation = 1.0 / (constant + lin * distance + quadratic * (distance * distance));
 
-	float ambientStrength = 0.2f;
+	float ambientStrength = 0.1f;
 	vec3 normal = normalize(fs_out.Normal);
 #if DIRECTIONAL_LIGHTING
 	vec3 lightDir = normalize(-directionalLight); // this is for directional light like sun. this function uses a global value directionalLight
@@ -51,7 +53,7 @@ void main()
 	ambient *= attenuation;
 	diffuse *= attenuation;
 #endif
-	vec4 texColor = texture(tex, fs_out.uv);
+	vec4 texColor = texture(textureSampler, fs_out.uv);
 	vec3 result = (ambient + diffuse) * vec3(texColor);
 	color = vec4(result, 1.0);
 }

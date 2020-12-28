@@ -17,11 +17,11 @@
 #include <glm.hpp>
 #include <gtc/type_ptr.hpp>
 #include <algorithm> 
-#include "src/Graphics/renderable3D.h"
 #include "src/Graphics/simplerenderer3D.h"
+#include "src/Graphics/renderable3D.h"
 #include "src/vendor/Models/cube.h"
 #include "src/Graphics/mesh.h"
-#include "src/Graphics//model.h"
+#include "src/Graphics/model.h"
 
 
 using namespace GameEngineTest;
@@ -40,10 +40,10 @@ int main()
 	Shader shader2("src/shaders/vertex.shader", "src/shaders/lightsourceFrag.shader");
 	Shader shader3("src/shaders/vertex.shader", "src/shaders/fragment.shader");
 
-	Texture texture("H:\\ProgrammingProjects\\repos\\GameEngineTest\\GameEngineTest\\textures\\sample_gigatextures_4096_seamless2.png");
-	Texture texture2("H:\\ProgrammingProjects\\repos\\GameEngineTest\\GameEngineTest\\textures\\tileable-grass_clover_tt7010116-sample_1.png");
-	Texture texture3("H:\\ProgrammingProjects\\repos\\GameEngineTest\\GameEngineTest\\textures\\381f5a63791945.5abc4ccf1297d.png");
-	Texture* textures[] = {	&texture, &texture2, &texture3 };
+	//Texture texture("H:\\ProgrammingProjects\\repos\\GameEngineTest\\GameEngineTest\\textures\\sample_gigatextures_4096_seamless2.png");
+	//Texture texture2("H:\\ProgrammingProjects\\repos\\GameEngineTest\\GameEngineTest\\textures\\tileable-grass_clover_tt7010116-sample_1.png");
+	//Texture texture3("H:\\ProgrammingProjects\\repos\\GameEngineTest\\GameEngineTest\\textures\\381f5a63791945.5abc4ccf1297d.png");
+	//Texture* textures[] = {	&texture, &texture2, &texture3 };
 
 
 	vec2 *translations = new vec2[900];
@@ -99,7 +99,8 @@ int main()
 
 	//glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 	
-	texture3.Bind(0);
+	//texture3.Bind(0);
+
 	//-----------shader settings------------
 	shader.setUniform1i("tex", 0);
 	//shader.setUniform3f("lightColor", vec3(0.505882f, 0.59609f, 0.70f)); //moonlight color
@@ -123,28 +124,30 @@ int main()
 	Renderer3D renderer3D;
 	
 
-	Model model("H:\\ProgrammingProjects\\repos\\GameEngineTest\\GameEngineTest\\Models\\Backpack\\backpack.obj");
-	Model model2("H:\\ProgrammingProjects\\repos\\GameEngineTest\\GameEngineTest\\Models\\gencor\\millennium-falcon.obj"); 
-	//Renderable3D backpack(model, 8 * model.getVertexCount(), layout, 3, 8 * sizeof(float));
+	//Model backpack("H:\\ProgrammingProjects\\repos\\GameEngineTest\\GameEngineTest\\Models\\backpack\\backpack.obj");
+	//Model basketball("H:\\ProgrammingProjects\\repos\\GameEngineTest\\GameEngineTest\\Models\\ball\\uploads_files_2222080_ball_obj.obj"); 
+	Model Arianna("H:\\ProgrammingProjects\\repos\\GameEngineTest\\GameEngineTest\\Models\\girl\\Girl_5.obj");
 	
-	glm::mat4 modell = glm::mat4(1.0f);
-	glm::mat4 view = glm::mat4(1.0f);
-	glm::mat4 projection = glm::perspective(glm::radians(45.0f), 1920.0f / 1080.0f, 0.1f, 100.0f);
+	//basketball.scale(5, 5, 5);
+	//basketball.translate(0, 0.5f, 0);
+
+	Arianna.scale(5, 5, 5);
+
 	while (!window.closed()) {
 		window.clear();
 		camera = glm::lookAt(window.cameraPos, window.cameraPos + window.cameraFront, window.cameraUp); // camera movement operations on view matrix each frame.
 			
-		model2.Draw(shader3, camera);
+		//backpack.Draw(shader3, camera);
+		//basketball.Draw(shader3, camera);
+		Arianna.Draw(shader3, camera);
 
-		int i = 0;
-
+		//int i = 0;
 		//for (Renderable3D* item : cubes)
 		//{
 		//	renderer3D.singleDraw(*item, shader, camera, 36);
 		//	item->rotate(0.0005f * 10.0f, rotationDirection[i].x, rotationDirection[i].y, rotationDirection[i].z);
 		//	rotationDirection[i++];
 		//}
-
 
 		renderer3D.singleDraw(light, shader2, camera, 36);
 		shader.setUniform2f("light_pos", vec2(lightX, lightY));

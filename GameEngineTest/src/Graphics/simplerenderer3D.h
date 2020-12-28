@@ -1,11 +1,7 @@
 #pragma once
-#include <GL/glew.h>
-#include <glm.hpp>
-#include <gtc/type_ptr.hpp>
-#include <gtc/matrix_transform.hpp>
-#include <algorithm> 
 #include "renderable3D.h"
 #include "shader.h"
+
 namespace GameEngineTest {
 	namespace Graphics {
 

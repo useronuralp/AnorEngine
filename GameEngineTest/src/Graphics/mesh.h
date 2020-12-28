@@ -1,7 +1,6 @@
 #pragma once
 #include <vector>
 #include "shader.h"
-#include "texture.h"
 #include <glm.hpp>
 #include <gtc/matrix_transform.hpp>
 #include <gtc/type_ptr.hpp>
@@ -15,25 +14,30 @@ namespace GameEngineTest {
             glm::vec3 Normal;
         };
 
+        struct TextureInfo {
+            unsigned int id;
+            std::string type;
+            std::string path;
+        };
+
         class Mesh {
         public:
-            // mesh data
             std::vector<Vertex>       vertices;
-            //std::vector<unsigned int> indices;
-            //std::vector<Texture>      textures;
-
-            Mesh(std::vector<Vertex> vertices);
-            void Draw(Shader& shader, glm::mat4 camera);
+            std::vector<unsigned int> indices;
+            std::vector<TextureInfo>  textures;
         private:
-
-            glm::mat4 modelMatrix = glm::mat4(1.0f);
-            glm::mat4 viewMatrix = glm::mat4(1.0f); //TODO: Fix this part later looks bad.
-            glm::mat4 projectionMatrix = glm::perspective(glm::radians(45.0f), 1920.0f / 1080.0f, 0.1f, 100.0f);
-
+            glm::mat4 modelMatrix;
+            glm::mat4 viewMatrix;
+            glm::mat4 projectionMatrix;
             //  render data
             unsigned int VAO, VBO, EBO;
-
+        private:
             void setupMesh();
+        public:
+            // mesh data
+            Mesh(std::vector<Vertex> vertices, std::vector<unsigned int> indices, std::vector<TextureInfo> textures);
+            void Draw(Shader& shader, glm::mat4 camera);
+            glm::mat4& getModelMatrix() { return modelMatrix; }
         };
 
     }

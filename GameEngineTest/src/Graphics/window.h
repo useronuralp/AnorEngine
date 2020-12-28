@@ -24,7 +24,6 @@ namespace GameEngineTest {
 			bool isMouseCaptured = false;
 			float deltaTime = 0.0f;	// Time between current frame and last frame
 			float lastFrame = 0.0f; // Time of last frame
-			float currentFrame;
 			bool firstMouse = true;
 			float lastY = m_Height / 2.0f;
 			float lastX = m_Width / 2.0f;
@@ -35,7 +34,7 @@ namespace GameEngineTest {
 			glm::vec3 cameraPos = glm::vec3(0.0f, 2.0f, 5.0f);
 			glm::vec3 cameraFront = glm::vec3(0.0f, 0.0f, -1.0f);
 			glm::vec3 cameraUp = glm::vec3(0.0f, 1.0f, 0.0f);
-			const float cameraSpeed = 0.005f; // adjust accordingly
+			float cameraSpeed = 0.005f; // adjust accordingly
 		public:
 			Window(const char* name, int width, int height);
 			~Window();
