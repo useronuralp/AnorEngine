@@ -130,7 +130,12 @@ int main()
 	//basketball.scale(5, 5, 5);
 	//basketball.translate(0, 0.5f, 0);
 
+
+
+
 	Arianna.scale(5, 5, 5);
+
+
 
 	while (!window.closed()) {
 		window.clear();
