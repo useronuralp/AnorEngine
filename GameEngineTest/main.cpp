@@ -122,7 +122,6 @@ int main()
 
 	glm::mat4 camera;
 	Renderer3D renderer3D;
-	
 
 	//Model backpack("H:\\ProgrammingProjects\\repos\\GameEngineTest\\GameEngineTest\\Models\\backpack\\backpack.obj");
 	//Model basketball("H:\\ProgrammingProjects\\repos\\GameEngineTest\\GameEngineTest\\Models\\ball\\uploads_files_2222080_ball_obj.obj"); 
@@ -131,7 +130,9 @@ int main()
 	//basketball.scale(5, 5, 5);
 	//basketball.translate(0, 0.5f, 0);
 
+
 	Arianna.scale(5, 5, 5);
+
 
 	while (!window.closed()) {
 		window.clear();
