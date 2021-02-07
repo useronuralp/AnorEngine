@@ -131,14 +131,14 @@ int main()
 	basketball.translate(0, 0.5f, 0);
 
 	Arianna.scale(5, 5, 5);
-
+	
 	while (!window.closed()) {
 		window.clear();
 		camera = glm::lookAt(window.cameraPos, window.cameraPos + window.cameraFront, window.cameraUp); // camera movement operations on view matrix each frame.
-			
-		backpack.Draw(shader3, camera);
-		basketball.Draw(shader3, camera);
-		//Arianna.Draw(shader3, camera);
+
+		//backpack.Draw(shader3, camera);
+		//basketball.Draw(shader3, camera);
+		Arianna.Draw(shader3, camera);
 
 		//int i = 0;
 		//for (Renderable3D* item : cubes)

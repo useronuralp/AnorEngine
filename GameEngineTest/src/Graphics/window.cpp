@@ -172,8 +172,9 @@ namespace GameEngineTest {
 				std::cout << "OpenGL ERROR: " << error << std::endl;
 
 			float currentFrame = glfwGetTime();
-			deltaTime = currentFrame - lastFrame;
+			deltaTime = currentFrame - lastFrame;	//delta time implementation. You could abstract this.
 			lastFrame = currentFrame;
+
 			cameraSpeed = 3 * deltaTime; //adjust speed here.
 			for (std::pair<char, bool> key : m_Keys)
 			{
