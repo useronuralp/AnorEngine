@@ -1,28 +1,4 @@
-#include "src/Graphics/window.h"
-#include "src/Math/maths.h"
-#include "src/Graphics/shader.h"
-#include "src/Graphics/Buffers/buffer.h"
-#include "src/Graphics/Buffers/indexbuffer.h"
-#include "src/Graphics/Buffers/vertexarray.h"
-#include "src/Graphics/renderer2D.h"
-#include "src/Graphics/renderable2D.h"
-#include "src/Graphics/simpleRenderer2D.h"
-#include "src/Graphics/static_sprite.h"
-#include "src/Graphics/batchrenderer2D.h"
-#include "src/Graphics/sprite.h"
-#include <time.h>
-#include "src/Graphics/Layers/tilelayer.h"
-#include "src/Graphics/texture.h"
-#include <gtc/matrix_transform.hpp>
-#include <glm.hpp>
-#include <gtc/type_ptr.hpp>
-#include <algorithm> 
-#include "src/Graphics/simplerenderer3D.h"
-#include "src/Graphics/renderable3D.h"
-#include "src/vendor/Models/cube.h"
-#include "src/Graphics/mesh.h"
-#include "src/Graphics/model.h"
-
+#include <Engine.h> 
 
 using namespace GameEngineTest;
 using namespace Math;
@@ -34,7 +10,7 @@ int main()
 	
 	srand(time(NULL));
 
-	Window window("Onuralp", 1920, 1080);
+	Window window("Onuralp_Engine", 1920, 1080);
 	
 	Shader shader("src/shaders/vertex.shader", "src/shaders/fragment.shader");
 	Shader shader2("src/shaders/vertex.shader", "src/shaders/lightsourceFrag.shader");
@@ -125,7 +101,7 @@ int main()
 
 	Model backpack("H:\\ProgrammingProjects\\repos\\GameEngineTest\\GameEngineTest\\Models\\backpack\\backpack.obj");
 	Model basketball("H:\\ProgrammingProjects\\repos\\GameEngineTest\\GameEngineTest\\Models\\ball\\uploads_files_2222080_ball_obj.obj"); 
-	Model Arianna("H:\\ProgrammingProjects\\repos\\GameEngineTest\\GameEngineTest\\Models\\girl\\Girl_5.obj");
+	Model Arianna("H:\\ProgrammingProjects\\repos\\GameEngineTest\\GameEngineTest\\Models\\girl\\Girl_1.obj");
 	
 	basketball.scale(5, 5, 5);
 	basketball.translate(0, 0.5f, 0);
@@ -147,7 +123,6 @@ int main()
 		//	item->rotate(0.0005f * 10.0f, rotationDirection[i].x, rotationDirection[i].y, rotationDirection[i].z);
 		//	rotationDirection[i++];
 		//}
-
 		renderer3D.singleDraw(light, shader2, camera, 36);
 		shader.setUniform2f("light_pos", vec2(lightX, lightY));
 		window.update();
