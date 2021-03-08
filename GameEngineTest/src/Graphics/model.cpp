@@ -14,12 +14,14 @@ namespace GameEngineTest {
 			const aiScene* scene = import.ReadFile(path, aiProcess_Triangulate | aiProcess_FlipUVs);
 
 			if (!scene || scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !scene->mRootNode)
-			{
-				std::cout << "ERROR::ASSIMP::" << import.GetErrorString() << std::endl;
+			{	
+				CRITICAL("ERROR::ASSIMP:: {0}", import.GetErrorString());
+				//std::cout << "ERROR::ASSIMP::" << import.GetErrorString() << std::endl;
 				return;
 			}
 			directory = path.substr(0, path.find_last_of("\\/"));
-			std::cout << "Directory name: "<< directory << std::endl;
+			INFO("Directory name: {0}", directory);
+			//std::cout << "Directory name: "<< directory << std::endl;
 			processNode(scene->mRootNode, scene);
 		}
 		void Model::processNode(aiNode* node, const aiScene* scene)
@@ -33,7 +35,8 @@ namespace GameEngineTest {
 			// then do the same for each of its children
 			for (unsigned int i = 0; i < node->mNumChildren; i++)
 			{
-				std::cout << node->mChildren[i]->mName.C_Str() << std::endl;
+				//spdlog::info("Loaded part: {0}", node->mChildren[i]->mName.C_Str());
+				//std::cout << node->mChildren[i]->mName.C_Str() << std::endl;
 				processNode(node->mChildren[i], scene);
 			}
 		}
@@ -154,11 +157,13 @@ namespace GameEngineTest {
 				glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
 				stbi_image_free(data);
-				std::cout << "LOAD SUCCSESFUL FROM: " << path << std::endl;
+				INFO("Textures succesfuly loaded from path: {0}", path);
+				//std::cout << "LOAD SUCCSESFUL FROM: " << path << std::endl;
 			}
 			else
 			{
-				std::cout << "Texture failed to load at path: " << path << std::endl;
+				CRITICAL("Textures failed to load from path: {0}", path);
+				//std::cout << "Texture failed to load at path: " << path << std::endl;
 				stbi_image_free(data);
 			}
 			return textureID;

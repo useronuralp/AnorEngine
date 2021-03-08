@@ -81,6 +81,9 @@
     <ClCompile Include="SandboxApplication.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\utils\Logger.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\Graphics\window.h">
@@ -165,6 +168,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\Engine.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\utils\Logger.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

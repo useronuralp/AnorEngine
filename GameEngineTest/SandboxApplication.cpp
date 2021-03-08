@@ -1,13 +1,16 @@
+//This .cpp file is our entry point. You could create a seperate project and make that project the client if you want to make this program more modular.
+//Also, if you happen to seperate the client and engine sides, remember to compile the engine code into a .dll file and link it with the client. "__declspec(dllexport/dllimport)"
+
 #include <Engine.h> 
 
 using namespace GameEngineTest;
 using namespace Math;
 using namespace Graphics;
 
-
 int main()
 {		
 	
+	Logger::init(); //this is a must do step when you initialize the engine or the client. Make something like an init function for the engine code in the future to put such initialization codes inside.
 	srand(time(NULL));
 
 	Window window("Onuralp_Engine", 1920, 1080);
@@ -47,9 +50,7 @@ int main()
 		shader2.setUniform2f("offsets[" + std::to_string(i) + "]", translations[i]);
 	}
 
-
 	delete[] translations;
-
 
 	int layout[] = { UV_VALUE, POSITION_VALUE, NORMAL_VALUE};
 	Renderable3D cube(Shape::vertices, 8 * 6 * 6, layout, 3, 8 * sizeof(float));
@@ -102,19 +103,24 @@ int main()
 	Model backpack("H:\\ProgrammingProjects\\repos\\GameEngineTest\\GameEngineTest\\Models\\backpack\\backpack.obj");
 	Model basketball("H:\\ProgrammingProjects\\repos\\GameEngineTest\\GameEngineTest\\Models\\ball\\uploads_files_2222080_ball_obj.obj"); 
 	Model Arianna("H:\\ProgrammingProjects\\repos\\GameEngineTest\\GameEngineTest\\Models\\girl\\Girl_1.obj");
-	
+	Model WinterGirl("H:\\ProgrammingProjects\\repos\\GameEngineTest\\GameEngineTest\\Models\\WinterGirl\\source\\Winter_Girl.obj");
+
 	basketball.scale(5, 5, 5);
 	basketball.translate(0, 0.5f, 0);
 
 	Arianna.scale(5, 5, 5);
-	
+
+
 	while (!window.closed()) {
 		window.clear();
 		camera = glm::lookAt(window.cameraPos, window.cameraPos + window.cameraFront, window.cameraUp); // camera movement operations on view matrix each frame.
 
-		//backpack.Draw(shader3, camera);
-		//basketball.Draw(shader3, camera);
-		Arianna.Draw(shader3, camera);
+
+		backpack.Draw(shader3, camera);
+		basketball.Draw(shader3, camera);
+		//Arianna.Draw(shader3, camera);
+		
+		//WinterGirl.Draw(shader3, camera);
 
 		//int i = 0;
 		//for (Renderable3D* item : cubes)
@@ -123,8 +129,8 @@ int main()
 		//	item->rotate(0.0005f * 10.0f, rotationDirection[i].x, rotationDirection[i].y, rotationDirection[i].z);
 		//	rotationDirection[i++];
 		//}
+
 		renderer3D.singleDraw(light, shader2, camera, 36);
-		shader.setUniform2f("light_pos", vec2(lightX, lightY));
 		window.update();
 	}
 	return 0;
