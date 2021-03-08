@@ -8,6 +8,7 @@
 #define WARN(...) GameEngineTest::Logger::getConsole()->warn(__VA_ARGS__)
 #define CRITICAL(...) GameEngineTest::Logger::getConsole()->critical(__VA_ARGS__)
 
+
 namespace GameEngineTest {
 	
 	static class Logger
