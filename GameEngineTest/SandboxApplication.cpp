@@ -103,7 +103,6 @@ int main()
 	Model backpack("H:\\ProgrammingProjects\\repos\\GameEngineTest\\GameEngineTest\\Models\\backpack\\backpack.obj");
 	Model basketball("H:\\ProgrammingProjects\\repos\\GameEngineTest\\GameEngineTest\\Models\\ball\\uploads_files_2222080_ball_obj.obj"); 
 	Model Arianna("H:\\ProgrammingProjects\\repos\\GameEngineTest\\GameEngineTest\\Models\\girl\\Girl_1.obj");
-	Model WinterGirl("H:\\ProgrammingProjects\\repos\\GameEngineTest\\GameEngineTest\\Models\\WinterGirl\\source\\Winter_Girl.obj");
 
 	basketball.scale(5, 5, 5);
 	basketball.translate(0, 0.5f, 0);
@@ -119,8 +118,6 @@ int main()
 		backpack.Draw(shader3, camera);
 		basketball.Draw(shader3, camera);
 		//Arianna.Draw(shader3, camera);
-		
-		//WinterGirl.Draw(shader3, camera);
 
 		//int i = 0;
 		//for (Renderable3D* item : cubes)
