@@ -1,6 +1,6 @@
 //This .cpp file is our entry point. You could create a seperate project and make that project the client if you want to make this program more modular.
 //Also, if you happen to seperate the client and engine sides, remember to compile the engine code into a .dll file and link it with the client. "__declspec(dllexport/dllimport)"
-
+#include "pch.h"
 #include <Engine.h> 
 
 using namespace GameEngineTest;
@@ -11,6 +11,7 @@ int main()
 {		
 	
 	Logger::init(); //this is a must do step when you initialize the engine or the client. Make something like an init function for the engine code in the future to put such initialization codes inside.
+	//if you don't initialize this, model.cpp file won't compile and you'll get errors.
 	srand(time(NULL));
 
 	Window window("Onuralp_Engine", 1920, 1080);
@@ -38,7 +39,6 @@ int main()
 			translations[index++] = translation;
 		}
 	}
-
 
 	for (unsigned int i = 0; i < 900; i++)
 	{
@@ -68,7 +68,6 @@ int main()
 		cubes[i]->translate(i, 0, 1 * (rand() % 100 < 50 ? -1 : 1));		
 		rotationDirection[i] = vec3(rand() % 10 / 10.0f, rand() % 10 / 10.0f, rand() % 10 / 10.0f);
 	}
-
 
 	float lightX = 2, lightY = 3;
 	light.translate(lightX, lightY, 0.0f);

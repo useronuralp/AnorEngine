@@ -1,5 +1,5 @@
+#include "pch.h"
 #include "indexbuffer.h"
-
 namespace GameEngineTest {
 	namespace Graphics {
 

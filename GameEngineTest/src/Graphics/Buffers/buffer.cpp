@@ -1,5 +1,5 @@
+#include "pch.h"
 #include "buffer.h"
-
 namespace GameEngineTest{
 	namespace Graphics {
 

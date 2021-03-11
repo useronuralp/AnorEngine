@@ -1,5 +1,4 @@
 #pragma once
-#include <vector>
 #include "shader.h"
 #include <glm.hpp>
 #include <gtc/matrix_transform.hpp>

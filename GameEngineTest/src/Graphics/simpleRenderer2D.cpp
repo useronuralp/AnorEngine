@@ -1,3 +1,4 @@
+#include "pch.h"
 #include "simpleRenderer2D.h"
 #include "renderer2D.h"
 #include <time.h>

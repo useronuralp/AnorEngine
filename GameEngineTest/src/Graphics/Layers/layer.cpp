@@ -1,5 +1,5 @@
+#include "pch.h"
 #include "layer.h"
-
 namespace GameEngineTest {
 	namespace Graphics {
 		Layer::Layer(Renderer2D* renderer, Shader* shader, Math::mat4 projectionMatrix)

@@ -1,7 +1,6 @@
 #pragma once
 #include <GL/glew.h>
 #include "../utils/fileutils.h"
-#include <vector>
 #include "../Math/maths.h"
 
 

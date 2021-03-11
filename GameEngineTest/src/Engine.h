@@ -14,13 +14,11 @@
 #include "Graphics/static_sprite.h"
 #include "Graphics/batchrenderer2D.h"
 #include "Graphics/sprite.h"
-#include <time.h>
 #include "Graphics/Layers/tilelayer.h"
 #include "Graphics/texture.h"
 #include <gtc/matrix_transform.hpp>
 #include <glm.hpp>
 #include <gtc/type_ptr.hpp>
-#include <algorithm> 
 #include "Graphics/simplerenderer3D.h"
 #include "Graphics/renderable3D.h"
 #include "vendor/Models/cube.h"

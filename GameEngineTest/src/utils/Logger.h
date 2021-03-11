@@ -2,7 +2,6 @@
 #include "spdlog/logger.h" //you can write your own wrapper for this library in the future.
 #include "spdlog/spdlog.h"
 #include "spdlog/sinks/stdout_color_sinks.h"
-#include <stdlib.h>
 
 #define INFO(...) GameEngineTest::Logger::getConsole()->info(__VA_ARGS__)
 #define WARN(...) GameEngineTest::Logger::getConsole()->warn(__VA_ARGS__)
@@ -10,7 +9,7 @@
 
 namespace GameEngineTest {
 	
-	static class Logger
+	class Logger
 	{
 	private:
 		static std::shared_ptr<spdlog::logger> console;

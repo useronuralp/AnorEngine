@@ -1,5 +1,5 @@
+#include "pch.h"
 #include "vertexarray.h"
-
 namespace GameEngineTest {
 	namespace Graphics {
 

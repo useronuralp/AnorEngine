@@ -1,3 +1,4 @@
+#include "pch.h"
 #include "renderer2D.h"
 #include "static_sprite.h"
 

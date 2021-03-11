@@ -1,4 +1,5 @@
 #pragma once
+#include "pch.h"
 #include "../renderable2D.h"
 
 namespace GameEngineTest {

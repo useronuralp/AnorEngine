@@ -1,11 +1,10 @@
 #pragma once
-#define _USE_MATH_DEFINES
-#include <math.h>
+#include "pch.h"
 #include "vec2.h"
 #include "vec3.h"
 #include "vec4.h"
 #include "mat4.h"
-
+# define M_PI           3.14159265358979323846  /* pi */
 namespace GameEngineTest {
 	namespace Math {
 		inline float toRadians(float degrees) {

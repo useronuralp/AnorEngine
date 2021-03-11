@@ -1,3 +1,4 @@
+#include "pch.h"
 #include "sprite.h"
 #include "../Math/maths.h"
 

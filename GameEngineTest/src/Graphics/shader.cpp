@@ -1,3 +1,4 @@
+#include "pch.h"
 #include "shader.h"
 namespace GameEngineTest {
 	namespace Graphics {

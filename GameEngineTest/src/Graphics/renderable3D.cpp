@@ -1,5 +1,5 @@
+#include "pch.h"
 #include "renderable3D.h"
-
 namespace GameEngineTest {
 	namespace Graphics {
 

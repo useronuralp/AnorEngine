@@ -1,5 +1,5 @@
+#include "pch.h"
 #include "batchrenderer2D.h"
-
 
 namespace GameEngineTest {
 	namespace Graphics {

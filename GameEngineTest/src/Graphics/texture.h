@@ -1,5 +1,4 @@
 #pragma once
-#include <string>
 #include "../vendor/stb_image/stb_image.h"
 #include <GL/glew.h>
 

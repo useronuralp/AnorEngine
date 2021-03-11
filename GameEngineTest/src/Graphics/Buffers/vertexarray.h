@@ -1,6 +1,5 @@
 #pragma once
 #include <GL/glew.h>
-#include <vector>
 #include "buffer.h"
 namespace GameEngineTest {
 	namespace Graphics {
