@@ -13,13 +13,13 @@ namespace GameEngineTest {
 		constexpr auto COLOR_VALUE = 3;
 		constexpr auto NORMAL_VALUE = 4;
 
-		struct VertexInfo {
+		struct ENGINE_API VertexInfo {
 			glm::vec3 Position;
 			glm::vec2 TexCoords;
 			glm::vec3 Normal;
 		};
 
-		class Renderable3D
+		class ENGINE_API Renderable3D
 		{
 		public:
 			glm::mat4 modelMatrix;

@@ -7,7 +7,7 @@
 namespace GameEngineTest {
 	namespace Graphics {
 
-		class Shader {
+		class ENGINE_API Shader {
 
 		private:
 			GLuint m_ShaderID;

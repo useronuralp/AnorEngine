@@ -3,7 +3,7 @@
 namespace GameEngineTest {
 	namespace Graphics {
 
-		class Sprite : public Renderable2D
+		class ENGINE_API Sprite : public Renderable2D
 		{
 		private:
 		public:

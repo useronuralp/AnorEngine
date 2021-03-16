@@ -7,19 +7,19 @@
 namespace GameEngineTest {
     namespace Graphics {
 
-        struct Vertex {
+        struct ENGINE_API Vertex {
             glm::vec3 Position;
             glm::vec2 TexCoords;
             glm::vec3 Normal;
         };
 
-        struct TextureInfo {
+        struct ENGINE_API TextureInfo {
             unsigned int id;
             std::string type;
             std::string path;
         };
 
-        class Mesh {
+        class ENGINE_API Mesh {
         public:
             std::vector<Vertex>       vertices;
             std::vector<unsigned int> indices;

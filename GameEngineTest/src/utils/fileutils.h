@@ -1,11 +1,12 @@
 #pragma once
+#include "pch.h"
 namespace GameEngineTest {
 
 
 	class FileUtils {
 
 	public:
-		static std::string read_file(const char* filepath) // a beautiful file reading system look into this later. Advantage of this kind of
+		static ENGINE_API std::string read_file(const char* filepath) // a beautiful file reading system look into this later. Advantage of this kind of
 			//file reading is that it is very fast.
 		{
 			FILE* file = fopen(filepath, "rt");

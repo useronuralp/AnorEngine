@@ -1,16 +1,17 @@
 #pragma once 
+#include <map>
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
 #include <glm.hpp>
 namespace GameEngineTest {
 	namespace Graphics {
 
-		struct MousePosition
+		struct ENGINE_API MousePosition
 		{
 			double x, y;
 		};
 
-		class Window {
+		class ENGINE_API Window {
 		private:
 			std::map<char, bool> m_Keys = {{'W', false }, {'S', false }, {'A', false}, {'D', false}};
 			const char *m_Title;
@@ -21,7 +22,7 @@ namespace GameEngineTest {
 			bool isMouseCaptured = false;
 			float deltaTime = 0.0f;	// Time between current frame and last frame
 			float lastFrame = 0.0f; // Time of last frame
-			bool firstMouse = true;
+			bool isFirstMouseCapture = true;
 			float lastY = m_Height / 2.0f;
 			float lastX = m_Width / 2.0f;
 			float YAW = -90.0f;
@@ -37,17 +38,18 @@ namespace GameEngineTest {
 			~Window();
 			void clear() const;
 			void update();
-			bool closed() const;
+			bool isClosed() const;
 			void drawRightAngledTriangle();
 			inline void getMousePosition(double& x, double& y) { x = mousePosition.x; y = mousePosition.y; }
+			inline bool* getMouseCaptured() { return &isMouseCaptured; } //dumb way of getting a private variable
+			inline bool* getFirstMouseCaptured() { return &isFirstMouseCapture; }
 			inline int getHeight() { return m_Height; }
 			inline int getWidth() { return m_Width; }
 		private:
 			bool init();
-			friend static void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods);
-			friend static void mouse_button_callback(GLFWwindow* window, int button, int action, int mods);
-			friend static void cursor_position_callback(GLFWwindow* window, double xpos, double ypos);
-
+			//friend static void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods);
+			//friend static void mouse_button_callback(GLFWwindow* window, int button, int action, int mods);
+			//friend static void cursor_position_callback(GLFWwindow* window, double xpos, double ypos);
 		};
 	}
 }

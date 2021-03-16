@@ -2,7 +2,7 @@
 #include <GL/glew.h>
 namespace GameEngineTest {
 	namespace Graphics {
-		class Buffer
+		class ENGINE_API Buffer
 		{
 		private:
 			GLuint m_BufferID;

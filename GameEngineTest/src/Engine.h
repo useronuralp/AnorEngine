@@ -1,7 +1,11 @@
 #pragma once
 
 //For use only by Client programs. Do not include this in actual engine code.
+#include "core.h"
 
+#include "Application.h"
+
+//-----Engine modules---------------
 #include "Graphics/window.h"
 #include "Math/maths.h"
 #include "Graphics/shader.h"
@@ -24,3 +28,11 @@
 #include "vendor/Models/cube.h"
 #include "Graphics/mesh.h"
 #include "Graphics/model.h"
+
+#include "utils/Logger.h"
+
+
+
+//--------------------Entry point--------------------
+#include "EntryPoint.h"
+//--------------------Entry point--------------------

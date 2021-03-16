@@ -4,7 +4,7 @@
 	 namespace GameEngineTest {
 		namespace Math {
 
-			struct mat4 {
+			struct ENGINE_API mat4 {
 
 				union {
 					float elements[4 * 4];

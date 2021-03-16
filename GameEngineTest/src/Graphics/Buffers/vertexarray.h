@@ -2,9 +2,9 @@
 #include <GL/glew.h>
 #include "buffer.h"
 namespace GameEngineTest {
-	namespace Graphics {
+	namespace  Graphics {
 
-		class VertexArray
+		class ENGINE_API VertexArray
 		{
 		private:
 			GLuint m_ArrayID;

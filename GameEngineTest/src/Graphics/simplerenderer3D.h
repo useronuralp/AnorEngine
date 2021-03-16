@@ -5,7 +5,7 @@
 namespace GameEngineTest {
 	namespace Graphics {
 
-		class Renderer3D
+		class ENGINE_API Renderer3D
 		{
 			int modelLocation;
 			int viewLocation;  //these variables grab the locaiton of corresponding matrices from the shader.

@@ -1,15 +1,13 @@
 #pragma once
 #include "../vendor/stb_image/stb_image.h"
 #include "mesh.h"
-#include <string.h>
 #include <assimp/Importer.hpp>
 #include <assimp/scene.h>
 #include <assimp/postprocess.h>
-#include <utils/Logger.h>
 
 namespace GameEngineTest {
     namespace Graphics {
-        class Model 
+        class ENGINE_API Model
         {
         public:
             Model(const char* path)

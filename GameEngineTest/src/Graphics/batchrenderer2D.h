@@ -19,7 +19,7 @@ namespace GameEngineTest {
 
 
 
-			class BatchRenderer2D : public Renderer2D
+			class ENGINE_API BatchRenderer2D : public Renderer2D
 			{
 			private:
 				GLuint m_VAO;

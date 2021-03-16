@@ -93,28 +93,28 @@ namespace GameEngineTest {
 
 
 
-		mat4 mat4::orthographic(float left, float right, float bottom, float top, float near, float far)
+		mat4 mat4::orthographic(float left, float right, float bottom, float top, float nearPlane, float farPlane)
 		{
 			mat4 result(1.0f);
 
 			result.elements[0 + 0 * 4] = 2.0f / (right - left);
 			result.elements[1 + 1 * 4] = 2.0f / (top - bottom); // check this later there could be problems
-			result.elements[2 + 2 * 4] = 2 / (near - far); //with ordering
+			result.elements[2 + 2 * 4] = 2 / (nearPlane - farPlane); //with ordering
 			result.elements[0 + 3 * 4] = (left + right) / (left - right);
 			result.elements[1 + 3 * 4] = (bottom + top) / (bottom - top);
-			result.elements[2 + 3 * 4] = (far + near) / (far - near);
+			result.elements[2 + 3 * 4] = (farPlane + nearPlane) / (farPlane - nearPlane);
 			
 			return result;
 		}
-		mat4 mat4::perspective(float fov, float aspectRatio, float near, float far)
+		mat4 mat4::perspective(float fov, float aspectRatio, float nearPlane, float farPlane)
 		{	
 			mat4 result = result.identity();
 
 			float q = 1.0f / tan(toRadians(0.5f * fov));
 			float a = q / aspectRatio;
 
-			float b = (near + far) / (near - far);
-			float c = (2.0f * near * far) / (near - far);
+			float b = (nearPlane + farPlane) / (nearPlane - farPlane);
+			float c = (2.0f * nearPlane * farPlane / (nearPlane - farPlane));
 
 			result.elements[0 + 0 * 4] = a;
 			result.elements[1 + 1 * 4] = q;

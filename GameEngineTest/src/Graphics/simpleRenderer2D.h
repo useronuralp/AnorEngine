@@ -6,7 +6,7 @@
 namespace GameEngineTest {
 	namespace Graphics {
 
-		class SimpleRenderer2D : public Renderer2D
+		class ENGINE_API SimpleRenderer2D : public Renderer2D
 		{
 		private:
 			std::deque<const StaticSprite*> m_RenderQueue;

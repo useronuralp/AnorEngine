@@ -22,120 +22,10 @@ namespace GameEngineTest {
 		{	
 			glfwTerminate();
 		}
-		
-
-		void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods) //friend definition
-		{
-			Window* win =  (Window*) glfwGetWindowUserPointer(window);
-			if (key == GLFW_KEY_W && (action == GLFW_PRESS))
-			{
-				win->m_Keys['W'] = true;
-			}
-			else if ((key == GLFW_KEY_W && (action == GLFW_RELEASE)))
-			{	
-				win->m_Keys['W'] = false;
-			}
-			if (key == GLFW_KEY_S && (action == GLFW_PRESS))
-			{
-				win->m_Keys['S'] = true;
-			}
-			else if ((key == GLFW_KEY_S && (action == GLFW_RELEASE)))
-			{
-				win->m_Keys['S'] = false;
-			}
-			if (key == GLFW_KEY_A && (action == GLFW_PRESS))
-			{
-				win->m_Keys['A'] = true;
-			}
-			else if ((key == GLFW_KEY_A && (action == GLFW_RELEASE)))
-			{
-				win->m_Keys['A'] = false;
-			}
-			if (key == GLFW_KEY_D && (action == GLFW_PRESS))
-			{
-				win->m_Keys['D'] = true;
-			}
-			else if ((key == GLFW_KEY_D && (action == GLFW_RELEASE)))
-			{
-				win->m_Keys['D'] = false;
-			}
-			if (key == GLFW_KEY_LEFT_CONTROL && action == GLFW_PRESS)
-			{
-				if (!win->isMouseCaptured)
-				{
-					glfwSetInputMode(win->m_Window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
-					win->isMouseCaptured = true;
-				}
-				else
-				{
-					glfwSetInputMode(win->m_Window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
-					win->isMouseCaptured = false;
-				}
-			}
-		}
-
-		void mouse_button_callback(GLFWwindow* window, int button, int action, int mods) //friend definition
-		{
-			//Window* win =  (Window*) glfwGetWindowUserPointer(window);
-			if (button == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_PRESS)
-			{
-				//std::cout << "Pressed Mouse button LEFT!" << std::endl;
-			}
-			if (button == GLFW_MOUSE_BUTTON_RIGHT && action == GLFW_PRESS)
-			{
-				//std::cout << "Pressed Mouse button RIGHT!" << std::endl;
-			}
-		}
-
-		void cursor_position_callback(GLFWwindow* window, double xpos, double ypos)  //friend definition
-		{
-			Window* win =  (Window*) glfwGetWindowUserPointer(window);
-			//glfwSetInputMode(win->m_Window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
-			if (glfwGetInputMode(win->m_Window, GLFW_CURSOR) == GLFW_CURSOR_DISABLED)
-			{
-
-				if (win->firstMouse)
-				{
-					win->lastX = (float)xpos;
-					win->lastY = (float)ypos;
-					win->firstMouse = false;
-				}
-
-
-				float xoffset = (float)(xpos - win->lastX);
-				float yoffset = (float)(win->lastY - ypos);
-				win->lastX = (float)xpos;
-				win->lastY = (float)ypos;
-
-				
-				xoffset *= win->sensitivity;
-				yoffset *= win->sensitivity;
-
-				win->YAW += xoffset;
-				win->PITCH += yoffset;
-
-				if (win->PITCH > 89.0f)
-					win->PITCH = 89.0f;
-				if (win->PITCH < -89.0f)
-					win->PITCH = -89.0f;
-
-				glm::vec3 direction;
-				direction.x = cos(glm::radians(win->YAW)) * cos(glm::radians(win->PITCH));
-				direction.y = sin(glm::radians(win->PITCH));
-				direction.z = sin(glm::radians(win->YAW)) * cos(glm::radians(win->PITCH));
-				win->cameraFront = glm::normalize(direction);
-
-
-
-				win->mousePosition.x = xpos;
-				win->mousePosition.y = ypos;
-			}
-		}
 
 		bool Window::init()
 		{	
 			
-
 			if (!glfwInit()) //calling glfwInit() inside this if statement.
 			{
 				std::cout << "Failed to initialize GLFW." << std::endl;
@@ -156,11 +46,115 @@ namespace GameEngineTest {
 				return false;
 			}
 
+			
+			glfwSetKeyCallback(m_Window, [](GLFWwindow* window, int key, int scancode, int action, int mods) //example of smart use of lambdas here. However, you'll have to define the body of the function here
+				//if you wanna use lambdas like this.
+			{
+				Window* win = (Window*)glfwGetWindowUserPointer(window);
+				if (key == GLFW_KEY_W && (action == GLFW_PRESS))
+				{
+					win->m_Keys['W'] = true;
+				}
+				else if ((key == GLFW_KEY_W && (action == GLFW_RELEASE)))
+				{
+					win->m_Keys['W'] = false;
+				}
+				if (key == GLFW_KEY_S && (action == GLFW_PRESS))
+				{
+					win->m_Keys['S'] = true;
+				}
+				else if ((key == GLFW_KEY_S && (action == GLFW_RELEASE)))
+				{
+					win->m_Keys['S'] = false;
+				}
+				if (key == GLFW_KEY_A && (action == GLFW_PRESS))
+				{
+					win->m_Keys['A'] = true;
+				}
+				else if ((key == GLFW_KEY_A && (action == GLFW_RELEASE)))
+				{
+					win->m_Keys['A'] = false;
+				}
+				if (key == GLFW_KEY_D && (action == GLFW_PRESS))
+				{
+					win->m_Keys['D'] = true;
+				}
+				else if ((key == GLFW_KEY_D && (action == GLFW_RELEASE)))
+				{
+					win->m_Keys['D'] = false;
+				}
+				if (key == GLFW_KEY_LEFT_CONTROL && action == GLFW_PRESS)
+				{
+					if (!(*win->getMouseCaptured())) //dereferencing is necessary because the function returns the memeory adress of a private variable.
+					{
+						glfwSetInputMode(win->m_Window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+						*win->getMouseCaptured() = true;
+						
+					}
+					else
+					{
+						glfwSetInputMode(win->m_Window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
+						*win->getMouseCaptured() = false; 
+						*win->getFirstMouseCaptured() = true;
+					}
+				}
+			});
+			glfwSetMouseButtonCallback(m_Window, [](GLFWwindow * window, int button, int action, int mods) //made with lambda 
+			{
+				//Window* win =  (Window*) glfwGetWindowUserPointer(window);
+				if (button == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_PRESS)
+				{
+					//std::cout << "Pressed Mouse button LEFT!" << std::endl;
+				}
+				if (button == GLFW_MOUSE_BUTTON_RIGHT && action == GLFW_PRESS)
+				{
+					//std::cout << "Pressed Mouse button RIGHT!" << std::endl;
+				}
+			});
 
-			glfwSetKeyCallback(m_Window, key_callback);
-			glfwSetMouseButtonCallback(m_Window, mouse_button_callback);
-			glfwSetCursorPosCallback(m_Window, cursor_position_callback);
+			glfwSetCursorPosCallback(m_Window, [](GLFWwindow* window, double xpos, double ypos) //made with lambda
+			{	
+				Window* win = (Window*)glfwGetWindowUserPointer(window);
+				//	//glfwSetInputMode(win->m_Window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+				if (glfwGetInputMode(win->m_Window, GLFW_CURSOR) == GLFW_CURSOR_DISABLED)
+				{
+					if (*win->getFirstMouseCaptured())
+					{
+						win->lastX = (float)xpos;
+						win->lastY = (float)ypos;
+						*win->getFirstMouseCaptured() = false;
+					}
 
+
+					float xoffset = (float)(xpos - win->lastX);
+					float yoffset = (float)(win->lastY - ypos);
+					win->lastX = (float)xpos;
+					win->lastY = (float)ypos;
+
+
+					xoffset *= win->sensitivity;
+					yoffset *= win->sensitivity;
+
+					win->YAW += xoffset;
+					win->PITCH += yoffset;
+
+					if (win->PITCH > 89.0f)
+						win->PITCH = 89.0f;
+					if (win->PITCH < -89.0f)
+						win->PITCH = -89.0f;
+
+					glm::vec3 direction;
+					direction.x = cos(glm::radians(win->YAW)) * cos(glm::radians(win->PITCH));
+					direction.y = sin(glm::radians(win->PITCH));
+					direction.z = sin(glm::radians(win->YAW)) * cos(glm::radians(win->PITCH));
+					win->cameraFront = glm::normalize(direction);
+
+
+
+					win->mousePosition.x = xpos;
+					win->mousePosition.y = ypos;
+				}
+			});
 
 			glfwSetWindowUserPointer(m_Window, this);// need this to access the currently active window. This is very important.
 			glfwSwapInterval(0);// Vsync
@@ -170,7 +164,8 @@ namespace GameEngineTest {
 		}
 
 		void Window::clear() const
-		{
+		{	
+			glClearColor(1 - 0.95, 1 - 0.95, 1 - 0.95, 1);
 			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		}
 		
@@ -206,17 +201,16 @@ namespace GameEngineTest {
 					}
 				}
 			}
-
-
 			glfwPollEvents();
 			glfwSwapBuffers(m_Window);
 			glfwGetFramebufferSize(m_Window, &m_Width, &m_Height);
 			glViewport(0, 0, m_Width, m_Height);
 		}
 
-		bool Window::closed() const
+		bool Window::isClosed() const
 		{
-			return glfwWindowShouldClose(m_Window);
+			return glfwWindowShouldClose(m_Window); // returns the close flag of the window. If either the 'x' button is clicked or the alt+f4 is pressed, this function will return 1 
+			//indicating that the window should be closed.
 		}
 
 		void Window::drawRightAngledTriangle()

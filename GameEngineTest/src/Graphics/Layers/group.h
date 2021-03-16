@@ -5,7 +5,7 @@
 namespace GameEngineTest {
 	namespace Graphics {
 
-		class Group : public Renderable2D
+		class ENGINE_API Group : public Renderable2D
 		{
 
 		private:

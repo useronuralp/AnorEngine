@@ -1,4 +1,5 @@
 #pragma once
+#include "pch.h"
 #include "Buffers/indexbuffer.h"
 #include "Buffers/vertexarray.h"
 #include "../Math/maths.h"
@@ -8,7 +9,7 @@
 namespace GameEngineTest {
 	namespace Graphics {
 
-		struct VertexData
+		struct ENGINE_API VertexData
 		{
 			Math::vec3 vertex;
 			//Math::vec4 color;
@@ -16,7 +17,7 @@ namespace GameEngineTest {
 			float tid; //texture id.
 			unsigned int color;
 		};
-		class Renderable2D
+		class ENGINE_API Renderable2D
 		{
 		protected:
 			Math::vec3 m_Position;

@@ -3,7 +3,7 @@
 namespace GameEngineTest {
 	namespace Graphics {
 
-		class StaticSprite : public Renderable2D
+		class ENGINE_API StaticSprite : public Renderable2D
 		{
 		private:
 			VertexArray* m_VertexArray;

@@ -5,14 +5,14 @@
 namespace GameEngineTest {
 	namespace Graphics {
 
-		class Texture
+		class ENGINE_API Texture
 		{
 		private:
 			
 			GLuint m_RendererID;
 			GLubyte* m_LocaBuffer;
 			std::string m_FilePath;
-			int m_Width, m_Height, m_BPP;
+			int m_Width, m_Height, m_BPP; 
 
 		public:
 			Texture(const std::string& path);

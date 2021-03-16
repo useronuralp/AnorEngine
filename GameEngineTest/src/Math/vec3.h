@@ -2,7 +2,7 @@
 namespace GameEngineTest {
 	namespace Math {
 
-		struct vec3 {
+		struct ENGINE_API vec3 {
 			float x, y, z;
 			vec3();
 			vec3(const float& x, const float& y, const float& z);
