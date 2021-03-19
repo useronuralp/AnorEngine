@@ -1,24 +1,20 @@
 #pragma once
-#include "../renderable2d.h"
-#include "../renderer2d.h"
 
 namespace GameEngineTest {
-	namespace Graphics {
-
-		class Layer
+	namespace Graphics
+	{
+		class ENGINE_API Layer
 		{
+
 		protected:
-			Renderer2D *m_Renderer;
-			std::vector<Renderable2D*> m_Renderables;
-			Shader* m_Shader;
-			Math::mat4 m_ProjectionMatrix;
-		protected:
-			Layer(Renderer2D *renderer, Shader *shader, Math::mat4 projectionMatrix);
-		public:
 			Layer();
-			virtual ~Layer();
-			virtual void add(Renderable2D* renderable);
-			virtual void render();
+		public:
+			Layer(const char* name);
+			virtual void OnAttach();
+			virtual void OnUpdate(); 	
+			inline const char* getName() { return m_LayerName; }
+		protected:
+			const char* m_LayerName;
 		};
 	}
 }

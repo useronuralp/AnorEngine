@@ -78,14 +78,14 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LinkIncremental>true</LinkIncremental>
-    <IncludePath>$(SolutionDir)GameEngineTest\src;$(SolutionDir)Dependencies\GLM;$(SolutionDir)Dependencies\FreeImage\include;$(SolutionDir)Dependencies\GLEW\include;$(SolutionDir)Dependencies\GLFW\includex64;$(SolutionDir)Dependencies\Assimp\include;$(SolutionDir)GameEngineTest\src\vendor\spdlog-1.x\include;$(IncludePath)</IncludePath>
+    <IncludePath>$(SolutionDir)GameEngineTest\src;$(SolutionDir)Dependencies\GLM;$(SolutionDir)Dependencies\FreeImage\include;$(SolutionDir)Dependencies\GLEW\include;$(SolutionDir)Dependencies\GLFW\includex64;$(SolutionDir)Dependencies\Assimp\include;$(SolutionDir)GameEngineTest\src\vendor\spdlog-1.x\include;$(SolutionDir)GameEngineTest\src\vendor\ImGUI;$(IncludePath)</IncludePath>
     <OutDir>$(SolutionDir)bin\$(Configuration)_$(Platform)-$(ProjectName)</OutDir>
     <IntDir>$(SolutionDir)bin\Intermediates\$(Configuration)_$(Platform)-$(ProjectName)</IntDir>
     <LibraryPath>$(SolutionDir)Dependencies\FreeImage\lib;$(SolutionDir)Dependencies\GLEW\lib\x64;$(SolutionDir)Dependencies\GLFW\lib-vc2019x64;$(SolutionDir)Dependencies\Assimp\lib;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LinkIncremental>false</LinkIncremental>
-    <IncludePath>$(SolutionDir)GameEngineTest\src;$(SolutionDir)Dependencies\GLM;$(SolutionDir)Dependencies\FreeImage\include;$(SolutionDir)Dependencies\GLEW\include;$(SolutionDir)Dependencies\GLFW\includex64;$(SolutionDir)Dependencies\Assimp\include;$(SolutionDir)GameEngineTest\src\vendor\spdlog-1.x\include;$(IncludePath)</IncludePath>
+    <IncludePath>$(SolutionDir)GameEngineTest\src;$(SolutionDir)Dependencies\GLM;$(SolutionDir)Dependencies\FreeImage\include;$(SolutionDir)Dependencies\GLEW\include;$(SolutionDir)Dependencies\GLFW\includex64;$(SolutionDir)Dependencies\Assimp\include;$(SolutionDir)GameEngineTest\src\vendor\spdlog-1.x\include;$(SolutionDir)GameEngineTest\src\vendor\ImGUI;$(IncludePath)</IncludePath>
     <OutDir>$(SolutionDir)bin\$(Configuration)_$(Platform)-$(ProjectName)</OutDir>
     <IntDir>$(SolutionDir)bin\Intermediates\$(Configuration)_$(Platform)-$(ProjectName)</IntDir>
     <LibraryPath>$(SolutionDir)Dependencies\FreeImage\lib;$(SolutionDir)Dependencies\GLEW\lib\x64;$(SolutionDir)Dependencies\GLFW\lib-vc2019x64;$(SolutionDir)Dependencies\Assimp\lib;$(LibraryPath)</LibraryPath>

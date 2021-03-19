@@ -1,40 +1,25 @@
 #include "pch.h"
-#include "layer.h"
+#include "Layer.h"
+
 namespace GameEngineTest {
-	namespace Graphics {
-		Layer::Layer(Renderer2D* renderer, Shader* shader, Math::mat4 projectionMatrix)
-			:m_Renderer(renderer), m_Shader(shader), m_ProjectionMatrix(projectionMatrix)
+	namespace Graphics
+	{
+		Layer::Layer()
 		{
-			m_Shader->enable();
-			m_Shader->setUniformMat4("pr_matrix", m_ProjectionMatrix);
-			m_Shader->disable();
+			m_LayerName = "Layer";
 		}
-		Layer::~Layer()
+		void Layer::OnUpdate()
 		{
-			delete m_Shader;
-			delete m_Renderer;
-			for (int i = 0; i< m_Renderables.size(); i++)
-			{
-				delete m_Renderables[i];
-			}
+			//Do rendering stuff each frame.
 		}
-		void Layer::add(Renderable2D* renderable)
+		void Layer::OnAttach()
 		{
-			m_Renderables.push_back(renderable);
+			//Default Stuff upon creation.
 		}
-		void Layer::render()
+		Layer::Layer(const char* name)
+			:m_LayerName(name)
 		{
-			//m_Shader->enable();
-			m_Renderer->begin();
 
-			for (const Renderable2D* renderable : m_Renderables)
-			{
-				m_Renderer->submit(renderable);
-			}
-
-			m_Renderer->end();
-			m_Renderer->flush();
-			//m_Shader->disable();
 		}
 	}
 }

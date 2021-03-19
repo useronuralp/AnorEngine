@@ -7,7 +7,8 @@ namespace GameEngineTest {
 		
 
 		Window::Window(const char* title, int width, int height) 
-		{
+		{	
+			 
 			m_Title = title;
 			m_Height = height;
 			m_Width = width;
@@ -51,7 +52,7 @@ namespace GameEngineTest {
 				//if you wanna use lambdas like this.
 			{
 				Window* win = (Window*)glfwGetWindowUserPointer(window);
-				if (key == GLFW_KEY_W && (action == GLFW_PRESS))
+				if (key == GLFW_KEY_W && (action == GLFW_PRESS || action == GLFW_REPEAT))
 				{
 					win->m_Keys['W'] = true;
 				}
@@ -59,15 +60,15 @@ namespace GameEngineTest {
 				{
 					win->m_Keys['W'] = false;
 				}
-				if (key == GLFW_KEY_S && (action == GLFW_PRESS))
+				if (key == GLFW_KEY_S && (action == GLFW_PRESS || action == GLFW_REPEAT))
 				{
 					win->m_Keys['S'] = true;
 				}
-				else if ((key == GLFW_KEY_S && (action == GLFW_RELEASE)))
+				else if (key == GLFW_KEY_S && (action == GLFW_RELEASE || action == GLFW_REPEAT ))
 				{
 					win->m_Keys['S'] = false;
 				}
-				if (key == GLFW_KEY_A && (action == GLFW_PRESS))
+				if (key == GLFW_KEY_A && (action == GLFW_PRESS || action == GLFW_REPEAT))
 				{
 					win->m_Keys['A'] = true;
 				}
@@ -75,7 +76,7 @@ namespace GameEngineTest {
 				{
 					win->m_Keys['A'] = false;
 				}
-				if (key == GLFW_KEY_D && (action == GLFW_PRESS))
+				if (key == GLFW_KEY_D && (action == GLFW_PRESS || action == GLFW_REPEAT))
 				{
 					win->m_Keys['D'] = true;
 				}
@@ -180,7 +181,7 @@ namespace GameEngineTest {
 			lastFrame = currentFrame;
 
 			cameraSpeed = 3 * deltaTime; //adjust speed here.
-			for (std::pair<char, bool> key : m_Keys)
+			for (auto key : m_Keys)
 			{
 				if (key.second)
 				{

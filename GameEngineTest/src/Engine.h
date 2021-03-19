@@ -5,6 +5,8 @@
 
 #include "Application.h"
 
+#include "ImGui/ImGuiLayer.h"
+
 //-----Engine modules---------------
 #include "Graphics/window.h"
 #include "Math/maths.h"
@@ -31,7 +33,9 @@
 
 #include "utils/Logger.h"
 
+#include "Graphics/Layers/Layer.h"
 
+#include "Graphics//Layers/LayerStack.h"
 
 //--------------------Entry point--------------------
 #include "EntryPoint.h"

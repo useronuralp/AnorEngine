@@ -1,11 +1,11 @@
 #pragma once
-#include "layer.h"
+#include "Layer.h"
 #include "../batchrenderer2D.h"
 
 namespace GameEngineTest {
 	namespace Graphics {
 
-		class TileLayer : public Layer
+		class ENGINE_API TileLayer : public Layer
 		{
 		public:
 			TileLayer(Shader* shader);

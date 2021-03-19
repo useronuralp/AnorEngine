@@ -3,13 +3,16 @@
 #pragma once
 #include "pch.h"
 #include "Application.h"
-
-extern GameEngineTest::Application* CreateApplication();
+#include "Graphics/Layers/LayerStack.h"
+namespace Game
+{
+	extern GameEngineTest::Application* CreateApplication();
+}
 
 int main()
-{
-	auto app = CreateApplication();
-	app->Draw();
+{	
+	auto app = Game::CreateApplication();
+	app->Run();
 	delete app;
 
 	return 0;
