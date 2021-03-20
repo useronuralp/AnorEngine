@@ -12,11 +12,11 @@ namespace GameEngineTest
 		ImGuiLayer::ImGuiLayer()
 			:Layer("ImGUILayer")
 		{
-			
+			WARN("ImGUI default constructor that calls 'Layer(const char* name)'");
 		}
 		void ImGuiLayer::OnAttach()
 		{
-			WARN("IMgui on attach!");
+			WARN("ImGUI on attach!");
 			ImGui::CreateContext();
 			ImGui::StyleColorsDark();
 			
@@ -31,7 +31,7 @@ namespace GameEngineTest
 		void ImGuiLayer::OnUpdate()
 		{
 
-			INFO("ImGUiLayer working!!!");
+			INFO("ImGUILayer working!!!");
 			
 			ImGuiIO& io = ImGui::GetIO();
 			Application& app = Application::Get();
@@ -51,6 +51,10 @@ namespace GameEngineTest
 			
 			ImGui::Render();
 			ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+		}
+		ImGuiLayer::~ImGuiLayer()
+		{
+			WARN("ImGuiLayer Destructor completed!!!");
 		}
 	}
 }

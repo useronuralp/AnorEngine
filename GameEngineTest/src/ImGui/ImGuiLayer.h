@@ -9,6 +9,7 @@ namespace GameEngineTest
 		{
 		public:
 			ImGuiLayer();
+			virtual ~ImGuiLayer();
 		private:
 			void OnAttach() override;
 			void OnUpdate() override;

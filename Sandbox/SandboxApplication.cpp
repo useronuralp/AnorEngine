@@ -8,17 +8,17 @@ namespace Game
 	class Scene : public Layer
 	{	
 	private:
-		Window* m_Window;
-		Shader *shader, *shader2, *shader3;
-		Renderable3D* light;
-		Model *Arianna, *backpack, *basketball;
+		Window* m_Window = nullptr;
+		Shader *shader = nullptr, *shader2 = nullptr, *shader3 = nullptr;
+		Renderable3D *light = nullptr;
+		Model *Arianna = nullptr, *backpack = nullptr, *basketball = nullptr;
 		glm::mat4 camera;
 		Renderer3D renderer3D;
 	public:
 		Scene(Window *window)
-			:m_Window(window)
+			:Layer("Scene"), m_Window(window)
 		{
-			
+			WARN("Scene default constrcutor that calls 'Layer(const char* name)'");
 		}
 	public:
 		void OnAttach() override
@@ -69,7 +69,7 @@ namespace Game
 
 			Arianna->scale(5, 5, 5);
 		}
-		void OnUpdate()
+		void OnUpdate() override
 		{
 			camera = glm::lookAt(m_Window->cameraPos, m_Window->cameraPos + m_Window->cameraFront, m_Window->cameraUp); // camera movement operations on view matrix each frame.
 			
@@ -87,6 +87,11 @@ namespace Game
 			
 			renderer3D.singleDraw(*light, *shader2, camera, 36);
 		}
+	public:
+		virtual ~Scene() 
+		{	
+			WARN("Scene Destructor completed!!");
+		}
 	};
 
 	class Sandbox : public Application
@@ -96,14 +101,21 @@ namespace Game
 	public:
 		Sandbox()
 		{	
+			
 			pushLayer(new Scene(m_Window));
 			pushLayer(new ImGuiLayer());
 			logInfoDebug();
 		}
-		~Sandbox()
+	protected:
+		virtual ~Sandbox() 
 		{
-			
+			for (auto layer = m_LayerStack.end(); layer != m_LayerStack.begin();)
+			{	
+				delete (*--layer); //Look in to the order of destructor calls and virutal keyword.
+			}
+			WARN("Sandbox destructor completed!!!");
 		}
+	public:
 		void logInfoDebug() override
 		{	
 			WARN("APP::{0}", "Custom sandbox application has been created!!");
@@ -124,8 +136,8 @@ namespace Game
 		}
 		void pushLayer(Layer *Layer)
 		{
-			m_LayerStack.pushLayer(*Layer);
 			Layer->OnAttach();
+			m_LayerStack.pushLayer(*Layer);
 		}
 		void popLayer()
 		{

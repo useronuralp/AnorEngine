@@ -7,10 +7,11 @@ namespace GameEngineTest
 	protected:
 		Graphics::Window *m_Window = nullptr;
 	private:
-		static Application* s_Instance;
+		static Application* s_Instance; //static singleton instance of this class.
 	public:
 		Application();
-		~Application();
+		virtual ~Application();
+	public:
 		virtual void Run();
 		inline static Application& Get() { return *s_Instance; }
 		//inline int getWindowHeight() { return m_Window->getHeight(); }

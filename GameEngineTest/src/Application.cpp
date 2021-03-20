@@ -12,7 +12,9 @@ namespace GameEngineTest
 	Application::Application()
 	{	
 		s_Instance = this; //static setup of instance of this singleton class.
+
 		GameEngineTest::EngineInitializer::init();
+
 		m_Window = new Graphics::Window("Onuralp_Engine", 1920, 1080); //window creation
 
 		if (!m_Window)
@@ -21,18 +23,18 @@ namespace GameEngineTest
 		}
 		else
 		{
-			WARN("APP::{0}", "Window created");
+			WARN("APP::{0}", "Window successfuly created");
 		}
 		logInfoDebug();
 	}
 	Application::~Application()
-	{
-		delete m_Window;
+	{	
+		WARN("Application Destructor!!!");
 	}
 	void Application::logInfoDebug()
 	{
-		WARN("APP::{0}", "Application Constructor!!");
-		WARN("APP::{0}", "Press a key...");
+		WARN("APP::{0}", "Application Default Constructor!!");
+		WARN("APP::{0}", "Press enter...");
 		getchar();
 	}
 }

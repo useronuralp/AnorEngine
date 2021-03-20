@@ -4,6 +4,7 @@
 #include "pch.h"
 #include "Application.h"
 #include "Graphics/Layers/LayerStack.h"
+
 namespace Game
 {
 	extern GameEngineTest::Application* CreateApplication();
@@ -14,6 +15,6 @@ int main()
 	auto app = Game::CreateApplication();
 	app->Run();
 	delete app;
-
+	system("pause");
 	return 0;
 }

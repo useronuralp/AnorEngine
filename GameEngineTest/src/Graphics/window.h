@@ -41,8 +41,8 @@ namespace GameEngineTest {
 			bool isClosed() const;
 			void drawRightAngledTriangle();
 			inline void getMousePosition(double& x, double& y) { x = mousePosition.x; y = mousePosition.y; }
-			inline bool* getMouseCaptured() { return &isMouseCaptured; } //dumb way of getting a private variable
-			inline bool* getFirstMouseCaptured() { return &isFirstMouseCapture; }
+			inline bool* getMouseCaptured() { return &isMouseCaptured; } //dumb way of getting a private variable which is very error prone
+			inline bool* getFirstMouseCaptured() { return &isFirstMouseCapture; } //same here
 			inline int getHeight() { return m_Height; }
 			inline int getWidth() { return m_Width; }
 		private:
