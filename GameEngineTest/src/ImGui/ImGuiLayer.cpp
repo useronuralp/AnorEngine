@@ -56,5 +56,21 @@ namespace GameEngineTest
 		{
 			WARN("ImGuiLayer Destructor completed!!!");
 		}
+		bool ImGuiLayer::MouseButtonPressedEvent()
+		{	
+			return false;
+		}
+		bool ImGuiLayer::MouseButtonReleasedEvent()
+		{
+			return false;
+		}
+		bool ImGuiLayer::MouseMovedEvent()
+		{
+			return false;
+		}
+		bool ImGuiLayer::MouseScrollEvent()
+		{
+			return false;
+		}
 	}
 }

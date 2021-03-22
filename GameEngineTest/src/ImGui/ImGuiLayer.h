@@ -15,6 +15,12 @@ namespace GameEngineTest
 			void OnUpdate() override;
 		private:
 			float m_Time = 0.0f;
+		private:
+			bool MouseButtonPressedEvent();
+			bool MouseButtonReleasedEvent();
+			bool MouseMovedEvent();
+			bool MouseScrollEvent();
+			
 		};
 	}
 }
