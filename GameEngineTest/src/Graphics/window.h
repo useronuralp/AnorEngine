@@ -45,11 +45,13 @@ namespace GameEngineTest {
 			inline bool* getFirstMouseCaptured() { return &isFirstMouseCapture; } //same here
 			inline int getHeight() { return m_Height; }
 			inline int getWidth() { return m_Width; }
+		public:
+			void OnEvent();
 		private:
 			bool init();
-			//friend static void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods);
-			//friend static void mouse_button_callback(GLFWwindow* window, int button, int action, int mods);
-			//friend static void cursor_position_callback(GLFWwindow* window, double xpos, double ypos);
+			friend static void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods);
+			friend static void mouse_button_callback(GLFWwindow* window, int button, int action, int mods);
+			friend static void cursor_position_callback(GLFWwindow* window, double xpos, double ypos);
 		};
 	}
 }

@@ -13,6 +13,7 @@ namespace GameEngineTest
 		private:
 			void OnAttach() override;
 			void OnUpdate() override;
+			void OnEvent() override;
 		private:
 			float m_Time = 0.0f;
 		private:

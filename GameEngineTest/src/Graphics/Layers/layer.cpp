@@ -17,6 +17,10 @@ namespace GameEngineTest {
 		{
 			//Default Stuff upon creation.
 		}
+		void Layer::OnEvent()
+		{
+			//
+		}
 		Layer::Layer(const char* name)
 			:m_LayerName(name)
 		{

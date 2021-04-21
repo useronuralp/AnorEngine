@@ -14,6 +14,7 @@ namespace GameEngineTest {
 			Layer(const char* name);
 			virtual void OnAttach();
 			virtual void OnUpdate(); 	
+			virtual void OnEvent();
 			inline const char* getName() { return m_LayerName; }
 			void logInfoDebug();
 		protected:

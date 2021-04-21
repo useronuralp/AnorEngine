@@ -52,6 +52,10 @@ namespace GameEngineTest
 			ImGui::Render();
 			ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 		}
+		void ImGuiLayer::OnEvent()
+		{
+
+		}
 		ImGuiLayer::~ImGuiLayer()
 		{
 			WARN("ImGuiLayer Destructor completed!!!");

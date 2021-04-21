@@ -73,9 +73,9 @@ namespace Game
 		{
 			camera = glm::lookAt(m_Window->cameraPos, m_Window->cameraPos + m_Window->cameraFront, m_Window->cameraUp); // camera movement operations on view matrix each frame.
 			
-			backpack->Draw(*shader3, camera);
-			basketball->Draw(*shader3, camera);
-			//Arianna.Draw(shader3, camera);
+			//backpack->Draw(*shader3, camera);
+			//basketball->Draw(*shader3, camera);
+			Arianna->Draw(*shader3, camera);
 			
 			//int i = 0;
 			//for (Renderable3D* item : cubes)
@@ -86,6 +86,10 @@ namespace Game
 			//}
 			
 			renderer3D.singleDraw(*light, *shader2, camera, 36);
+		}
+		void OnEvent() override
+		{
+
 		}
 	public:
 		virtual ~Scene() 
