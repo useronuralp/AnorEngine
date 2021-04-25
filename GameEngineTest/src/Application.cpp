@@ -35,6 +35,5 @@ namespace GameEngineTest
 	{
 		WARN("APP::{0}", "Application Default Constructor!!");
 		WARN("APP::{0}", "Press enter...");
-		getchar();
 	}
 }

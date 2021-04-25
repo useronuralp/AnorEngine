@@ -3,6 +3,8 @@
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
 #include <glm.hpp>
+#include <stack>
+#include "Layers/Layer.h"
 namespace GameEngineTest {
 	namespace Graphics {
 
@@ -12,6 +14,9 @@ namespace GameEngineTest {
 		};
 
 		class ENGINE_API Window {
+		private:
+			//this pointer currently causes high coupling between this "singleton" window class and ImGuiLayer. You should get rid of this dependency and create a robust event handler/dispatcher class in the future.
+			Layer *ImGui; 
 		private:
 			std::map<char, bool> m_Keys = {{'W', false }, {'S', false }, {'A', false}, {'D', false}};
 			const char *m_Title;
@@ -45,6 +50,8 @@ namespace GameEngineTest {
 			inline bool* getFirstMouseCaptured() { return &isFirstMouseCapture; } //same here
 			inline int getHeight() { return m_Height; }
 			inline int getWidth() { return m_Width; }
+			inline Layer* getImGuiWindowPointer() { return ImGui; }
+			inline void setImGuiPointer(Layer* ptr) { ImGui = ptr; }
 		public:
 			void OnEvent();
 		private:

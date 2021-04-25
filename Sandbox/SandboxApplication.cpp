@@ -20,6 +20,9 @@ namespace Game
 		{
 			WARN("Scene default constrcutor that calls 'Layer(const char* name)'");
 		}
+		bool OnMouseLeftClickPressedEvent() override { return false; };
+		bool OnMouseLeftClickReleasedEvent() override { return false; };
+		bool OnMouseMove(float xpos, float ypos) override { return false; };
 	public:
 		void OnAttach() override
 		{	
@@ -73,9 +76,9 @@ namespace Game
 		{
 			camera = glm::lookAt(m_Window->cameraPos, m_Window->cameraPos + m_Window->cameraFront, m_Window->cameraUp); // camera movement operations on view matrix each frame.
 			
-			//backpack->Draw(*shader3, camera);
+			backpack->Draw(*shader3, camera);
 			//basketball->Draw(*shader3, camera);
-			Arianna->Draw(*shader3, camera);
+			//Arianna->Draw(*shader3, camera);
 			
 			//int i = 0;
 			//for (Renderable3D* item : cubes)
@@ -104,10 +107,10 @@ namespace Game
 		LayerStack m_LayerStack;
 	public:
 		Sandbox()
-		{	
-			
-			pushLayer(new Scene(m_Window));
-			pushLayer(new ImGuiLayer());
+		{			
+			pushLayer(new Scene(m_Window)); //as our first layer we need to create the Scene that our "game" will play out on.
+			m_Window->setImGuiPointer(new ImGuiLayer()); //after creating the scene layer. We need to attach a new ImGuiLayer as a debug layer/ui to its member variable. (This part should be changed later)
+			pushLayer(m_Window->getImGuiWindowPointer()); // finally, we push the debug/imgui layer to our layer stack to render it. (This layer should be rendered first, meaning it should be pushed into the stack as the last element.)
 			logInfoDebug();
 		}
 	protected:
@@ -123,8 +126,6 @@ namespace Game
 		void logInfoDebug() override
 		{	
 			WARN("APP::{0}", "Custom sandbox application has been created!!");
-			WARN("Press a enter to continue...");
-			getchar();
 		}
 		void Run() override
 		{		

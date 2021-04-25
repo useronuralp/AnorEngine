@@ -57,14 +57,24 @@ namespace GameEngineTest {
 		}
 		void mouse_button_callback(GLFWwindow* window, int button, int action, int mods)
 		{
-			//Window* win =  (Window*) glfwGetWindowUserPointer(window);
+			Window* win =  (Window*) glfwGetWindowUserPointer(window);
 			if (button == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_PRESS)
-			{
-				//std::cout << "Pressed Mouse button LEFT!" << std::endl;
+			{	
+				bool _wasInputHandled_ByImGui = false;
+				_wasInputHandled_ByImGui = win->ImGui->OnMouseLeftClickPressedEvent();
+				if (!_wasInputHandled_ByImGui)
+				{
+					std::cout << "Mouse Left Clicked. Note: Game Layer Handles the click!" << std::endl;
+				}
 			}
-			if (button == GLFW_MOUSE_BUTTON_RIGHT && action == GLFW_PRESS)
-			{
-				//std::cout << "Pressed Mouse button RIGHT!" << std::endl;
+			if (button == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_RELEASE)
+			{	
+				bool _wasInputHandled_ByImGui = false;
+				_wasInputHandled_ByImGui = win->ImGui->OnMouseLeftClickReleasedEvent();
+				if (!_wasInputHandled_ByImGui)
+				{
+					std::cout << "Mouse Left Released. Note: Game Layer Handles the click!" << std::endl;
+				}
 			}
 		}
 		void cursor_position_callback(GLFWwindow* window, double xpos, double ypos)
@@ -79,8 +89,6 @@ namespace GameEngineTest {
 					win->lastY = (float)ypos;
 					*win->getFirstMouseCaptured() = false;
 				}
-
-
 				float xoffset = (float)(xpos - win->lastX);
 				float yoffset = (float)(win->lastY - ypos);
 				win->lastX = (float)xpos;
@@ -104,16 +112,24 @@ namespace GameEngineTest {
 				direction.z = sin(glm::radians(win->YAW)) * cos(glm::radians(win->PITCH));
 				win->cameraFront = glm::normalize(direction);
 
-
-
 				win->mousePosition.x = xpos;
 				win->mousePosition.y = ypos;
+			}
+			else
+			{	
+				win->mousePosition.x = xpos;
+				win->mousePosition.y = ypos;
+				if (!win->ImGui->OnMouseMove(xpos, ypos))
+				{
+					INFO("Mouse Position (Handled by GAME): x = {0}, y = {1}", win->mousePosition.x, win->mousePosition.y);
+				}
+				
 			}
 		}
 
 		Window::Window(const char* title, int width, int height) 
 		{	
-			 
+			ImGui = nullptr;
 			m_Title = title;
 			m_Height = height;
 			m_Width = width;

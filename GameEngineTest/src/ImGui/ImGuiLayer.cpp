@@ -1,6 +1,5 @@
 #include "pch.h"
 #include "ImGuiLayer.h"
-
 #include "../ImGuiExampleBuilds/imgui_impl_glfw.h"
 #include "../ImGuiExampleBuilds/imgui_impl_opengl3.h"
 #include <GLFW/glfw3.h>
@@ -31,8 +30,6 @@ namespace GameEngineTest
 		void ImGuiLayer::OnUpdate()
 		{
 
-			INFO("ImGUILayer working!!!");
-			
 			ImGuiIO& io = ImGui::GetIO();
 			Application& app = Application::Get();
 			io.DisplaySize = ImVec2(app.getWindow().getWidth() , app.getWindow().getHeight());
@@ -52,9 +49,47 @@ namespace GameEngineTest
 			ImGui::Render();
 			ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 		}
-		void ImGuiLayer::OnEvent()
-		{
 
+		bool ImGuiLayer::OnMouseLeftClickPressedEvent()
+		{
+			ImGuiIO& io = ImGui::GetIO();
+			if (io.WantCaptureMouse)
+			{
+				io.MouseDown[0] = true;
+				return true; // means this fnc handles the input
+			}
+			return false;
+		}
+		bool ImGuiLayer::OnMouseLeftClickReleasedEvent()
+		{	
+			ImGuiIO& io = ImGui::GetIO();
+			if (io.WantCaptureMouse)
+			{
+				io.MouseDown[0] = false;
+				return true;
+			}
+			return false;
+		}
+		bool ImGuiLayer::OnMouseMove(float xpos, float ypos)
+		{	
+			ImGuiIO& io = ImGui::GetIO();
+
+			if (ImGui::IsAnyItemHovered())
+				io.WantCaptureMouse = true;
+			else
+				io.WantCaptureMouse = false;
+
+			if (io.WantCaptureMouse)
+			{
+				WARN("IMGUI is handling the input right now: x = {0}, y = {1}", io.MousePos.x, io.MousePos.y);
+				io.MousePos = ImVec2(xpos, ypos);
+				return true;
+			}
+			else
+			{
+				io.MousePos = ImVec2(xpos, ypos);
+				return false;
+			}		
 		}
 		ImGuiLayer::~ImGuiLayer()
 		{

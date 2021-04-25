@@ -12,7 +12,6 @@ namespace GameEngineTest
 			WARN("ENGINE::{0}", "Following components have been initialized:");
 			WARN("ENGINE::{0}", "Logger initialized!");
 			WARN("Press enter to continue...");
-			getchar();
 			return true;
 		}
 	private:

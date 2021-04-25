@@ -9,18 +9,6 @@ namespace GameEngineTest {
 			m_LayerName = "Layer";
 			WARN("Layer Default contstructor!!");
 		}
-		void Layer::OnUpdate()
-		{
-			//Do rendering stuff each frame.
-		}
-		void Layer::OnAttach()
-		{
-			//Default Stuff upon creation.
-		}
-		void Layer::OnEvent()
-		{
-			//
-		}
 		Layer::Layer(const char* name)
 			:m_LayerName(name)
 		{
