@@ -88,11 +88,6 @@ namespace GameEngineTest {
 			return left.multiply(right);
 		}
 
-
-
-
-
-
 		mat4 mat4::orthographic(float left, float right, float bottom, float top, float nearPlane, float farPlane)
 		{
 			mat4 result(1.0f);

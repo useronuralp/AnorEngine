@@ -20,9 +20,6 @@ namespace Game
 		{
 			WARN("Scene default constrcutor that calls 'Layer(const char* name)'");
 		}
-		bool OnMouseLeftClickPressedEvent() override { return false; };
-		bool OnMouseLeftClickReleasedEvent() override { return false; };
-		bool OnMouseMove(float xpos, float ypos) override { return false; };
 	public:
 		void OnAttach() override
 		{	
@@ -71,6 +68,7 @@ namespace Game
 			camera = glm::lookAt(m_Window->cameraPos, m_Window->cameraPos + m_Window->cameraFront, m_Window->cameraUp);
 
 			Arianna->scale(5, 5, 5);
+			Arianna->translate(0, 0, -0.7f);
 		}
 		void OnUpdate() override
 		{
@@ -78,7 +76,7 @@ namespace Game
 			
 			backpack->Draw(*shader3, camera);
 			//basketball->Draw(*shader3, camera);
-			//Arianna->Draw(*shader3, camera);
+			Arianna->Draw(*shader3, camera);
 			
 			//int i = 0;
 			//for (Renderable3D* item : cubes)

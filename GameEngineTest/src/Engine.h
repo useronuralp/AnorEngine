@@ -1,14 +1,12 @@
 #pragma once
-
-//For use only by Client programs. Do not include this in actual engine code.
 #include "core.h"
-
-#include "Application.h"
 
 #include "ImGui/ImGuiLayer.h"
 
+#include <EngineKeyCodes.h>
+#include <MouseButtonCodes.h>
+
 //-----Engine modules---------------
-#include "Graphics/window.h"
 #include "Math/maths.h"
 #include "Graphics/shader.h"
 #include "Graphics/Buffers/buffer.h"
@@ -33,10 +31,8 @@
 
 #include "utils/Logger.h"
 
-#include "Graphics/Layers/Layer.h"
-
-#include "Graphics//Layers/LayerStack.h"
 
 //--------------------Entry point--------------------
 #include "EntryPoint.h"
 //--------------------Entry point--------------------
+

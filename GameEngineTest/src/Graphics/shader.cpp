@@ -8,7 +8,6 @@ namespace GameEngineTest {
 			m_FragPath = fragPath;
 			m_ShaderID = load();			
 		}
-
 		void Shader::enable() const
 		{
 			glUseProgram(m_ShaderID);
@@ -22,20 +21,17 @@ namespace GameEngineTest {
 		{
 			glUseProgram(0);
 		}
-
 		GLuint Shader::load()
 		{		
 			GLuint program = glCreateProgram();
 			GLuint vertex = glCreateShader(GL_VERTEX_SHADER);
 			GLuint fragment = glCreateShader(GL_FRAGMENT_SHADER);
 
-
 			std::string vertSourceString = FileUtils::read_file(m_VertPath);
 			std::string fragSourceString = FileUtils::read_file(m_FragPath);
 
 			const char* vertSource = vertSourceString.c_str();
 			const char* fragSource = fragSourceString.c_str();
-
 
 			glShaderSource(vertex, 1, &vertSource, NULL);
 			glCompileShader(vertex);
@@ -73,7 +69,6 @@ namespace GameEngineTest {
 
 			glLinkProgram(program);
 			glValidateProgram(program);
-
 
 			glGetProgramiv(program, GL_LINK_STATUS, &result);
 			if (!result) {

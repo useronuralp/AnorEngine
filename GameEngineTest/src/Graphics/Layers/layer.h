@@ -1,11 +1,11 @@
 #pragma once
-
 namespace GameEngineTest {
 	namespace Graphics
 	{
 		class ENGINE_API Layer
 		{
-
+		public:
+			bool wantToCaptureMouse = true;
 		protected:
 			Layer();
 		public:
@@ -15,9 +15,6 @@ namespace GameEngineTest {
 			virtual void OnAttach() {};
 			virtual void OnUpdate() {};
 			virtual void OnEvent() {};
-			virtual bool OnMouseLeftClickPressedEvent() = 0;
-			virtual bool OnMouseLeftClickReleasedEvent() = 0;
-			virtual bool OnMouseMove(float xpos, float ypos) = 0;
 			inline const char* getName() { return m_LayerName; }
 			void logInfoDebug();
 		protected:

@@ -36,7 +36,7 @@ namespace GameEngineTest {
             // mesh data
             Mesh(std::vector<Vertex> vertices, std::vector<unsigned int> indices, std::vector<TextureInfo> textures);
             void Draw(Shader& shader, glm::mat4 camera);
-            glm::mat4& getModelMatrix() { return modelMatrix; }
+            inline glm::mat4& getModelMatrix() { return modelMatrix; }
         };
 
     }

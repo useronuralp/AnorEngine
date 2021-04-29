@@ -168,7 +168,6 @@ namespace GameEngineTest {
 			}
 			return textureID;
 		}
-
 		void Model::rotate(const float& degree, const float& x, const float& y, const float& z)
 		{
 			for (int i = 0; i < meshes.size(); i++)
@@ -190,6 +189,5 @@ namespace GameEngineTest {
 				meshes[i].getModelMatrix() = glm::scale(meshes[i].getModelMatrix(), glm::vec3(x, y, z));
 			}
 		}
-		
 	}
 }

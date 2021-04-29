@@ -18,18 +18,16 @@ namespace GameEngineTest {
             {
                 glActiveTexture(GL_TEXTURE0 + i); // activate proper texture unit before binding
                 // retrieve texture number (the N in diffuse_textureN)
-                std::string number;
-                std::string name = textures[i].type;
-                if (name == "texture_diffuse")
-                    number = std::to_string(diffuseNr++);
-                else if (name == "texture_specular")
-                    number = std::to_string(specularNr++);
+                //std::string number;
+                //std::string name = textures[i].type;
+                //if (name == "texture_diffuse")
+                //    number = std::to_string(diffuseNr++);
+                //else if (name == "texture_specular")
+                //    number = std::to_string(specularNr++);
 
-                shader.setUniform1i((name + number).c_str(), i);
+                //shader.setUniform1i((name + number).c_str(), i);
                 glBindTexture(GL_TEXTURE_2D, textures[i].id);
             }
-
-            //glActiveTexture(GL_TEXTURE0);
 
             shader.enable();
             glBindVertexArray(VAO);

@@ -5,6 +5,9 @@
 #include <glm.hpp>
 #include <stack>
 #include "Layers/Layer.h"
+#include <EngineKeyCodes.h>
+#include <MouseButtonCodes.h>
+
 namespace GameEngineTest {
 	namespace Graphics {
 
@@ -27,7 +30,7 @@ namespace GameEngineTest {
 			bool isMouseCaptured = false;
 			float deltaTime = 0.0f;	// Time between current frame and last frame
 			float lastFrame = 0.0f; // Time of last frame
-			bool isFirstMouseCapture = true;
+			bool isInitialMouseCaptured = false;
 			float lastY = m_Height / 2.0f;
 			float lastX = m_Width / 2.0f;
 			float YAW = -90.0f;
@@ -46,19 +49,17 @@ namespace GameEngineTest {
 			bool isClosed() const;
 			void drawRightAngledTriangle();
 			inline void getMousePosition(double& x, double& y) { x = mousePosition.x; y = mousePosition.y; }
-			inline bool* getMouseCaptured() { return &isMouseCaptured; } //dumb way of getting a private variable which is very error prone
-			inline bool* getFirstMouseCaptured() { return &isFirstMouseCapture; } //same here
-			inline int getHeight() { return m_Height; }
-			inline int getWidth() { return m_Width; }
+			inline float getHeight() { return m_Height; }
+			inline float getWidth() { return m_Width; }
 			inline Layer* getImGuiWindowPointer() { return ImGui; }
 			inline void setImGuiPointer(Layer* ptr) { ImGui = ptr; }
-		public:
-			void OnEvent();
+			inline GLFWwindow* getGLFWwindow() { return m_Window; }
 		private:
 			bool init();
 			friend static void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods);
 			friend static void mouse_button_callback(GLFWwindow* window, int button, int action, int mods);
 			friend static void cursor_position_callback(GLFWwindow* window, double xpos, double ypos);
+			friend static void mouse_scroll_callback(GLFWwindow* window, double xoffset, double yoffset);
 		};
 	}
 }

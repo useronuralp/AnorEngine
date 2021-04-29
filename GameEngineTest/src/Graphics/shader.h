@@ -15,10 +15,7 @@ namespace GameEngineTest {
 			const char* m_FragPath;
 		public:
 			Shader(const char* vertPath, const char* fragPath);
-			~Shader();
-			
-
-		
+			~Shader();		
 			void setUniform1f(const GLchar* name, const float value);
 			void setUniform1fv(const GLchar* name, float* value,int count);
 			void setUniform1i(const GLchar* name, const int value);
@@ -31,7 +28,6 @@ namespace GameEngineTest {
 			void setUniformMat4(const GLchar* name, const Math::mat4 &matrix);
 			void enable() const;
 			void disable() const;
-
 		private:
 			GLuint load();
 			GLint getUniformLocation(const GLchar* name);
