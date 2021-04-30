@@ -35,6 +35,5 @@ namespace GameEngineTest {
 		public:
 			inline GLuint getShaderID() const { return m_ShaderID; }
 		};
-
 	}
 }
