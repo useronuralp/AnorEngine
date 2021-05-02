@@ -22,11 +22,12 @@ namespace GameEngineTest {
 
 		void BatchRenderer2D::submit(const Renderable2D* renderable)
 		{
-			const Math::vec2 &size = renderable->getSize();
-			const Math::vec4 &color = renderable->getColor();
-			const Math::vec3 &startPosition = renderable->getPosition();
-			const std::vector<Math::vec2>& uv = renderable->getUV();
-			const GLuint TID = renderable->getTextureID();
+			StaticSprite* rdrbl = (StaticSprite*)renderable;//change the staticsprite thing to Renderable2D later when you implement more types.
+			const Math::vec2 &size = rdrbl->getSize();
+			const Math::vec4 &color = rdrbl->getColor();
+			const Math::vec3 &startPosition = rdrbl->getPosition();
+			const std::vector<Math::vec2>& uv = rdrbl->getUV();
+			const GLuint TID = rdrbl->getTexture().getTID();
 
 			unsigned int c = 0;
 			float ts = 0.0f;
@@ -43,7 +44,6 @@ namespace GameEngineTest {
 						break;
 					}
 				}
-
 				if (!found)
 				{
 					if (m_TextureSlots.size() >= 32)
@@ -52,7 +52,6 @@ namespace GameEngineTest {
 						flush();
 						begin();
 					}
-
 					m_TextureSlots.push_back(TID);
 					ts = (float)(m_TextureSlots.size());
 				}
@@ -63,13 +62,8 @@ namespace GameEngineTest {
 				int g = color.y * 255.0f;  //faster color operations, study this later.
 				int b = color.z * 255.0f;
 				int a = color.w * 255.0f;
-
-
 				c = a << 24 | b << 16 | g << 8 | r;
-
 			}
-
-
 			m_GiantBuffer->vertex = *m_TransformationBack * startPosition;
 			m_GiantBuffer->uv = uv[0];
 			m_GiantBuffer->tid = ts;
@@ -95,7 +89,6 @@ namespace GameEngineTest {
 			m_GiantBuffer++;
 
 			m_IndexCount += 6;
-
 		}
 
 		void BatchRenderer2D::flush()
@@ -159,7 +152,7 @@ namespace GameEngineTest {
 				offset += 4;
 			}
 
-			m_IBO = new IndexBuffer(indices, RENDERER_INDICES_SIZE);
+			m_IBO = new IndexBuffer((GLuint*)indices, RENDERER_INDICES_SIZE);
 
 			glBindVertexArray(0);
 		}

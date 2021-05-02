@@ -9,8 +9,7 @@ namespace GameEngineTest {
 			VertexArray* m_VertexArray;
 			IndexBuffer* m_IndexBuffer;
 			Shader &m_Shader;
-			Texture &m_Texture;
-			
+			Texture &m_Texture;		
 		public:
 			StaticSprite(float x, float y, float width, float height, const Math::vec4 &color, Shader &shader, Texture &texture);
 			~StaticSprite();

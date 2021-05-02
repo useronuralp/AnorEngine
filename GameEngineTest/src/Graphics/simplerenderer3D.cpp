@@ -21,10 +21,10 @@ namespace GameEngineTest {
 			object.bindVAO();
 
 			updateMVP(object, shader, camera);
-			glDrawArrays(GL_TRIANGLES, 0, vertexCount);
+			glDrawArrays(GL_TRIANGLES, 0 ,vertexCount);
 
-			object.unbindVAO();
-			shader.disable();
+			//object.unbindVAO();
+			//shader.disable();
 		}
 		void Renderer3D::updateMVP(Renderable3D& object, Shader& shader, const glm::mat4& camera)
 		{

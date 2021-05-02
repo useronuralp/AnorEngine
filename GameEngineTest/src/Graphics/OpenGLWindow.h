@@ -1,13 +1,11 @@
 #pragma once 
-#include <map>
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
 #include <glm.hpp>
-#include <stack>
 #include "Layers/Layer.h"
 #include <EngineKeyCodes.h>
 #include <MouseButtonCodes.h>
-
+#include <map>
 namespace GameEngineTest {
 	namespace Graphics {
 
@@ -16,7 +14,7 @@ namespace GameEngineTest {
 			double x, y;
 		};
 
-		class ENGINE_API Window {
+		class ENGINE_API OpenGLWindow{
 		private:
 			//this pointer currently causes high coupling between this "singleton" window class and ImGuiLayer. You should get rid of this dependency and create a robust event handler/dispatcher class in the future.
 			Layer *ImGui; 
@@ -42,8 +40,8 @@ namespace GameEngineTest {
 			glm::vec3 cameraUp = glm::vec3(0.0f, 1.0f, 0.0f);
 			float cameraSpeed = 0.005f; // adjust accordingly
 		public:
-			Window(const char* name, int width, int height);
-			~Window();
+			OpenGLWindow(const char* name, int width, int height);
+			~OpenGLWindow();
 			void clear() const;
 			void update();
 			bool isClosed() const;

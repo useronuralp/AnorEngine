@@ -177,9 +177,8 @@ xcopy "$(SolutionDir)bin\Release_x64-GameEngineTest\GameEngineTest.dll" "$(Solut
   <ItemGroup>
     <ClCompile Include="src\Application.cpp" />
     <ClCompile Include="src\Graphics\batchrenderer2D.cpp" />
-    <ClCompile Include="src\Graphics\Buffers\buffer.cpp" />
-    <ClCompile Include="src\Graphics\Buffers\indexbuffer.cpp" />
-    <ClCompile Include="src\Graphics\Buffers\vertexarray.cpp" />
+    <ClCompile Include="src\Graphics\Buffers\Buffer.cpp" />
+    <ClCompile Include="src\Graphics\Buffers\VertexArray.cpp" />
     <ClCompile Include="src\Graphics\Layers\Layer.cpp" />
     <ClCompile Include="src\Graphics\Layers\twoDimensionalLayer.cpp" />
     <ClCompile Include="src\Graphics\Layers\LayerStack.cpp" />
@@ -193,7 +192,7 @@ xcopy "$(SolutionDir)bin\Release_x64-GameEngineTest\GameEngineTest.dll" "$(Solut
     <ClCompile Include="src\Graphics\sprite.cpp" />
     <ClCompile Include="src\Graphics\static_sprite.cpp" />
     <ClCompile Include="src\Graphics\texture.cpp" />
-    <ClCompile Include="src\Graphics\window.cpp" />
+    <ClCompile Include="src\Graphics\OpenGLWindow.cpp" />
     <ClCompile Include="src\ImGuiExampleBuilds\imgui_impl_glfw.cpp" />
     <ClCompile Include="src\ImGuiExampleBuilds\imgui_impl_opengl3.cpp" />
     <ClCompile Include="src\ImGui\ImGuiLayer.cpp" />
@@ -231,9 +230,8 @@ xcopy "$(SolutionDir)bin\Release_x64-GameEngineTest\GameEngineTest.dll" "$(Solut
     <ClInclude Include="src\utils\Logger.h" />
     <ClInclude Include="src\Engine.h" />
     <ClInclude Include="src\Graphics\batchrenderer2D.h" />
-    <ClInclude Include="src\Graphics\Buffers\buffer.h" />
-    <ClInclude Include="src\Graphics\Buffers\indexbuffer.h" />
-    <ClInclude Include="src\Graphics\Buffers\vertexarray.h" />
+    <ClInclude Include="src\Graphics\Buffers\Buffer.h" />
+    <ClInclude Include="src\Graphics\Buffers\VertexArray.h" />
     <ClInclude Include="src\Graphics\Layers\group.h" />
     <ClInclude Include="src\Graphics\Layers\twoDimensionalLayer.h" />
     <ClInclude Include="src\Graphics\Layers\tilelayer.h" />
@@ -248,7 +246,7 @@ xcopy "$(SolutionDir)bin\Release_x64-GameEngineTest\GameEngineTest.dll" "$(Solut
     <ClInclude Include="src\Graphics\sprite.h" />
     <ClInclude Include="src\Graphics\static_sprite.h" />
     <ClInclude Include="src\Graphics\texture.h" />
-    <ClInclude Include="src\Graphics\window.h" />
+    <ClInclude Include="src\Graphics\OpenGLWindow.h" />
     <ClInclude Include="src\Math\mat4.h" />
     <ClInclude Include="src\Math\maths.h" />
     <ClInclude Include="src\Math\vec2.h" />
@@ -266,6 +264,8 @@ xcopy "$(SolutionDir)bin\Release_x64-GameEngineTest\GameEngineTest.dll" "$(Solut
   </ItemGroup>
   <ItemGroup>
     <None Include="Models\Backpack\backpack.mtl" />
+    <None Include="src\shaders\2DFragment.shader" />
+    <None Include="src\shaders\2DVertex.shader" />
     <None Include="src\shaders\fragment.shader" />
     <None Include="src\shaders\vertex.shader" />
     <None Include="src\shaders\lightsourceFrag.shader" />

@@ -15,7 +15,7 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="src\Graphics\window.cpp">
+    <ClCompile Include="src\Graphics\OpenGLWindow.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\Math\vec2.cpp">
@@ -33,13 +33,10 @@
     <ClCompile Include="src\Graphics\shader.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\Graphics\Buffers\buffer.cpp">
+    <ClCompile Include="src\Graphics\Buffers\Buffer.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\Graphics\Buffers\indexbuffer.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Graphics\Buffers\vertexarray.cpp">
+    <ClCompile Include="src\Graphics\Buffers\VertexArray.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\Graphics\simpleRenderer2D.cpp">
@@ -119,7 +116,7 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="src\Graphics\window.h">
+    <ClInclude Include="src\Graphics\OpenGLWindow.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\Math\vec2.h">
@@ -143,13 +140,10 @@
     <ClInclude Include="src\Graphics\shader.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\Graphics\Buffers\buffer.h">
+    <ClInclude Include="src\Graphics\Buffers\Buffer.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\Graphics\Buffers\indexbuffer.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Graphics\Buffers\vertexarray.h">
+    <ClInclude Include="src\Graphics\Buffers\VertexArray.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\Graphics\renderable2D.h">
@@ -270,6 +264,8 @@
     <None Include="src\vendor\ImGUI\.editorconfig" />
     <None Include="src\vendor\ImGUI\.gitattributes" />
     <None Include="src\vendor\ImGUI\.gitignore" />
+    <None Include="src\shaders\2DVertex.shader" />
+    <None Include="src\shaders\2DFragment.shader" />
   </ItemGroup>
   <ItemGroup>
     <Image Include="textures\sample_gigatextures_4096_seamless2.png">

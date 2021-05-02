@@ -8,14 +8,14 @@ namespace Game
 	class Scene : public Layer
 	{	
 	private:
-		Window* m_Window = nullptr;
+		OpenGLWindow* m_Window = nullptr;
 		Shader *shader = nullptr, *shader2 = nullptr, *shader3 = nullptr;
 		Renderable3D *light = nullptr;
 		Model *Arianna = nullptr, *backpack = nullptr, *basketball = nullptr;
 		glm::mat4 camera;
 		Renderer3D renderer3D;
 	public:
-		Scene(Window *window)
+		Scene(OpenGLWindow *window)
 			:Layer("Scene"), m_Window(window)
 		{
 			WARN("Scene default constrcutor that calls 'Layer(const char* name)'");
@@ -26,17 +26,24 @@ namespace Game
 			shader = new Shader("H:\\ProgrammingProjects\\repos\\GameEngineTest\\GameEngineTest\\src\\shaders\\vertex.shader", "H:\\ProgrammingProjects\\repos\\GameEngineTest\\GameEngineTest\\src\\shaders\\fragment.shader");
 			shader2 = new Shader("H:\\ProgrammingProjects\\repos\\GameEngineTest\\GameEngineTest\\src\\shaders\\vertex.shader", "H:\\ProgrammingProjects\\repos\\GameEngineTest\\GameEngineTest\\src\\shaders\\lightsourceFrag.shader");
 			shader3 = new Shader("H:\\ProgrammingProjects\\repos\\GameEngineTest\\GameEngineTest\\src\\shaders\\vertex.shader", "H:\\ProgrammingProjects\\repos\\GameEngineTest\\GameEngineTest\\src\\shaders\\fragment.shader");
+		
 
 
-			int layout2[] = { POSITION_VALUE };
-			light = new Renderable3D(Shape::lightSourceVertx, 3 * 6 * 6, layout2, 1, 3 * sizeof(float));
+
+			BufferLayout layout = { {ShaderDataType::vec3, "a_Position", 0} };
 			
+			uint32_t totalComponentCount = sizeof(Shape::lightSourceVertx) / sizeof(Shape::lightSourceVertx[0]); // this is how you calculate the element count in a const float* array.
+			uint32_t size = totalComponentCount * sizeof(GL_FLOAT);
+
+			light = new Renderable3D(*new Buffer(Shape::lightSourceVertx, size ,layout));
+
+
+
 			float lightX = 2, lightY = 3;
 			light->translate(lightX, lightY, 0.0f);
 			light->scale(0.3f, 0.3f, 0.3f);
 			
 			//glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-			
 			//texture3.Bind(0);
 			
 			//-----------shader settings------------
@@ -55,38 +62,30 @@ namespace Game
 			//shader.setUniform3f("lightColor", vec3(0.505882f, 0.59609f, 0.70f)); //moonlight color
 			shader3->setUniform3f("lightColor", vec3(1.0f, 1.0f, 1.0f));
 			shader3->setUniform2f("light_pos", vec2(lightX, lightY));
-
+			
 			backpack = new Model("H:\\ProgrammingProjects\\repos\\GameEngineTest\\GameEngineTest\\Models\\backpack\\backpack.obj");
 			basketball = new Model("H:\\ProgrammingProjects\\repos\\GameEngineTest\\GameEngineTest\\Models\\ball\\uploads_files_2222080_ball_obj.obj");
-			Arianna = new Model("H:\\ProgrammingProjects\\repos\\GameEngineTest\\GameEngineTest\\Models\\girl\\Girl_1.obj");
-			
-			glEnable(GL_DEPTH_TEST);
+			//Arianna = new Model("H:\\ProgrammingProjects\\repos\\GameEngineTest\\GameEngineTest\\Models\\girl\\Girl_1.obj");
 
+			glEnable(GL_DEPTH_TEST);
+			
 			basketball->scale(5, 5, 5);
 			basketball->translate(0, 0.5f, 0);
 			
 			camera = glm::lookAt(m_Window->cameraPos, m_Window->cameraPos + m_Window->cameraFront, m_Window->cameraUp);
-
-			Arianna->scale(5, 5, 5);
-			Arianna->translate(0, 0, -0.7f);
+			
+			//Arianna->scale(5, 5, 5);
+			//Arianna->translate(0, 0, -0.7f);
 		}
 		void OnUpdate() override
 		{
 			camera = glm::lookAt(m_Window->cameraPos, m_Window->cameraPos + m_Window->cameraFront, m_Window->cameraUp); // camera movement operations on view matrix each frame.
 			
 			backpack->Draw(*shader3, camera);
-			//basketball->Draw(*shader3, camera);
-			Arianna->Draw(*shader3, camera);
-			
-			//int i = 0;
-			//for (Renderable3D* item : cubes)
-			//{
-			//	renderer3D.singleDraw(*item, shader, camera, 36);
-			//	item->rotate(0.0005f * 10.0f, rotationDirection[i].x, rotationDirection[i].y, rotationDirection[i].z);
-			//	rotationDirection[i++];
-			//}
-			
-			renderer3D.singleDraw(*light, *shader2, camera, 36);
+			basketball->Draw(*shader3, camera);
+			//Arianna->Draw(*shader3, camera);
+	
+			renderer3D.singleDraw(*light, *shader2, camera, 4 * 6);
 		}
 		void OnEvent() override
 		{
@@ -105,7 +104,7 @@ namespace Game
 		LayerStack m_LayerStack;
 	public:
 		Sandbox()
-		{			
+		{	
 			pushLayer(new Scene(m_Window)); //as our first layer we need to create the Scene that our "game" will play out on.
 			m_Window->setImGuiPointer(new ImGuiLayer()); //after creating the scene layer. We need to attach a new ImGuiLayer as a debug layer/ui to its member variable. (This part should be changed later)
 			pushLayer(m_Window->getImGuiWindowPointer()); // finally, we push the debug/imgui layer to our layer stack to render it. (This layer should be rendered first, meaning it should be pushed into the stack as the last element.)
@@ -126,9 +125,9 @@ namespace Game
 			WARN("APP::{0}", "Custom sandbox application has been created!!");
 		}
 		void Run() override
-		{		
+		{	
 			while (!m_Window->isClosed())
-			{
+			{									
 				m_Window->clear();
 				for (Layer* layer : m_LayerStack)
 				{	
@@ -147,11 +146,9 @@ namespace Game
 			m_LayerStack.popLayer();
 		}
 	};
-
 	GameEngineTest::Application* CreateApplication()
 	{
 		return new Sandbox();
 	}
-
 }
 

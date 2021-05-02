@@ -9,9 +9,8 @@
 //-----Engine modules---------------
 #include "Math/maths.h"
 #include "Graphics/shader.h"
-#include "Graphics/Buffers/buffer.h"
-#include "Graphics/Buffers/indexbuffer.h"
-#include "Graphics/Buffers/vertexarray.h"
+#include "Graphics/Buffers/Buffer.h"
+#include "Graphics/Buffers/VertexArray.h"
 #include "Graphics/renderer2D.h"
 #include "Graphics/renderable2D.h"
 #include "Graphics/simpleRenderer2D.h"

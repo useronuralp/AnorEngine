@@ -13,7 +13,8 @@ in DATA
 	vec2 uv;
 	float tid;
 	vec4 color;
-
+	vec3 Normal;
+	vec3 FragPos;
 }fs_out;
 
 //uniform sampler2D u_Textures[32];
@@ -31,6 +32,6 @@ void main()
 		int tid = int(fs_out.tid - 0.5);
 		texColor = texture(u_Textures[tid], fs_out.uv);
 	}*/
-	//texColor = texture(tex, fs_out.uv);
-	color =  colour; //always constant white
+	texColor = texture(tex, fs_out.uv);
+	color = vec4(1, 1, 1, 1); //bright white
 }

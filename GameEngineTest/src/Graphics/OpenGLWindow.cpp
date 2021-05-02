@@ -1,12 +1,12 @@
 #include "pch.h"
-#include "window.h"
+#include "OpenGLWindow.h"
 
 namespace GameEngineTest {
 	namespace Graphics {
 
 		void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods)
 		{
-			Window* win = (Window*)glfwGetWindowUserPointer(window);
+			OpenGLWindow* win = (OpenGLWindow*)glfwGetWindowUserPointer(window);
 			if (key == ONURALP_KEY_LEFT_CONTROL && action == GLFW_PRESS)
 			{
 				if (!win->isMouseCaptured)
@@ -65,12 +65,12 @@ namespace GameEngineTest {
 		}
 		void mouse_button_callback(GLFWwindow* window, int button, int action, int mods)
 		{
-			Window* win =  (Window*) glfwGetWindowUserPointer(window);
+			OpenGLWindow* win =  (OpenGLWindow*) glfwGetWindowUserPointer(window);
 			//std::cout << "Button clicked:" << button << std::endl;
 		}
 		void cursor_position_callback(GLFWwindow* window, double xpos, double ypos)
 		{
-			Window* win = (Window*)glfwGetWindowUserPointer(window);
+			OpenGLWindow* win = (OpenGLWindow*)glfwGetWindowUserPointer(window);
 			if (glfwGetInputMode(win->m_Window, GLFW_CURSOR) == GLFW_CURSOR_DISABLED)
 			{
 				if (!win->isInitialMouseCaptured)
@@ -79,7 +79,6 @@ namespace GameEngineTest {
 					win->lastY = (float)ypos;
 					win->isInitialMouseCaptured = true;
 				}
-				std::cout << "Mouse Position :" << win->mousePosition.x << " " << win->mousePosition.y << std::endl;
 				float xoffset = (float)(xpos - win->lastX);
 				float yoffset = (float)(win->lastY - ypos);
 				win->lastX = (float)xpos;
@@ -109,9 +108,55 @@ namespace GameEngineTest {
 		}
 		void mouse_scroll_callback(GLFWwindow* window, double xoffset, double yoffset)
 		{	
-			//Window* win = (Window*)glfwGetWindowUserPointer(window);
+			//OpenGLWindow* win = (OpenGLWindow*)glfwGetWindowUserPointer(window);
 		}
-		Window::Window(const char* title, int width, int height) 
+		void APIENTRY openglErrorCallbackFunction(GLenum source,GLenum type,GLuint id,GLenum severity,GLsizei length,const GLchar* message,const void* userParam)
+		{
+			using namespace std;
+			if (id == 131169 || id == 131185 || id == 131218 || id == 131204) return;
+			cout << "---------------------opengl-callback-start------------" << endl;
+			cout << "message: " << message << endl;
+			cout << "type: ";
+			switch (type) {
+			case GL_DEBUG_TYPE_ERROR:
+				cout << "ERROR";
+				break;
+			case GL_DEBUG_TYPE_DEPRECATED_BEHAVIOR:
+				cout << "DEPRECATED_BEHAVIOR";
+				break;
+			case GL_DEBUG_TYPE_UNDEFINED_BEHAVIOR:
+				cout << "UNDEFINED_BEHAVIOR";
+				break;
+			case GL_DEBUG_TYPE_PORTABILITY:
+				cout << "PORTABILITY";
+				break;
+			case GL_DEBUG_TYPE_PERFORMANCE:
+				cout << "PERFORMANCE";
+				break;
+			case GL_DEBUG_TYPE_OTHER:
+				cout << "OTHER";
+				break;
+			}
+			cout << endl;
+
+			cout << "id: " << id << endl;
+			cout << "severity: ";
+			switch (severity) {
+			case GL_DEBUG_SEVERITY_LOW:
+				cout << "LOW";
+				break;
+			case GL_DEBUG_SEVERITY_MEDIUM:
+				cout << "MEDIUM";
+				break;
+			case GL_DEBUG_SEVERITY_HIGH:
+				cout << "HIGH";
+				break;
+			}
+			cout << endl;
+			cout << "---------------------opengl-callback-end--------------" << endl;
+		}
+
+		OpenGLWindow::OpenGLWindow(const char* title, int width, int height) 
 		{	
 			ImGui = nullptr;
 			m_Title = title;
@@ -123,26 +168,30 @@ namespace GameEngineTest {
 				glfwTerminate();
 			}
 		}
-		Window::~Window() 
+		OpenGLWindow::~OpenGLWindow() 
 		{	
 			glfwTerminate();
 		}
 
-		bool Window::init()
-		{	
-			
+		bool OpenGLWindow::init()
+		{		
 			if (!glfwInit()) //calling glfwInit() inside this if statement.
 			{
 				std::cout << "Failed to initialize GLFW." << std::endl;
 				return false;
 			}
-
+			glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, true);
 			m_Window = glfwCreateWindow(m_Width, m_Height , m_Title , NULL, NULL);
-
+			int flags; glGetIntegerv(GL_CONTEXT_FLAGS, &flags);
+			if (flags & GL_CONTEXT_FLAG_DEBUG_BIT)
+			{
+				// initialize debug output 
+			}
 			if (!m_Window) {
 				glfwTerminate();
-				std::cout << "Failed to create GLFW Window." << std::endl;
+				std::cout << "Failed to create GLFW OpenGLWindow." << std::endl;
 			}
+
 			glfwMakeContextCurrent(m_Window);
 
 			if (glewInit() != GLEW_OK)
@@ -150,8 +199,8 @@ namespace GameEngineTest {
 				std::cout << "Could not initialize GLEW!" << std::endl;
 				return false;
 			}
-
 			
+			glDebugMessageCallback(openglErrorCallbackFunction, nullptr);
 			glfwSetKeyCallback(m_Window, key_callback);
 			glfwSetMouseButtonCallback(m_Window, mouse_button_callback);
 			glfwSetCursorPosCallback(m_Window, cursor_position_callback);
@@ -164,13 +213,13 @@ namespace GameEngineTest {
 			return true;
 		}
 
-		void Window::clear() const
+		void OpenGLWindow::clear() const
 		{	
 			glClearColor(1 - 0.95, 1 - 0.95, 1 - 0.95, 1);
 			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		}
 		
-		void Window::update()
+		void OpenGLWindow::update()
 		{
 			GLenum error = glGetError();
 			if (error != GL_NO_ERROR) //shitty error handling. Improve this later.
@@ -208,13 +257,13 @@ namespace GameEngineTest {
 			glViewport(0, 0, m_Width, m_Height);
 		}
 
-		bool Window::isClosed() const
+		bool OpenGLWindow::isClosed() const
 		{
 			return glfwWindowShouldClose(m_Window); // returns the close flag of the window. If either the 'x' button is clicked or the alt+f4 is pressed, this function will return 1 
 			//indicating that the window should be closed.
 		}
 
-		void Window::drawRightAngledTriangle()
+		void OpenGLWindow::drawRightAngledTriangle()
 		{	
 			//Legacy OpenGL, this is an old way of drawing stuff on the screen.
 			glBegin(GL_TRIANGLES);

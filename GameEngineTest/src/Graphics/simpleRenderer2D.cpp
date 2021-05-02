@@ -19,20 +19,18 @@ namespace GameEngineTest {
 				sprite->getIBO()->bind();
 				sprite->getShader().enable();
 				
-				sprite->getShader().setUniformMat4("ml_matrix", Math::mat4::translation(sprite->getPosition()));;
-				sprite->getShader().setUniform4f("colour", sprite->getColor());
+				//sprite->getShader().setUniformMat4("ml_matrix", Math::mat4::translation(sprite->getPosition()));;
+				//sprite->getShader().setUniform4f("colour", sprite->getColor());
 
-				glDrawElements(GL_TRIANGLES, sprite->getIBO()->getCount(), GL_UNSIGNED_SHORT, nullptr);
+				//glDrawElements(GL_TRIANGLES, sprite->getIBO()->getCount(), GL_UNSIGNED_SHORT, nullptr);
 
 				sprite->getIBO()->unbind();
 				sprite->getVAO()->unbind();
-
 
 				m_RenderQueue.pop_front();			
 			}
 			
 		}
-
 		void SimpleRenderer2D::end()
 		{
 		}

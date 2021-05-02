@@ -43,8 +43,6 @@ namespace GameEngineTest
 		{
 			Begin();
 
-			std::cout << "Want to capture mouse:" << wantToCaptureMouse << std::endl;
-
 			static bool show = true;
 			ImGui::ShowDemoWindow(&show);
 			

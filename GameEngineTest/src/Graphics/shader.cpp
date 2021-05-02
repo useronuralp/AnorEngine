@@ -79,7 +79,10 @@ namespace GameEngineTest {
 				std::cout << "Failed to link shaders!" << std::endl << &error[0] << std::endl;
 				glDeleteShader(fragment);
 				return 0;
-			}
+			}	
+
+			glDetachShader(program, vertex);
+			glDetachShader(program, fragment);
 			glDeleteShader(vertex);
 			glDeleteShader(fragment);
 

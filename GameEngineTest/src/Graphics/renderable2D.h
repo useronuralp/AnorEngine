@@ -1,6 +1,6 @@
 #pragma once
 #include "pch.h"
-#include "Buffers/indexbuffer.h"
+#include "Buffers/buffer.h"
 #include "Buffers/vertexarray.h"
 #include "../Math/maths.h"
 #include "../Graphics/shader.h"
@@ -12,7 +12,6 @@ namespace GameEngineTest {
 		struct ENGINE_API VertexData
 		{
 			Math::vec3 vertex;
-			//Math::vec4 color;
 			Math::vec2 uv; //texture coordinates.
 			float tid; //texture id.
 			unsigned int color;
@@ -31,9 +30,7 @@ namespace GameEngineTest {
 			Renderable2D(Math::vec3 position, Math::vec2 size, Math::vec4 color)
 				:m_Position(position), m_Size(size), m_Color(color)
 			{
-
 				setUVDefaults();
-
 			}
 			virtual ~Renderable2D()
 			{

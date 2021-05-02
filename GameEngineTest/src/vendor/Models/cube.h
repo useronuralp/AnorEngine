@@ -6,10 +6,10 @@ namespace GameEngineTest
 	{
 		float lightSourceVertx[] =
 		{
-			-0.5f, -0.5f, -0.5f,
-			 0.5f, -0.5f, -0.5f,
-			 0.5f,  0.5f, -0.5f,
-			 0.5f,  0.5f, -0.5f,
+			-0.5f, -0.5f, -0.5f, //1
+			 0.5f, -0.5f, -0.5f, //2
+			 0.5f,  0.5f, -0.5f, //3
+			 0.5f,  0.5f, -0.5f, //4
 			-0.5f,  0.5f, -0.5f,
 			-0.5f, -0.5f, -0.5f,
 
@@ -46,7 +46,7 @@ namespace GameEngineTest
 			 0.5f,  0.5f,  0.5f,
 			 0.5f,  0.5f,  0.5f,
 			-0.5f,  0.5f,  0.5f,
-			-0.5f,  0.5f, -0.5f,
+			-0.5f,  0.5f, -0.5f
 		};
 
 		float vertices[] = {
