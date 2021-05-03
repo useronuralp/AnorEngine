@@ -1,26 +1,26 @@
 #pragma once
 #include <GL/glew.h>
-#include "buffer.h"
+#include "Buffer.h"
 namespace GameEngineTest {
 	namespace  Graphics {
 
 		class ENGINE_API VertexArray
 		{
 		private:
-			IndexBuffer m_IndexBuffer;
-			GLuint m_ArrayID;
-			std::vector<Buffer> m_VertexBuffers;
+			std::vector<std::shared_ptr<Buffer>> m_VertexBuffers;
+			std::shared_ptr<IndexBuffer> m_IndexBuffer;
+			uint32_t m_ArrayID;
 		public:
 			VertexArray();
 			~VertexArray();
 
-			void AddVertexBuffer(Buffer& buffer);
-			void SetIndexBuffer(IndexBuffer& buffer);
+			void AddVertexBuffer(const std::shared_ptr<Buffer>& buffer);
+			void SetIndexBuffer(const std::shared_ptr<IndexBuffer>& indexBuffer);
 			void bind() const;
 			void unbind() const;
 
-			std::vector<Buffer>& GetVertexBuffers() { return m_VertexBuffers; }
-			IndexBuffer& GetIndexBuffer() { return m_IndexBuffer; }
+			const std::vector<std::shared_ptr<Buffer>>& GetVertexBuffers() const { return m_VertexBuffers; }
+			const IndexBuffer& GetIndexBuffer() const { return *m_IndexBuffer; }
 		};
 	}
 }

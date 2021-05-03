@@ -16,15 +16,13 @@ namespace GameEngineTest {
 
 		class ENGINE_API OpenGLWindow{
 		private:
-			//this pointer currently causes high coupling between this "singleton" window class and ImGuiLayer. You should get rid of this dependency and create a robust event handler/dispatcher class in the future.
-			Layer *ImGui; 
-		private:
 			std::map<char, bool> m_Keys = {{'W', false }, {'S', false }, {'A', false}, {'D', false}};
 			const char *m_Title;
 			int m_Width, m_Height;
 			GLFWwindow* m_Window;
 			bool m_Closed;
 			MousePosition mousePosition;
+			
 			bool isMouseCaptured = false;
 			float deltaTime = 0.0f;	// Time between current frame and last frame
 			float lastFrame = 0.0f; // Time of last frame
@@ -35,6 +33,7 @@ namespace GameEngineTest {
 			float PITCH = 0.0f;
 			float sensitivity = 0.05f;
 		public:
+			bool ImGuiWantToCaptureMouse = true;
 			glm::vec3 cameraPos = glm::vec3(0.0f, 2.0f, 5.0f);
 			glm::vec3 cameraFront = glm::vec3(0.0f, 0.0f, -1.0f);
 			glm::vec3 cameraUp = glm::vec3(0.0f, 1.0f, 0.0f);
@@ -49,8 +48,6 @@ namespace GameEngineTest {
 			inline void getMousePosition(double& x, double& y) { x = mousePosition.x; y = mousePosition.y; }
 			inline float getHeight() { return m_Height; }
 			inline float getWidth() { return m_Width; }
-			inline Layer* getImGuiWindowPointer() { return ImGui; }
-			inline void setImGuiPointer(Layer* ptr) { ImGui = ptr; }
 			inline GLFWwindow* getGLFWwindow() { return m_Window; }
 		private:
 			bool init();

@@ -16,7 +16,7 @@ namespace GameEngineTest {
 				width,0,0,		   color.x, color.y, color.z, color.w,  getUV()[3].x, getUV()[3].y
 			};
 			
-			BufferLayout layout = { {ShaderDataType::vec3, "a_Position", 0}, {ShaderDataType::vec2, "a_Uv", 1} , {ShaderDataType::vec4, "a_Color", 3}  };
+			//BufferLayout layout = { {ShaderDataType::vec3, "a_Position", 0}, {ShaderDataType::vec2, "a_Uv", 1} , {ShaderDataType::vec4, "a_Color", 3}  };
 			//m_VertexArray->AddVertexBuffer(*new Buffer(vertices, 9 * 4, layout)); //This part is not complete, you can code this part as a practice if you want.
 
 			GLushort indices[] = { 0,1,2,2,3,0 };

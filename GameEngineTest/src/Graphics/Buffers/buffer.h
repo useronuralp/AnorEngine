@@ -24,6 +24,7 @@ namespace GameEngineTest {
 			case ShaderDataType::Bool: return GL_BOOL;
 			}
 			CRITICAL("Unknown ShaderDataType");
+			__debugbreak;
 			return 0;
 		}
 		static uint32_t ShaderDataTypeConverter(ShaderDataType type)
@@ -49,31 +50,30 @@ namespace GameEngineTest {
 		}
 		struct ENGINE_API BufferElement
 		{
-			std::string name;
-			ShaderDataType type;
-			uint32_t size;
-			uint32_t offset;
-			uint32_t componentCount = 0;
-			uint32_t ShaderLayoutLocation; // used to match the shader layout (location = ?) value.
-			bool normalized;
+			std::string m_Name;
+			ShaderDataType m_Type;
+			uint32_t m_SizeByte;
+			uint32_t m_Offset;
+			uint32_t m_ComponentCount = 0;
+			uint32_t m_ShaderLayoutLocation; // used to match the shader layout (location = ?) value.
+			bool m_Normalized;
 		public:
-			//BufferElement() {}
 			BufferElement(ShaderDataType type, std::string name, int shaderLocation, bool normalized = false)
-				:name(name), type(type), size(ShaderDataTypeConverter(type)), offset(0), ShaderLayoutLocation(shaderLocation), normalized(normalized)
+				:m_Name(name), m_Type(type), m_SizeByte(ShaderDataTypeConverter(type)), m_Offset(0), m_ShaderLayoutLocation(shaderLocation), m_Normalized(normalized)
 			{
 				switch (type)
 				{
-					case ShaderDataType::vec:	componentCount = 1;		break;
-					case ShaderDataType::vec2:	componentCount = 2;		break;
-					case ShaderDataType::vec3:	componentCount = 3;		break;
-					case ShaderDataType::vec4:	componentCount = 4;		break;
-					case ShaderDataType::mat3:	componentCount = 3 * 3;	break;
-					case ShaderDataType::mat4:	componentCount = 4 * 4;	break;
-					case ShaderDataType::Int:	componentCount = 1;		break;
-					case ShaderDataType::Int2:	componentCount = 2;		break;
-					case ShaderDataType::Int3:	componentCount = 3;		break;
-					case ShaderDataType::Int4:	componentCount = 4;		break;
-					case ShaderDataType::Bool:	componentCount = 1;		break;
+					case ShaderDataType::vec:	m_ComponentCount = 1;		break;
+					case ShaderDataType::vec2:	m_ComponentCount = 2;		break;
+					case ShaderDataType::vec3:	m_ComponentCount = 3;		break;
+					case ShaderDataType::vec4:	m_ComponentCount = 4;		break;
+					case ShaderDataType::mat3:	m_ComponentCount = 3 * 3;	break;
+					case ShaderDataType::mat4:	m_ComponentCount = 4 * 4;	break;
+					case ShaderDataType::Int:	m_ComponentCount = 1;		break;
+					case ShaderDataType::Int2:	m_ComponentCount = 2;		break;
+					case ShaderDataType::Int3:	m_ComponentCount = 3;		break;
+					case ShaderDataType::Int4:	m_ComponentCount = 4;		break;
+					case ShaderDataType::Bool:	m_ComponentCount = 1;		break;
 				}
 			}
 		};
@@ -82,10 +82,14 @@ namespace GameEngineTest {
 		{
 		private:
 			std::vector<BufferElement> m_Elements;
-			uint32_t m_Stride = 0;
-			uint32_t totalComponentCount = 0;
+			uint32_t m_StrideByte = 0;
+			uint32_t m_TotalComponentCount = 0;
 		public:
-			BufferLayout() {}
+			std::vector<BufferElement>::iterator begin() { return m_Elements.begin(); }
+			std::vector<BufferElement>::iterator end() { return m_Elements.end(); }
+			const std::vector<BufferElement>::const_iterator begin() const { return m_Elements.begin(); }
+			const std::vector<BufferElement>::const_iterator end() const { return m_Elements.end(); }
+		public:
 			BufferLayout(const std::initializer_list<BufferElement>& elements)
 				:m_Elements(elements)
 			{
@@ -95,42 +99,40 @@ namespace GameEngineTest {
 			void CalculateOffsetAndStride()
 			{
 				uint32_t offset = 0;
-				m_Stride = 0;
+				m_StrideByte = 0;
 				for (auto& element : m_Elements)
 				{
-					element.offset = offset;
-					offset += element.size;
-					totalComponentCount += element.componentCount;
-					m_Stride += element.size;
+					element.m_Offset = offset;
+					offset += element.m_SizeByte;
+					m_TotalComponentCount += element.m_ComponentCount;
+					m_StrideByte += element.m_SizeByte;
 				}
 			}		
 		public:	
-			inline const std::vector<BufferElement>& GetBufferElements() const { return m_Elements; }
-			uint32_t getStride() { return m_Stride; }
-			uint32_t getComponentCount() { return totalComponentCount; }
+			inline const std::vector<BufferElement>& GetLayoutElements() const { return m_Elements; }
+			const uint32_t& GetStride() const { return m_StrideByte; }
+			const uint32_t& GetComponentCount() const { return m_TotalComponentCount; }
 		};
 
 		class ENGINE_API Buffer
 		{
-			friend class VertexArray;
 		private:
-			uint32_t m_Size;
-			GLuint m_BufferID;
+			uint32_t m_SizeByte;
+			uint32_t m_BufferID;
 			BufferLayout m_Layout;
 		public:
-			Buffer(GLfloat * vertices, uint32_t size, BufferLayout layout); // size = total component count * sizeof(passed variable)
+			Buffer(GLfloat* vertices, uint32_t sizeByte, BufferLayout& layout); // size = total component count * sizeof(passed variable)
 			~Buffer();
 			void bind() const;
 			void unbind() const;
-			inline BufferLayout& getBufferLayout() { return m_Layout; }
+			const inline BufferLayout& GetBufferLayout() const { return m_Layout; }
 			//void SetLayout(BufferLayout& layout) { m_Layout = layout; }
 		};
 
 		class ENGINE_API IndexBuffer
 		{
-			friend class VertexArray;
 		private:
-			GLuint m_BufferID;
+			uint32_t m_BufferID;
 			uint32_t m_Count;
 		private:
 			IndexBuffer()
@@ -141,7 +143,7 @@ namespace GameEngineTest {
 			void bind() const;
 			void unbind() const;
 		public:
-			uint32_t GetCount() { return m_Count; }
+			const uint32_t& GetCount() const { return m_Count; }
 		};
 	}
 }

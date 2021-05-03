@@ -1,8 +1,8 @@
 #include "pch.h"
 #include "ImGuiLayer.h"
+#include "../Application.h" //added fresh
 #include "../ImGuiExampleBuilds/imgui_impl_glfw.h"
 #include "../ImGuiExampleBuilds/imgui_impl_opengl3.h"
-
 namespace GameEngineTest
 {	namespace Graphics
 	{

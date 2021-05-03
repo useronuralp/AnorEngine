@@ -28,16 +28,13 @@ namespace Game
 			shader3 = new Shader("H:\\ProgrammingProjects\\repos\\GameEngineTest\\GameEngineTest\\src\\shaders\\vertex.shader", "H:\\ProgrammingProjects\\repos\\GameEngineTest\\GameEngineTest\\src\\shaders\\fragment.shader");
 		
 
-
-
 			BufferLayout layout = { {ShaderDataType::vec3, "a_Position", 0} };
 			
 			uint32_t totalComponentCount = sizeof(Shape::lightSourceVertx) / sizeof(Shape::lightSourceVertx[0]); // this is how you calculate the element count in a const float* array.
-			uint32_t size = totalComponentCount * sizeof(GL_FLOAT);
+			uint32_t size = totalComponentCount * sizeof(GL_FLOAT); // you can maybe find a way to calculate this in the passed objcect?
 
-			light = new Renderable3D(*new Buffer(Shape::lightSourceVertx, size ,layout));
-
-
+			//A Buffer object needs to be always created with a BufferLayout. That is why I currently don't allow a default constructor in there.
+			light = new Renderable3D(std::make_shared<Buffer>(Shape::lightSourceVertx, size ,layout));
 
 			float lightX = 2, lightY = 3;
 			light->translate(lightX, lightY, 0.0f);
@@ -94,6 +91,14 @@ namespace Game
 	public:
 		virtual ~Scene() 
 		{	
+			delete m_Window;
+			delete shader;
+			delete shader2;
+			delete shader3;
+			delete light;
+			delete Arianna;
+			delete backpack;
+			delete basketball;
 			WARN("Scene Destructor completed!!");
 		}
 	};
@@ -105,9 +110,8 @@ namespace Game
 	public:
 		Sandbox()
 		{	
-			pushLayer(new Scene(m_Window)); //as our first layer we need to create the Scene that our "game" will play out on.
-			m_Window->setImGuiPointer(new ImGuiLayer()); //after creating the scene layer. We need to attach a new ImGuiLayer as a debug layer/ui to its member variable. (This part should be changed later)
-			pushLayer(m_Window->getImGuiWindowPointer()); // finally, we push the debug/imgui layer to our layer stack to render it. (This layer should be rendered first, meaning it should be pushed into the stack as the last element.)
+			pushLayer(new Scene(m_Window));
+			pushLayer(ImGui); //Application class now has its own ImGui pointer which is a lot better than storing it inside OpenGLWindow class.
 			logInfoDebug();
 		}
 	protected:
@@ -127,14 +131,25 @@ namespace Game
 		void Run() override
 		{	
 			while (!m_Window->isClosed())
-			{									
+			{			
 				m_Window->clear();
+				//---------------------------------------
+				//---------------------------------------
+				//---------------------------------------
+				if (m_Window->ImGuiWantToCaptureMouse)
+					ImGui->wantToCaptureMouse = true;
+				else
+					ImGui->wantToCaptureMouse = false;
+				//---*Render Here*---//
 				for (Layer* layer : m_LayerStack)
 				{	
 					layer->OnUpdate();
 				}
+				//---------------------------------------
+				//---------------------------------------
+				//---------------------------------------
 				m_Window->update();
-			}
+			}		
 		}
 		void pushLayer(Layer *Layer)
 		{

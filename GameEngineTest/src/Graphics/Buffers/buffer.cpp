@@ -7,12 +7,12 @@ namespace GameEngineTest{
 		//-------------VertexBuffer impl ----------------
 		//----------------------------------------------
 		//-----------------------------------------------
-		Buffer::Buffer(GLfloat* vertices, uint32_t size, BufferLayout layout)
-			:m_Layout(layout), m_Size(size)
+		Buffer::Buffer(GLfloat* vertices, uint32_t sizeByte, BufferLayout& layout)
+			:m_Layout(layout), m_SizeByte(sizeByte)
 		{
 			glGenBuffers(1, &m_BufferID);
 			glBindBuffer(GL_ARRAY_BUFFER, m_BufferID);
-			glBufferData(GL_ARRAY_BUFFER,  m_Size, vertices, GL_STATIC_DRAW);
+			glBufferData(GL_ARRAY_BUFFER,  m_SizeByte, vertices, GL_STATIC_DRAW);
 			glBindBuffer(GL_ARRAY_BUFFER, 0);
 		}
 		Buffer::~Buffer()

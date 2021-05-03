@@ -13,13 +13,13 @@ namespace GameEngineTest {
 				{
 					glfwSetInputMode(win->m_Window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 					win->isMouseCaptured = true;
-					win->ImGui->wantToCaptureMouse = false;
+					win->ImGuiWantToCaptureMouse = false;
 				}
 				else
 				{
 					glfwSetInputMode(win->m_Window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
 					win->isMouseCaptured = false;
-					win->ImGui->wantToCaptureMouse = true;
+					win->ImGuiWantToCaptureMouse = true;
 					win->isInitialMouseCaptured = false;
 					win->m_Keys['W'] = false;
 					win->m_Keys['A'] = false;
@@ -158,7 +158,6 @@ namespace GameEngineTest {
 
 		OpenGLWindow::OpenGLWindow(const char* title, int width, int height) 
 		{	
-			ImGui = nullptr;
 			m_Title = title;
 			m_Height = height;
 			m_Width = width;

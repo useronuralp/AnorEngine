@@ -4,6 +4,7 @@
 #include <gtc/type_ptr.hpp>
 #include <gtc/matrix_transform.hpp>
 #include "BUffers/vertexarray.h"
+//#include <memory>
 namespace GameEngineTest {
 	namespace Graphics {
 
@@ -28,7 +29,7 @@ namespace GameEngineTest {
 		private:
 			VertexArray m_VAO;
 		public:
-			Renderable3D(Buffer& buffer);
+			Renderable3D(std::shared_ptr<Buffer> buffer);
 		public:
 			void rotate(const float& degree, const float& x, const float& y, const float& z);
 			void translate(const float& x, const float& y, const float& z);
@@ -36,9 +37,9 @@ namespace GameEngineTest {
 		public:
 			void bindVAO();
 			void unbindVAO();
-			VertexArray& getVertexArray() { return m_VAO; }
+			const VertexArray& getVertexArray() const { return m_VAO; }
 		private:
-			void init(Buffer buffer);
+			void init(std::shared_ptr<Buffer> buffer);
 		};
 	}
 }

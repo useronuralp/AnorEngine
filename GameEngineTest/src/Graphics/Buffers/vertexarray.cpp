@@ -9,29 +9,36 @@ namespace GameEngineTest {
 			glGenVertexArrays(1, &m_ArrayID);
 		}
 		VertexArray::~VertexArray()
-		{
+		{	
+			//if(!m_IndexBuffer)
+			//	delete m_IndexBuffer;
+			//for (auto buffer : m_VertexBuffers)
+			//{
+			//	delete buffer; //This is not managed by the shader_ptr class.
+			//}
 			glDeleteVertexArrays(1, &m_ArrayID);
 		}
-		void VertexArray::AddVertexBuffer(Buffer& buffer)
-		{
-			glBindVertexArray(m_ArrayID);//THIS PART IS SO IMPORTANT. OpenGL is a state machine and in this code snippet, before linking buffer data with a VAO, you FIRST NEED TO BIND THE VAO. Meaning you need to select the state.
-			buffer.bind(); //Remember this binding operation is done by using the m_ArrayID which is unique to every array. After binding the array, you need to bind a buffer. Then link the two active objects together using the
-			const auto& layout = buffer.getBufferLayout().GetBufferElements();
-			for (auto& element : layout)
-			{
-				glEnableVertexAttribArray(element.ShaderLayoutLocation);
-				glVertexAttribPointer(element.ShaderLayoutLocation, element.componentCount, ShaderDataTypeToOpenGLBaseType(element.type), element.normalized ? GL_TRUE : GL_FALSE, buffer.getBufferLayout().getStride(), (void*)element.offset);
-			}
-			m_VertexBuffers.push_back(buffer);
-			buffer.unbind();
-			glBindVertexArray(0);
-		}
-		void VertexArray::SetIndexBuffer(IndexBuffer& indexBuffer)
+		void VertexArray::AddVertexBuffer(const std::shared_ptr<Buffer>& buffer)
 		{
 			glBindVertexArray(m_ArrayID);
-			indexBuffer.bind();
+			buffer->bind();
+			auto& layout = buffer->GetBufferLayout();
+			for (const auto& element : layout) //This is a vector.
+			{
+				glEnableVertexAttribArray(element.m_ShaderLayoutLocation);
+				glVertexAttribPointer(element.m_ShaderLayoutLocation, element.m_ComponentCount, ShaderDataTypeToOpenGLBaseType(element.m_Type), element.m_Normalized ? GL_TRUE : GL_FALSE, buffer->GetBufferLayout().GetStride(), (void*)element.m_Offset);
+			}
+			m_VertexBuffers.push_back(buffer);
+			buffer->unbind();
+			glBindVertexArray(0);
+		}
+		void VertexArray::SetIndexBuffer(const std::shared_ptr<IndexBuffer>& indexBuffer)
+		{
+			glBindVertexArray(m_ArrayID);
+			indexBuffer->bind();
 
 			m_IndexBuffer = indexBuffer;
+			glBindVertexArray(0);
 		}
 		void VertexArray::bind() const
 		{
