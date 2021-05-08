@@ -1,8 +1,8 @@
 #pragma once
 #include <glm.hpp>
 #include <Graphics/Buffers/VertexArray.h>
-#include "../Camera.h"
-#include "../shader.h"
+#include "Graphics/Camera.h"
+#include "Graphics/shader.h"
 //#include "RendererCommand.h"
 namespace AnorEngine
 {

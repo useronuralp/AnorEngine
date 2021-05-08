@@ -218,9 +218,8 @@ namespace Game
 				Renderer::BeginScene(m_OrthoCamera);
 				Renderer::ClearColor(glm::vec4(0.1f, 0.1f, 0.1f, 1));
 				Renderer::Clear();
-				cameraSpeed =  10 * DeltaTime();
-				ProcessCamera();
-				m_OrthoCamera->SetPosition(cameraPos);
+				cameraSpeed =  10 * DeltaTime();		
+				m_OrthoCamera->SetPosition(ProcessCamera());
 
 				for (Layer* layer : m_LayerStack)
 				{	
@@ -246,7 +245,7 @@ namespace Game
 #ifdef RENDER_MY_SCENE
 			if (event->GetEventType() == Input::EventType::KeyPressEvent)
 			{
-				if (dynamic_cast<Input::KeyPressEvent*>(event)->GetKeyCode() == ONURALP_KEY_LEFT_CONTROL)
+				if (dynamic_cast<Input::KeyPressEvent*>(event)->GetKeyCode() == ANOR_KEY_LEFT_CONTROL)
 				{
 					if (!isMouseCaptured)
 					{
@@ -303,9 +302,9 @@ namespace Game
 #endif
 			delete event;
 		}
-		void ProcessCamera()
+		glm::vec3& ProcessCamera()
 		{		
-			if (Input::EventHandler::IsKeyDown(ONURALP_KEY_W))
+			if (Input::EventHandler::IsKeyDown(ANOR_KEY_W))
 			{
 #ifdef RENDER_MY_SCENE
 				m_PersCamera->cameraPos += cameraSpeed * m_PersCamera->cameraFront;
@@ -313,7 +312,7 @@ namespace Game
 				cameraPos.y += cameraSpeed;
 #endif
 			}
-			else if (Input::EventHandler::IsKeyDown(ONURALP_KEY_S))
+			else if (Input::EventHandler::IsKeyDown(ANOR_KEY_S))
 			{
 #ifdef RENDER_MY_SCENE
 				m_PersCamera->cameraPos -= cameraSpeed * m_PersCamera->cameraFront;
@@ -321,7 +320,7 @@ namespace Game
 				cameraPos.y -= cameraSpeed;
 #endif
 			}
-			if (Input::EventHandler::IsKeyDown(ONURALP_KEY_A))
+			if (Input::EventHandler::IsKeyDown(ANOR_KEY_A))
 			{
 #ifdef RENDER_MY_SCENE
 				m_PersCamera->cameraPos -= glm::normalize(glm::cross(m_PersCamera->cameraFront, m_PersCamera->cameraUp)) * cameraSpeed;
@@ -329,7 +328,7 @@ namespace Game
 				cameraPos.x -= cameraSpeed;
 #endif
 			}
-			else if (Input::EventHandler::IsKeyDown(ONURALP_KEY_D))
+			else if (Input::EventHandler::IsKeyDown(ANOR_KEY_D))
 			{
 #ifdef RENDER_MY_SCENE
 				m_PersCamera->cameraPos += glm::normalize(glm::cross(m_PersCamera->cameraFront, m_PersCamera->cameraUp)) * cameraSpeed;
@@ -337,6 +336,7 @@ namespace Game
 				cameraPos.x += cameraSpeed;
 #endif
 			}
+			return cameraPos;
 		}
 		float DeltaTime()
 		{

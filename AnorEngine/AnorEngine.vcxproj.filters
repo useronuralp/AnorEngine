@@ -114,10 +114,10 @@
     <ClCompile Include="src\vendor\ImGUI\imgui_widgets.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\Graphics\Renderer\Renderer.cpp">
+    <ClCompile Include="src\Renderer\Renderer.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\Graphics\Renderer\RendererCommand.cpp">
+    <ClCompile Include="src\Renderer\RendererCommand.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\Graphics\Camera.cpp">
@@ -266,10 +266,10 @@
     <ClInclude Include="src\MouseButtonCodes.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\Graphics\Renderer\Renderer.h">
+    <ClInclude Include="src\Renderer\Renderer.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\Graphics\Renderer\RendererCommand.h">
+    <ClInclude Include="src\Renderer\RendererCommand.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\Graphics\Camera.h">

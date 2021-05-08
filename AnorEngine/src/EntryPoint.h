@@ -4,7 +4,6 @@
 #include "pch.h"
 #include "Application.h"
 #include "Graphics/Layers/LayerStack.h"
-#include <filesystem>
 namespace Game
 {
 	extern AnorEngine::Application* CreateApplication();

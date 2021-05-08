@@ -49,7 +49,7 @@ namespace AnorEngine
 				Event::m_EventType = EventType::KeyReleaseEvent;
 			}
 		public:
-			void Log() override { INFO("Key Released Event. Pressed Key: {0}", m_KeyCode); }
+			void Log() override { INFO("Key Release Event. Pressed Key: {0}", m_KeyCode); }
 			int GetKeyCode() { return m_KeyCode; }
 		private:
 			virtual ~KeyReleaseEvent(){}
@@ -66,7 +66,7 @@ namespace AnorEngine
 				Event::m_EventType = EventType::MouseClickEvent;
 			}
 		public:
-			void Log() override { INFO("Mouse Click Event. Clicked Key: {0}", m_MouseCode); }
+			void Log() override { INFO("Mouse Click Event. Clicked Mouse Button: {0}", m_MouseCode); }
 			int GetMouseCode() { return m_MouseCode; }
 			int GetMouseAction() { return m_Action; }
 			virtual ~MouseClickEvent() override {}
@@ -84,7 +84,7 @@ namespace AnorEngine
 				Event::m_EventType = EventType::MouseReleaseEvent;
 			}
 		public:
-			void Log() override { INFO("Mouse Release Event. Release Key: {0}", m_MouseCode); }
+			void Log() override { INFO("Mouse Release Event. Released Mouse Button: {0}", m_MouseCode); }
 			int GetMouseCode() { return m_MouseCode; }
 			int GetMouseAction() { return m_Action; }
 			virtual ~MouseReleaseEvent() override {}

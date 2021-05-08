@@ -82,7 +82,7 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LinkIncremental>true</LinkIncremental>
-    <IncludePath>$(SolutionDir)AnorEngine\src;$(SolutionDir)Dependencies\GLM;$(SolutionDir)Dependencies\FreeImage\include;$(SolutionDir)Dependencies\GLEW\include;$(SolutionDir)Dependencies\GLFW\includex64;$(SolutionDir)Dependencies\Assimp\include;$(SolutionDir)AnorEngine\src\vendor\spdlog-1.x\include;$(SolutionDir)AnorEngine\src\vendor\imGUI;$(IncludePath)</IncludePath>
+    <IncludePath>$(SolutionDir)AnorEngine\src;$(SolutionDir)Dependencies\GLM;$(SolutionDir)Dependencies\FreeImage\include;$(SolutionDir)Dependencies\GLEW\include;$(SolutionDir)Dependencies\GLFW\includex64;$(SolutionDir)Dependencies\Assimp\include;$(SolutionDir)AnorEngine\src\vendor\spdlog-1.x\include;$(SolutionDir)AnorEngine\src\vendor\imgui;$(IncludePath)</IncludePath>
     <LibraryPath>$(SolutionDir)Dependencies\FreeImage\lib;$(SolutionDir)Dependencies\GLEW\lib\x64;$(SolutionDir)Dependencies\GLFW\lib-vc2019x64;$(SolutionDir)Dependencies\Assimp\lib;$(LibraryPath)</LibraryPath>
     <IntDir>$(SolutionDir)bin-int\$(Configuration)_$(Platform)-$(ProjectName)_int</IntDir>
     <OutDir>$(SolutionDir)bin\$(Configuration)_$(Platform)-$(ProjectName)</OutDir>
@@ -91,7 +91,7 @@
     <LinkIncremental>false</LinkIncremental>
     <OutDir>$(SolutionDir)bin\$(Configuration)_$(Platform)-$(ProjectName)</OutDir>
     <IntDir>$(SolutionDir)bin-int\$(Configuration)_$(Platform)-$(ProjectName)_int</IntDir>
-    <IncludePath>$(SolutionDir)AnorEngine\src;$(SolutionDir)Dependencies\GLM;$(SolutionDir)Dependencies\FreeImage\include;$(SolutionDir)Dependencies\GLEW\include;$(SolutionDir)Dependencies\GLFW\includex64;$(SolutionDir)Dependencies\Assimp\include;$(SolutionDir)AnorEngine\src\vendor\spdlog-1.x\include;$(SolutionDir)AnorEngine\src\vendor\imGUI;$(IncludePath)</IncludePath>
+    <IncludePath>$(SolutionDir)AnorEngine\src;$(SolutionDir)Dependencies\GLM;$(SolutionDir)Dependencies\FreeImage\include;$(SolutionDir)Dependencies\GLEW\include;$(SolutionDir)Dependencies\GLFW\includex64;$(SolutionDir)Dependencies\Assimp\include;$(SolutionDir)AnorEngine\src\vendor\spdlog-1.x\include;$(SolutionDir)AnorEngine\src\vendor\imgui;$(IncludePath)</IncludePath>
     <LibraryPath>$(SolutionDir)Dependencies\FreeImage\lib;$(SolutionDir)Dependencies\GLEW\lib\x64;$(SolutionDir)Dependencies\GLFW\lib-vc2019x64;$(SolutionDir)Dependencies\Assimp\lib;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
@@ -188,8 +188,8 @@ xcopy "$(SolutionDir)bin\Release_x64-AnorEngine\AnorEngine.dll" "$(SolutionDir)b
     <ClCompile Include="src\Graphics\mesh.cpp" />
     <ClCompile Include="src\Graphics\model.cpp" />
     <ClCompile Include="src\Graphics\renderable3D.cpp" />
-    <ClCompile Include="src\Graphics\Renderer\Renderer.cpp" />
-    <ClCompile Include="src\Graphics\Renderer\RendererCommand.cpp" />
+    <ClCompile Include="src\Renderer\Renderer.cpp" />
+    <ClCompile Include="src\Renderer\RendererCommand.cpp" />
     <ClCompile Include="src\Graphics\simpleRenderer2D.cpp" />
     <ClCompile Include="src\Graphics\shader.cpp" />
     <ClCompile Include="src\Graphics\simplerenderer3D.cpp" />
@@ -229,8 +229,8 @@ xcopy "$(SolutionDir)bin\Release_x64-AnorEngine\AnorEngine.dll" "$(SolutionDir)b
     <ClInclude Include="src\Graphics\Camera.h" />
     <ClInclude Include="src\Graphics\Layers\Layer.h" />
     <ClInclude Include="src\Graphics\Layers\LayerStack.h" />
-    <ClInclude Include="src\Graphics\Renderer\Renderer.h" />
-    <ClInclude Include="src\Graphics\Renderer\RendererCommand.h" />
+    <ClInclude Include="src\Renderer\Renderer.h" />
+    <ClInclude Include="src\Renderer\RendererCommand.h" />
     <ClInclude Include="src\ImGuiExampleBuilds\imgui_impl_glfw.h" />
     <ClInclude Include="src\ImGuiExampleBuilds\imgui_impl_opengl3.h" />
     <ClInclude Include="src\ImGui\ImGuiLayer.h" />
