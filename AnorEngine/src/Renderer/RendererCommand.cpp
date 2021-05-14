@@ -4,7 +4,7 @@ namespace AnorEngine
 {
 	namespace Graphics
 	{
-		void RenderCommand::DrawIndexed(std::shared_ptr<VertexArray>& vertexArray)
+		void RenderCommand::DrawIndexed(Ref<VertexArray>& vertexArray)
 		{
 			
 		}

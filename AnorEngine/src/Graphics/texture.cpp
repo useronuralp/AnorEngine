@@ -19,7 +19,7 @@ namespace AnorEngine {
 
 			glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, m_Width, m_Height, 0, GL_RGBA, GL_UNSIGNED_BYTE, m_LocaBuffer);
 			glBindTexture(GL_TEXTURE_2D, 0);
-
+			
 			if (m_LocaBuffer)
 				stbi_image_free(m_LocaBuffer);
 		}
@@ -31,7 +31,7 @@ namespace AnorEngine {
 
 		void Texture::Bind(unsigned int slot) const
 		{
-			glActiveTexture(GL_TEXTURE0 + slot); //allows you to speicfy a texture slot, usually on pc there are 32 texture slots and theu count up one by one.
+			//glActiveTexture(GL_TEXTURE0 + slot); //allows you to speicfy a texture slot, usually on pc there are 32 texture slots and theu count up one by one.
 			glBindTexture(GL_TEXTURE_2D, m_RendererID);
 		}
 

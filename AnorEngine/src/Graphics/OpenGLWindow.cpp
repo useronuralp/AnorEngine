@@ -7,24 +7,24 @@ namespace AnorEngine {
 		void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods)
 		{	
 			if (action == GLFW_PRESS || action == GLFW_REPEAT)
-				Input::EventHandler::SubmitEvent(new Input::KeyPressEvent(key, action));
+				Input::EventHandler::SubmitEvent(std::make_shared<Input::KeyPressEvent>(key, action));
 
 			else if (action == GLFW_RELEASE)
-				Input::EventHandler::SubmitEvent(new Input::KeyReleaseEvent(key));
+				Input::EventHandler::SubmitEvent(std::make_shared<Input::KeyReleaseEvent>(key));
 
 		}
 		void mouse_button_callback(GLFWwindow* window, int button, int action, int mods)
 		{
 			OpenGLWindow* win = (OpenGLWindow*)glfwGetWindowUserPointer(window);
 			if(action == GLFW_PRESS)
-				Input::EventHandler::SubmitEvent(new Input::MouseClickEvent(button, action));
+				Input::EventHandler::SubmitEvent(std::make_shared<Input::MouseClickEvent>(button, action));
 			else
-				Input::EventHandler::SubmitEvent(new Input::MouseReleaseEvent(button, action));
+				Input::EventHandler::SubmitEvent(std::make_shared<Input::MouseReleaseEvent>(button, action));
 		}
 		void cursor_position_callback(GLFWwindow* window, double xpos, double ypos)
 		{
 			OpenGLWindow* win = (OpenGLWindow*)glfwGetWindowUserPointer(window);
-			Input::EventHandler::SubmitEvent(new Input::MouseMoveEvent(xpos, ypos));
+			Input::EventHandler::SubmitEvent(std::make_shared<Input::MouseMoveEvent>(xpos, ypos));
 		}
 		void mouse_scroll_callback(GLFWwindow* window, double xoffset, double yoffset)
 		{

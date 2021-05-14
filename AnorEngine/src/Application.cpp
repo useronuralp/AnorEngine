@@ -12,9 +12,9 @@ namespace AnorEngine
 	{	
 		s_Instance = this; //static setup of instance of this singleton class.
 		AnorEngine::EngineInitializer::init();
-		m_OpenGLWindow = new Graphics::OpenGLWindow("Anor Engine", 1920, 1080);  //window creation
-		ImGui = new Graphics::ImGuiLayer(); //Create the imgui layer at the construction.
-		if (!ImGui)
+		m_OpenGLWindow = std::make_shared<Graphics::OpenGLWindow>("Anor Engine", 1920, 1080);  //window creation
+		ImGuiEditorLayer = std::make_shared<Graphics::ImGuiLayer>(); //Create the imgui layer at the construction.
+		if (!ImGuiEditorLayer)
 			CRITICAL("APP::{0}", "Application failed to initialize ImGui Layer!!!!");
 		else
 			WARN("APP::{0}", "ImGui Layer was successfuly created");

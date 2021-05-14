@@ -3,7 +3,7 @@
 namespace AnorEngine {
 	namespace Graphics {
 
-		void Model::Draw(Shader& shader , PerspectiveCamera* camera)
+		void Model::Draw(const Ref<Shader> shader , const Ref<PerspectiveCamera> camera)
 		{
 			for (unsigned int i = 0; i < meshes.size(); i++)
 				meshes[i].Draw(shader, camera);

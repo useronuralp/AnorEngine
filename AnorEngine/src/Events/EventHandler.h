@@ -10,7 +10,7 @@ namespace AnorEngine
 		private:
 			static Application* s_TargetApplication;
 		public:
-			static void SubmitEvent(Event* event);
+			static void SubmitEvent(Ref<Event> event);
 			inline static void SetTargetApplication(Application* target) { s_TargetApplication = target; }
 			static bool IsKeyDown(int keyCode);
 			static bool IsMousePressed(int button);

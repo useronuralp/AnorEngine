@@ -40,13 +40,13 @@
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
-    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <ConfigurationType>StaticLibrary</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
     <PlatformToolset>v142</PlatformToolset>
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
-    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <ConfigurationType>StaticLibrary</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
     <PlatformToolset>v142</PlatformToolset>
     <WholeProgramOptimization>true</WholeProgramOptimization>
@@ -143,8 +143,8 @@
       <AdditionalDependencies>glfw3.lib;glew32s.lib;opengl32.lib;FreeImage.lib;assimp-vc142-mtd.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <PostBuildEvent>
-      <Command>if not exist "$(SolutionDir)bin\Debug_x64-Sandbox" mkdir "$(SolutionDir)bin\Debug_x64-Sandbox"
-xcopy "$(SolutionDir)bin\Debug_x64-AnorEngine\AnorEngine.dll" "$(SolutionDir)bin\Debug_x64-Sandbox" /Y</Command>
+      <Command>
+      </Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -170,8 +170,8 @@ xcopy "$(SolutionDir)bin\Debug_x64-AnorEngine\AnorEngine.dll" "$(SolutionDir)bin
       <AdditionalDependencies>glfw3.lib;glew32s.lib;opengl32.lib;FreeImage.lib;assimp-vc142-mtd.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <PostBuildEvent>
-      <Command>if not exist "$(SolutionDir)bin\Release_x64-Sandbox" mkdir "$(SolutionDir)bin\Release_x64-Sandbox"
-xcopy "$(SolutionDir)bin\Release_x64-AnorEngine\AnorEngine.dll" "$(SolutionDir)bin\Release_x64-Sandbox" /Y</Command>
+      <Command>
+      </Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
@@ -274,7 +274,9 @@ xcopy "$(SolutionDir)bin\Release_x64-AnorEngine\AnorEngine.dll" "$(SolutionDir)b
   <ItemGroup>
     <None Include="Models\Backpack\backpack.mtl" />
     <None Include="src\shaders\2DFragment.shader" />
+    <None Include="src\shaders\2DFragmentTexture.shader" />
     <None Include="src\shaders\2DVertex.shader" />
+    <None Include="src\shaders\2DVertexTexture.shader" />
     <None Include="src\shaders\fragment.shader" />
     <None Include="src\shaders\vertex.shader" />
     <None Include="src\shaders\lightsourceFrag.shader" />
@@ -290,6 +292,7 @@ xcopy "$(SolutionDir)bin\Release_x64-AnorEngine\AnorEngine.dll" "$(SolutionDir)b
     <Image Include="Models\Backpack\roughness.jpg" />
     <Image Include="Models\Backpack\specular.jpg" />
     <Image Include="textures\381f5a63791945.5abc4ccf1297d.png" />
+    <Image Include="textures\minecraft-diamond.png" />
     <Image Include="textures\sample_gigatextures_4096_seamless2.png" />
     <Image Include="textures\tileable-grass_clover_tt7010116-sample_1.png" />
     <Image Include="vertexLayoutExample.PNG" />

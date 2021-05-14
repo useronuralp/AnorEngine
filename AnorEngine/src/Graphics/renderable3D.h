@@ -27,7 +27,7 @@ namespace AnorEngine {
 		private:
 			VertexArray m_VAO;
 		public:
-			Renderable3D(std::shared_ptr<Buffer> buffer);
+			Renderable3D(Ref<Buffer> buffer);
 		public:
 			void rotate(const float& degree, const float& x, const float& y, const float& z);
 			void translate(const float& x, const float& y, const float& z);
@@ -37,7 +37,7 @@ namespace AnorEngine {
 			void unbindVAO();
 			const VertexArray& getVertexArray() const { return m_VAO; }
 		private:
-			void init(std::shared_ptr<Buffer> buffer);
+			void init(Ref<Buffer> buffer);
 		};
 	}
 }

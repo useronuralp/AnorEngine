@@ -2,11 +2,11 @@
 #include "twoDimensionalLayer.h"
 namespace AnorEngine {
 	namespace Graphics {
-		TwoDimensionalLayer::TwoDimensionalLayer(Renderer2D* renderer, Shader* shader, Math::mat4 projectionMatrix)
+		TwoDimensionalLayer::TwoDimensionalLayer(Renderer2D* renderer, Shader* shader, const glm::mat4& projectionMatrix)
 			:m_Renderer(renderer), m_Shader(shader), m_ProjectionMatrix(projectionMatrix)
 		{
 			m_Shader->enable();
-			m_Shader->setUniformMat4("pr_matrix", m_ProjectionMatrix);
+			m_Shader->UploadMat4("pr_matrix", m_ProjectionMatrix);
 			m_Shader->disable();
 		}
 		TwoDimensionalLayer::~TwoDimensionalLayer()

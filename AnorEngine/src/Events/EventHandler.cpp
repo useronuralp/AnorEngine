@@ -5,13 +5,13 @@ namespace AnorEngine
 	namespace Input
 	{
 		Application* EventHandler::s_TargetApplication;
-		void EventHandler::SubmitEvent(Event* event)
+		void EventHandler::SubmitEvent(Ref<Event> event)
 		{
 			EventHandler::s_TargetApplication->OnEvent(event);
 		}
 		bool EventHandler::IsKeyDown(int keyCode)
 		{
-			return glfwGetKey(EventHandler::s_TargetApplication->GetOpenGLWindow().GetNativeWindow(), keyCode); //GLFW_RELEASE equals to 0 thats why this works.
+			return glfwGetKey(EventHandler::s_TargetApplication->GetOpenGLWindow()->GetNativeWindow(), keyCode); //GLFW_RELEASE equals to 0 thats why this works.
 		}
 		float EventHandler::GetMouseXOffset(GLFWwindow* windowPtr)
 		{
@@ -27,7 +27,7 @@ namespace AnorEngine
 		}
 		bool EventHandler::IsMousePressed(int button)
 		{
-			return glfwGetMouseButton(s_TargetApplication->GetOpenGLWindow().GetNativeWindow(), button);
+			return glfwGetMouseButton(s_TargetApplication->GetOpenGLWindow()->GetNativeWindow(), button);
 		}
 	}
 }

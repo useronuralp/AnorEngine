@@ -4,9 +4,9 @@
 namespace AnorEngine {
 	namespace Graphics
 	{
-		void LayerStack::pushLayer(Layer &Layer)
+		void LayerStack::pushLayer(Ref<Layer> Layer)
 		{
-			m_LayerStack.push_back(&Layer);
+			m_LayerStack.push_back(Layer);
 		}
 		void LayerStack::popLayer()
 		{

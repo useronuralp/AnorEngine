@@ -15,6 +15,7 @@ namespace AnorEngine {
 			virtual void OnAttach() {};
 			virtual void OnUpdate() {};
 			virtual void OnEvent() {};
+			virtual void OnImGuiRender() {};
 			inline const char* getName() { return m_LayerName; }
 			void logInfoDebug();
 		protected:

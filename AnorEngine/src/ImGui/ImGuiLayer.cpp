@@ -1,8 +1,7 @@
 #include "pch.h"
 #include "ImGuiLayer.h"
 #include "../Application.h" //added fresh
-#include "../ImGuiExampleBuilds/imgui_impl_glfw.h"
-#include "../ImGuiExampleBuilds/imgui_impl_opengl3.h"
+
 namespace AnorEngine
 {	namespace Graphics
 	{
@@ -34,19 +33,23 @@ namespace AnorEngine
 			}
 
 			Application& app = Application::Get();
-			GLFWwindow* window = static_cast<GLFWwindow*>(app.GetOpenGLWindow().GetNativeWindow());
+			GLFWwindow* window = static_cast<GLFWwindow*>(app.GetOpenGLWindow()->GetNativeWindow());
 			
 			ImGui_ImplGlfw_InitForOpenGL(window, true);
 			ImGui_ImplOpenGL3_Init("#version 460");
 		}
-		void ImGuiLayer::OnUpdate()
+		void ImGuiLayer::OnImGuiRender()
 		{
 			Begin();
 
 			static bool show = true;
 			ImGui::ShowDemoWindow(&show);
-			
+			//ImGui::ColorEdit3("I dont even know", glm::value_ptr(*color1));		
+			ImGui::ColorEdit3("I dont even know2", glm::value_ptr(*color2));
+			//ImGui::ColorEdit3("I dont even know3", glm::value_ptr(*color3));
+
 			End();
+
 		}
 		void ImGuiLayer::Begin()
 		{	
@@ -67,7 +70,7 @@ namespace AnorEngine
 		{
 			Application& app = Application::Get();
 			ImGuiIO& io = ImGui::GetIO();
-			io.DisplaySize = ImVec2(app.GetOpenGLWindow().GetWidth(), app.GetOpenGLWindow().GetHeight());
+			io.DisplaySize = ImVec2(app.GetOpenGLWindow()->GetWidth(), app.GetOpenGLWindow()->GetHeight());
 		
 			//Rendering
 			ImGui::Render();

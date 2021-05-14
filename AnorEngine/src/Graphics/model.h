@@ -27,7 +27,7 @@ namespace AnorEngine {
             unsigned int TextureFromFile(const char* path, const std::string& directory, bool gamma = false);
         public:
             std::vector<Mesh> getMeshes() { return meshes; }
-            void Draw(Shader& shader, PerspectiveCamera* camera);
+            void Draw(const Ref<Shader> shader, const Ref<PerspectiveCamera> camera);
             void rotate(const float& degree, const float& x, const float& y, const float& z);
             void translate(const float& x, const float& y, const float& z);
             void scale(const float& x, const float& y, const float& z);

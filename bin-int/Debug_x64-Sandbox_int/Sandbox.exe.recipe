@@ -2,9 +2,6 @@
 <Project>
   <ProjectOutputs>
     <ProjectOutput>
-      <FullPath>H:\ProgrammingProjects\repos\AnorEngine\bin\Debug_x64-AnorEngine\AnorEngine.dll</FullPath>
-    </ProjectOutput>
-    <ProjectOutput>
       <FullPath>H:\ProgrammingProjects\repos\AnorEngine\bin\Debug_x64-Sandbox\Sandbox.exe</FullPath>
     </ProjectOutput>
   </ProjectOutputs>

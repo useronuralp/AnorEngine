@@ -29,6 +29,8 @@
 #include <assimp/scene.h>
 #include <assimp/postprocess.h>*/
 
+#include <imgui.h>
+
 #include "utils/Logger.h"
 /*#include "spdlog/logger.h"
 #include "spdlog/spdlog.h"

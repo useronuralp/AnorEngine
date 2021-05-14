@@ -36,6 +36,7 @@ namespace AnorEngine
 			int GetAction() { return m_Action; }
 		private:
 			int m_KeyCode, m_Action;
+		public:
 			virtual ~KeyPressEvent(){} 
 		};
 		//--------------------------------------------------------------------
@@ -52,8 +53,9 @@ namespace AnorEngine
 			void Log() override { INFO("Key Release Event. Pressed Key: {0}", m_KeyCode); }
 			int GetKeyCode() { return m_KeyCode; }
 		private:
-			virtual ~KeyReleaseEvent(){}
 			int m_KeyCode;
+		public:
+			virtual ~KeyReleaseEvent(){}
 		};
 		//--------------------------------------------------------------------
 		//--------------------------------------------------------------------
@@ -69,6 +71,7 @@ namespace AnorEngine
 			void Log() override { INFO("Mouse Click Event. Clicked Mouse Button: {0}", m_MouseCode); }
 			int GetMouseCode() { return m_MouseCode; }
 			int GetMouseAction() { return m_Action; }
+		public:
 			virtual ~MouseClickEvent() override {}
 		private:
 			int m_MouseCode, m_Action;
@@ -87,6 +90,7 @@ namespace AnorEngine
 			void Log() override { INFO("Mouse Release Event. Released Mouse Button: {0}", m_MouseCode); }
 			int GetMouseCode() { return m_MouseCode; }
 			int GetMouseAction() { return m_Action; }
+		public:
 			virtual ~MouseReleaseEvent() override {}
 		private:
 			int m_MouseCode, m_Action;
@@ -105,6 +109,7 @@ namespace AnorEngine
 			void Log() override { INFO("Mouse Move Event. Mouse Position: X: {0}, Y: {1}", m_MouseXOffset, m_MouseYOffset); }
 			int GetMouseXOffset() { return m_MouseXOffset; }
 			int GetMouseYOffset() { return m_MouseYOffset; }
+		public:
 			virtual ~MouseMoveEvent() override {}
 		private:
 			float m_MouseXOffset, m_MouseYOffset;

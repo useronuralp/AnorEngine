@@ -18,7 +18,7 @@ namespace AnorEngine {
 			//}
 			glDeleteVertexArrays(1, &m_ArrayID);
 		}
-		void VertexArray::AddVertexBuffer(const std::shared_ptr<Buffer>& buffer)
+		void VertexArray::AddVertexBuffer(const Ref<Buffer>& buffer)
 		{
 			glBindVertexArray(m_ArrayID);
 			buffer->bind();
@@ -32,7 +32,7 @@ namespace AnorEngine {
 			buffer->unbind();
 			glBindVertexArray(0);
 		}
-		void VertexArray::SetIndexBuffer(const std::shared_ptr<IndexBuffer>& indexBuffer)
+		void VertexArray::SetIndexBuffer(const Ref<IndexBuffer>& indexBuffer)
 		{
 			glBindVertexArray(m_ArrayID);
 			indexBuffer->bind();

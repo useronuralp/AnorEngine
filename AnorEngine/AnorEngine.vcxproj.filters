@@ -293,6 +293,8 @@
     <None Include="src\vendor\ImGUI\.gitignore" />
     <None Include="src\shaders\2DVertex.shader" />
     <None Include="src\shaders\2DFragment.shader" />
+    <None Include="src\shaders\2DVertexTexture.shader" />
+    <None Include="src\shaders\2DFragmentTexture.shader" />
   </ItemGroup>
   <ItemGroup>
     <Image Include="textures\sample_gigatextures_4096_seamless2.png">
@@ -320,6 +322,9 @@
       <Filter>Resource Files</Filter>
     </Image>
     <Image Include="Models\Backpack\ao.jpg">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="textures\minecraft-diamond.png">
       <Filter>Resource Files</Filter>
     </Image>
   </ItemGroup>

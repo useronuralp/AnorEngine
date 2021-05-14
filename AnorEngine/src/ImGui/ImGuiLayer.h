@@ -1,5 +1,9 @@
 #pragma once
 #include "../Graphics/Layers/Layer.h"
+#include <glm.hpp>
+#include <type_traits>
+#include "../ImGuiExampleBuilds/imgui_impl_glfw.h"
+#include "../ImGuiExampleBuilds/imgui_impl_opengl3.h"
 namespace AnorEngine
 {
 	namespace Graphics
@@ -8,13 +12,18 @@ namespace AnorEngine
 		{
 		private:
 		public:
+			glm::vec4* color1;
+			glm::vec4* color2;
+			glm::vec4* color3;
 			bool wantToCaptureMouseInput = true;
 			ImGuiLayer();
 			virtual ~ImGuiLayer();
 		private:
-			void OnAttach() override;
-			void OnUpdate() override;
-			void OnEvent() override {} 
+			virtual void OnAttach() override;
+			virtual void OnUpdate() override {} ;
+			virtual void OnEvent() override {} ;
+		public:
+			void OnImGuiRender() override;
 		private:
 			float m_Time = 0.0f;
 		public:

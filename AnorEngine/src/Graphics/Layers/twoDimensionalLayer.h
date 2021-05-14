@@ -11,9 +11,9 @@ namespace AnorEngine {
 			Renderer2D *m_Renderer;
 			std::vector<Renderable2D*> m_Renderables;
 			Shader* m_Shader;
-			Math::mat4 m_ProjectionMatrix;
+			glm::mat4 m_ProjectionMatrix;
 		protected:
-			TwoDimensionalLayer(Renderer2D *renderer, Shader *shader, Math::mat4 projectionMatrix);
+			TwoDimensionalLayer(Renderer2D *renderer, Shader *shader, const glm::mat4& projectionMatrix);
 		public:
 			~TwoDimensionalLayer();
 			void add(Renderable2D* renderable);

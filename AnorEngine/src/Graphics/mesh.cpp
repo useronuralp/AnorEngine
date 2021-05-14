@@ -2,7 +2,7 @@
 #include "mesh.h"
 namespace AnorEngine {
     namespace Graphics {
-        Mesh::Mesh(std::vector<Vertex> vertices, std::vector<unsigned int> indices, std::vector<TextureInfo> textures)
+        Mesh::Mesh(const std::vector<Vertex>& vertices, const std::vector<unsigned int>& indices, const std::vector<TextureInfo>& textures)
             :modelMatrix(glm::mat4(1.0f))
         {
             this->vertices = vertices;
@@ -10,7 +10,7 @@ namespace AnorEngine {
             this->textures = textures;
             setupMesh();
         }
-        void Mesh::Draw(Shader& shader, PerspectiveCamera* camera)
+        void Mesh::Draw(const Ref<Shader> shader, const Ref<PerspectiveCamera> camera)
         {       
             unsigned int diffuseNr = 1;
             unsigned int specularNr = 1;
@@ -19,11 +19,11 @@ namespace AnorEngine {
                 glActiveTexture(GL_TEXTURE0 + i); // activate proper texture unit before binding
                 glBindTexture(GL_TEXTURE_2D, textures[i].id);
             }
-            shader.enable();
+            shader->enable();
             glBindVertexArray(VAO);
-            int modelLocation = glGetUniformLocation(shader.getShaderID(), "ml_matrix");
-            int viewLocation = glGetUniformLocation(shader.getShaderID(), "vw_matrix");
-            int projectionLocation = glGetUniformLocation(shader.getShaderID(), "pr_matrix");
+            int modelLocation = glGetUniformLocation(shader->getShaderID(), "ml_matrix");
+            int viewLocation = glGetUniformLocation(shader->getShaderID(), "vw_matrix");
+            int projectionLocation = glGetUniformLocation(shader->getShaderID(), "pr_matrix");
             glUniformMatrix4fv(modelLocation, 1, GL_FALSE, glm::value_ptr(modelMatrix));
             glUniformMatrix4fv(viewLocation, 1, GL_FALSE, glm::value_ptr(glm::lookAt(camera->cameraPos, camera->cameraPos + camera->cameraFront, camera->cameraUp)));
             glUniformMatrix4fv(projectionLocation, 1, GL_FALSE, glm::value_ptr(camera->m_ProjectionMatrix));
@@ -31,7 +31,7 @@ namespace AnorEngine {
             //glDrawArrays(GL_TRIANGLES, 0, vertices.size()); // switch to this if you wanna draw with arrays.
             glDrawElements(GL_TRIANGLES, (GLsizei)indices.size(), GL_UNSIGNED_INT, 0);
             glBindVertexArray(0);
-            shader.disable();
+            shader->disable();
         }
 
         void Mesh::setupMesh()

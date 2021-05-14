@@ -7,20 +7,20 @@ namespace AnorEngine {
 		class ANOR_API VertexArray
 		{
 		private:
-			std::vector<std::shared_ptr<Buffer>> m_VertexBuffers;
-			std::shared_ptr<IndexBuffer> m_IndexBuffer;
+			std::vector<Ref<Buffer>> m_VertexBuffers;
+			Ref<IndexBuffer> m_IndexBuffer;
 			uint32_t m_ArrayID;
 		public:
 			VertexArray();
 			~VertexArray();
 
-			void AddVertexBuffer(const std::shared_ptr<Buffer>& buffer);
-			void SetIndexBuffer(const std::shared_ptr<IndexBuffer>& indexBuffer);
+			void AddVertexBuffer(const Ref<Buffer>& buffer);
+			void SetIndexBuffer(const Ref<IndexBuffer>& indexBuffer);
 			void bind() const;
 			void unbind() const;
 
-			const std::vector<std::shared_ptr<Buffer>>& GetVertexBuffers() const { return m_VertexBuffers; }
-			const IndexBuffer& GetIndexBuffer() const { return *m_IndexBuffer; }
+			const std::vector<Ref<Buffer>>& GetVertexBuffers() const { return m_VertexBuffers; }
+			const Ref<IndexBuffer> GetIndexBuffer() const { return m_IndexBuffer; }
 		};
 	}
 }

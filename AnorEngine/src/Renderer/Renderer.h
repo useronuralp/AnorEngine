@@ -11,13 +11,13 @@ namespace AnorEngine
 		class ANOR_API Renderer
 		{
 		public:
-			static void BeginScene(OrthographicCamera* camera);
+			static void BeginScene(Ref<OrthographicCamera> camera);
 			static void EndScene();
 			static void ClearColor(const glm::vec4& color);
 			static void Clear();
-			static void Submit(std::shared_ptr<VertexArray>& vertexArray, Shader* shader);
+			static void Submit(Ref<VertexArray> vertexArray, Ref<Shader> shader, const glm::mat4& modelMatrix, const glm::vec4& color);
 		public:
-			static OrthographicCamera* s_OrthoCamera;
+			static Ref<OrthographicCamera> s_OrthoCamera;
 		};
 	}
 }

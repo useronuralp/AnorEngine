@@ -32,8 +32,8 @@ namespace AnorEngine {
             void setupMesh();
         public:
             // mesh data
-            Mesh(std::vector<Vertex> vertices, std::vector<unsigned int> indices, std::vector<TextureInfo> textures);
-            void Draw(Shader& shader, PerspectiveCamera* camera);
+            Mesh(const std::vector<Vertex>& vertices, const std::vector<unsigned int>& indices, const std::vector<TextureInfo>& textures);
+            void Draw(const Ref<Shader> shader, const Ref<PerspectiveCamera> camera);
             inline glm::mat4& getModelMatrix() { return modelMatrix; }
         };
 
