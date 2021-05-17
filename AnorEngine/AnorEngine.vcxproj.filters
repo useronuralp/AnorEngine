@@ -343,6 +343,9 @@
     <Image Include="Assets\Models\ball\ball_ball_BaseColor.png">
       <Filter>Resource Files</Filter>
     </Image>
+    <Image Include="Assets\Textures\transparent.png">
+      <Filter>Resource Files</Filter>
+    </Image>
   </ItemGroup>
   <ItemGroup>
     <Text Include="Assets\Models\Backpack\source_attribution.txt" />

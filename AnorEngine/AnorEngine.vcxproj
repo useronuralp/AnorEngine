@@ -301,6 +301,7 @@
     <Image Include="Assets\Textures\minecraft-diamond.png" />
     <Image Include="Assets\Textures\sample_gigatextures_4096_seamless2.png" />
     <Image Include="Assets\Textures\tileable-grass_clover_tt7010116-sample_1.png" />
+    <Image Include="Assets\Textures\transparent.png" />
     <Image Include="vertexLayoutExample.PNG" />
   </ItemGroup>
   <ItemGroup>
