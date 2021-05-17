@@ -11,6 +11,7 @@ namespace AnorEngine
 		class ANOR_API Renderer
 		{
 		public:
+			static void Init();
 			static void BeginScene(Ref<OrthographicCamera> camera);
 			static void EndScene();
 			static void ClearColor(const glm::vec4& color);

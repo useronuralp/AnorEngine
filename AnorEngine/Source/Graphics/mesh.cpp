@@ -14,12 +14,14 @@ namespace AnorEngine {
         {       
             unsigned int diffuseNr = 1;
             unsigned int specularNr = 1;
+            shader->enable();
             for (unsigned int i = 0; i < textures.size(); i++)
             {
-                glActiveTexture(GL_TEXTURE0 + i); // activate proper texture unit before binding
+                glActiveTexture(GL_TEXTURE0 + textures[i].id); // activate proper texture unit before binding
                 glBindTexture(GL_TEXTURE_2D, textures[i].id);
+                //shader->UploadInteger("textureSampler", textures[i].id);
             }
-            shader->enable();
+            //shader->UploadInteger("textureSampler", textures[0].id);
             glBindVertexArray(VAO);
             int modelLocation = glGetUniformLocation(shader->getShaderID(), "ml_matrix");
             int viewLocation = glGetUniformLocation(shader->getShaderID(), "vw_matrix");

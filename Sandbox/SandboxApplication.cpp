@@ -98,13 +98,17 @@ namespace Game
 		}
 	};
 #endif
+
+
+
+
 	class ExampleLayer : public Layer
 	{
-		float vertices[21] =
+		float vertices[24] =
 		{
-			-3.0f, -1.6f, 0.0f,  0.33f, 0.9f, 0.7f, 1.0f,
-			 3.0f, -1.6f, 0.0f,  0.18f, 0.2f, 0.7f, 1.0f,
-			 0.0f,  1.6f, 0.0f,  0.69f, 0.01f, 0.7f, 1.0f 
+			-3.0f, -1.6f, 0.0f,  0.33f, 0.9f, 0.7f, 0.5f,
+			 3.0f, -1.6f, 0.0f,  0.18f, 0.2f, 0.7f, 0.5f,
+			 0.0f,  1.6f, 0.0f,  0.69f, 0.01f, 0.7f, 0.5f
 		};
 		uint32_t indices[3] =
 		{
@@ -120,13 +124,13 @@ namespace Game
 		{
 			myVAO = std::make_shared<VertexArray>();
 			std::string solutionDir= __SOLUTION_DIR;
-			shader = std::make_shared<Shader>((solutionDir + "AnorEngine\\src\\shaders\\2DVertex.shader").c_str(), (solutionDir + "AnorEngine\\src\\shaders\\2DFragment.shader").c_str());
+			shader = std::make_shared<Shader>((solutionDir + "AnorEngine\\Assets\\Shaders\\2DVertex.shader").c_str(), (solutionDir + "AnorEngine\\Assets\\Shaders\\2DFragment.shader").c_str());
 		}
 		void OnAttach() override
 		{
 
 			BufferLayout Layout = { {ShaderDataType::vec3, "a_Position", 0} ,{ShaderDataType::vec4, "a_Color", 1} };
-			myVAO->AddVertexBuffer(std::make_shared<Buffer>(vertices, 21 * sizeof(float), Layout));
+			myVAO->AddVertexBuffer(std::make_shared<Buffer>(vertices, 24 * sizeof(float), Layout));
 			myVAO->SetIndexBuffer(std::make_shared<IndexBuffer>(indices, 3));
 			
 		}
@@ -159,7 +163,7 @@ namespace Game
 			m_ModelMatrix = glm::translate(m_ModelMatrix, { 1,2,0 });
 			myVAO = std::make_shared<VertexArray>();
 			std::string solutionDir = __SOLUTION_DIR;
-			shader = std::make_shared<Shader>((solutionDir + "AnorEngine\\src\\shaders\\2DVertex.shader").c_str(), (solutionDir + "AnorEngine\\src\\shaders\\2DFragment.shader").c_str());
+			shader = std::make_shared<Shader>((solutionDir + "AnorEngine\\Assets\\Shaders\\2DVertex.shader").c_str(), (solutionDir + "AnorEngine\\Assets\\Shaders\\2DFragment.shader").c_str());
 		}
 		void OnAttach() override
 		{
@@ -178,6 +182,8 @@ namespace Game
 	};
 
 
+
+
 	class Sandbox : public Application
 	{
 	private:
@@ -191,12 +197,17 @@ namespace Game
 		bool isInitialMouseCaptured = false;
 		//My Quad Info------------------------------------
 		//------------------------------------------------
-		float vertices[5 * 4] =
+		float vertices[5 * 6] =
 		{
-			-1.0f, -1.0f, 0.0f, 0.0f, 0.0f,
-			 1.0f, -1.0f, 0.0f, 0.0f, 1.0f,
-			 1.0f,  1.0f, 0.0f, 1.0f, 1.0f,
-			-1.0f,  1.0f, 0.0f, 0.0f, 1.0f
+			//-1.0f, -1.0f, 0.0f, 0.0f, 0.0f,
+			// 1.0f, -1.0f, 0.0f, 0.0f, 1.0f,
+			// 1.0f,  1.0f, 0.0f, 1.0f, 1.0f,
+			//-1.0f,  1.0f, 0.0f, 0.0f, 1.0f
+
+			- 1.0f, -1.0f, 0.0f, 0.5f, 1.0f, 0.1f,  0.1f,
+			 1.0f, -1.0f, 0.0f, 0.4f, 1.0f, 0.1f,  0.1f,
+			 1.0f,  1.0f, 0.0f, 0.2f, 1.0f, 0.1f,  0.1f,
+			-1.0f,  1.0f, 0.0f, 0.1f, 1.0f, 0.1f,   0.1f
 		};
 		uint32_t indices[6] =
 		{
@@ -212,11 +223,12 @@ namespace Game
 		float quadMoveSpeed = 0.1f;
 		Ref<ExampleLayer> layer = std::make_shared<ExampleLayer>();
 		Ref<ExampleLayer2> layer2 = std::make_shared<ExampleLayer2>();
+		Ref<ImGuiLayer> ImGui = std::make_shared<ImGuiLayer>();
+		//My Quad Info------------------------------------
+		//------------------------------------------------
 #ifdef RENDER_MY_SCENE
 		Ref<Scene> scene = std::make_shared<Scene>(m_PersCamera);
 #endif
-		//My Quad Info------------------------------------
-		//------------------------------------------------
 	public:
 		Sandbox()
 			:m_OrthoCamera(new OrthographicCamera(-1.6f * 5, 1.6f * 5, -0.9f * 5, 0.9f * 5)), m_PersCamera(new PerspectiveCamera(1920, 1080))
@@ -224,22 +236,21 @@ namespace Game
 			Input::EventHandler::SetTargetApplication(this); //Important to set this to the active Application else, you won't get your input processed.
 			
 			m_QuadVAO = std::make_shared<VertexArray>();
-			m_QuadShader = std::make_shared<Shader>((solutionDir + "AnorEngine\\src\\shaders\\2DVertexTexture.shader").c_str(), (solutionDir + "AnorEngine\\src\\shaders\\2DFragmentTexture.shader").c_str());
-			m_QuadTexture = std::make_shared<Texture>(solutionDir + "AnorEngine\\textures\\minecraft-diamond.png");
+			m_QuadShader = std::make_shared<Shader>((solutionDir + "AnorEngine\\Assets\\Shaders\\2DVertex.shader").c_str(), (solutionDir + "AnorEngine\\Assets\\Shaders\\2DFragment.shader").c_str());
+			m_QuadTexture = std::make_shared<Texture>(solutionDir + "AnorEngine\\Assets\\Textures\\transparent.png");
 			m_QuadShader->UploadInteger("u_Sampler", 0);
-			BufferLayout QuadLayout = { {ShaderDataType::vec3, "a_Position", 0} ,  {ShaderDataType::vec2, "a_TexCoord", 1} };
-			m_QuadVAO->AddVertexBuffer(std::make_shared<Buffer>(vertices, 5 * 4 * sizeof(float), QuadLayout));
+			BufferLayout QuadLayout = { {ShaderDataType::vec3, "a_Position", 0} ,  {ShaderDataType::vec4, "a_TexCoord", 1} };
+			m_QuadVAO->AddVertexBuffer(std::make_shared<Buffer>(vertices, 5 * 6 * sizeof(float), QuadLayout));
 			m_QuadVAO->SetIndexBuffer(std::make_shared<IndexBuffer>(indices, 6));
 #ifdef RENDER_MY_SCENE
 			pushLayer(scene);
-#endif
-			
+#endif			
 			pushLayer(layer);
 			//pushLayer(layer2);
 			//ImGuiEditorLayer->color1 = &m_QuadColor;
-			ImGuiEditorLayer->color2 = &layer->color;
+			ImGui->color2 = &layer->color;
 			//ImGuiEditorLayer->color3 = &layer2->color;
-			pushLayer(ImGuiEditorLayer);
+			pushLayer(ImGui);
 			logInfoDebug();
 		}
 	protected:
@@ -271,11 +282,12 @@ namespace Game
 				{	
 					layer->OnUpdate();
 				}
+
 				m_QuadTexture->Bind();
 				Renderer::Submit(m_QuadVAO, m_QuadShader, m_QuadModelMatrix, m_QuadColor);
 				m_QuadTexture->Unbind();
 
-				ImGuiEditorLayer->OnImGuiRender();
+				ImGui->OnImGuiRender();
 				m_OpenGLWindow->Update();
 				Renderer::EndScene();
 			}
@@ -302,14 +314,14 @@ namespace Game
 					{
 						m_OpenGLWindow->SetInputMode(GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 						isMouseCaptured = true;
-						ImGuiEditorLayer->wantToCaptureMouse = false;
+						ImGui->wantToCaptureMouse = false;
 					}
 					else
 					{
 						m_OpenGLWindow->SetInputMode(GLFW_CURSOR, GLFW_CURSOR_NORMAL);
 						isMouseCaptured = false;
 						isInitialMouseCaptured = false;
-						ImGuiEditorLayer->wantToCaptureMouse = true;
+						ImGui->wantToCaptureMouse = true;
 					}
 				}
 			}

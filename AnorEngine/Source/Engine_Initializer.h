@@ -11,7 +11,7 @@ namespace AnorEngine
 			AnorEngine::Logger::init();
 			WARN("ENGINE::{0}", "Following components have been initialized:");
 			WARN("ENGINE::{0}", "Logger initialized!");
-			WARN("Press enter to continue...");
+			WARN("..............................");
 			return true;
 		}
 	private:

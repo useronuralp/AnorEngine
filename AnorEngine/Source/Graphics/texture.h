@@ -9,10 +9,8 @@ namespace AnorEngine {
 		{
 		private:
 			
-			GLuint m_RendererID;
-			GLubyte* m_LocaBuffer;
 			std::string m_FilePath;
-			int m_Width, m_Height, m_BPP; 
+			uint32_t m_RendererID, m_Width, m_Height, m_Channels;
 
 		public:
 			Texture(const std::string& path);
@@ -23,7 +21,7 @@ namespace AnorEngine {
 
 			inline int GetWidth() const { return m_Width; }
 			inline int GetHeight() const { return m_Height; }
-			inline GLuint getTID() const{ return m_RendererID; }
+			inline unsigned int getTID() const{ return m_RendererID; }
 		};
 	}
 }

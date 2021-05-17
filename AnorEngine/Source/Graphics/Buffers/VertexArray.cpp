@@ -10,12 +10,6 @@ namespace AnorEngine {
 		}
 		VertexArray::~VertexArray()
 		{	
-			//if(!m_IndexBuffer)
-			//	delete m_IndexBuffer;
-			//for (auto buffer : m_VertexBuffers)
-			//{
-			//	delete buffer; //This is not managed by the shader_ptr class.
-			//}
 			glDeleteVertexArrays(1, &m_ArrayID);
 		}
 		void VertexArray::AddVertexBuffer(const Ref<Buffer>& buffer)

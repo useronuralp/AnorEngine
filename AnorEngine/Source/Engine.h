@@ -21,7 +21,7 @@
 /*#include "renderable3D.h"
 #include "shader.h"
 #include "Camera.h"*/
-#include "vendor/Models/cube.h"
+#include <../Assets/Models/cube.h>
 #include "Graphics/model.h"
 /*#include "../vendor/stb_image/stb_image.h"
 #include "mesh.h"

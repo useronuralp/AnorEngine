@@ -1,6 +1,7 @@
 #pragma once
 #include "Graphics/OpenGLWindow.h"
 #include "ImGui/ImGuiLayer.h"
+#include "Renderer/Renderer.h"
 namespace AnorEngine
 {	
 	namespace Input
@@ -11,7 +12,6 @@ namespace AnorEngine
 	{
 	protected:
 		Ref<Graphics::OpenGLWindow> m_OpenGLWindow;
-		Ref<Graphics::ImGuiLayer> ImGuiEditorLayer; //Every application should only have one ImGui UI initializer really.
 	private:
 		static Application* s_Instance; //static singleton instance of this class.
 	public:

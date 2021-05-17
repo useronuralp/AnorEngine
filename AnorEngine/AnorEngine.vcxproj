@@ -82,7 +82,7 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LinkIncremental>true</LinkIncremental>
-    <IncludePath>$(SolutionDir)AnorEngine\src;$(SolutionDir)Dependencies\GLM;$(SolutionDir)Dependencies\FreeImage\include;$(SolutionDir)Dependencies\GLEW\include;$(SolutionDir)Dependencies\GLFW\includex64;$(SolutionDir)Dependencies\Assimp\include;$(SolutionDir)AnorEngine\src\vendor\spdlog-1.x\include;$(SolutionDir)AnorEngine\src\vendor\imgui;$(IncludePath)</IncludePath>
+    <IncludePath>$(SolutionDir)AnorEngine\Source;$(SolutionDir)Dependencies\GLM;$(SolutionDir)Dependencies\FreeImage\include;$(SolutionDir)Dependencies\GLEW\include;$(SolutionDir)Dependencies\GLFW\includex64;$(SolutionDir)Dependencies\Assimp\include;$(SolutionDir)AnorEngine\Vendor\spdlog-1.x\include;$(SolutionDir)AnorEngine\Vendor\imgui;$(IncludePath)</IncludePath>
     <LibraryPath>$(SolutionDir)Dependencies\FreeImage\lib;$(SolutionDir)Dependencies\GLEW\lib\x64;$(SolutionDir)Dependencies\GLFW\lib-vc2019x64;$(SolutionDir)Dependencies\Assimp\lib;$(LibraryPath)</LibraryPath>
     <IntDir>$(SolutionDir)bin-int\$(Configuration)_$(Platform)-$(ProjectName)_int</IntDir>
     <OutDir>$(SolutionDir)bin\$(Configuration)_$(Platform)-$(ProjectName)</OutDir>
@@ -91,7 +91,7 @@
     <LinkIncremental>false</LinkIncremental>
     <OutDir>$(SolutionDir)bin\$(Configuration)_$(Platform)-$(ProjectName)</OutDir>
     <IntDir>$(SolutionDir)bin-int\$(Configuration)_$(Platform)-$(ProjectName)_int</IntDir>
-    <IncludePath>$(SolutionDir)AnorEngine\src;$(SolutionDir)Dependencies\GLM;$(SolutionDir)Dependencies\FreeImage\include;$(SolutionDir)Dependencies\GLEW\include;$(SolutionDir)Dependencies\GLFW\includex64;$(SolutionDir)Dependencies\Assimp\include;$(SolutionDir)AnorEngine\src\vendor\spdlog-1.x\include;$(SolutionDir)AnorEngine\src\vendor\imgui;$(IncludePath)</IncludePath>
+    <IncludePath>$(SolutionDir)AnorEngine\Source;$(SolutionDir)Dependencies\GLM;$(SolutionDir)Dependencies\FreeImage\include;$(SolutionDir)Dependencies\GLEW\include;$(SolutionDir)Dependencies\GLFW\includex64;$(SolutionDir)Dependencies\Assimp\include;$(SolutionDir)AnorEngine\Vendor\spdlog-1.x\include;$(SolutionDir)AnorEngine\Vendor\imgui;$(IncludePath)</IncludePath>
     <LibraryPath>$(SolutionDir)Dependencies\FreeImage\lib;$(SolutionDir)Dependencies\GLEW\lib\x64;$(SolutionDir)Dependencies\GLFW\lib-vc2019x64;$(SolutionDir)Dependencies\Assimp\lib;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
@@ -175,131 +175,137 @@
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="src\Application.cpp" />
-    <ClCompile Include="src\Events\EventHandler.cpp" />
-    <ClCompile Include="src\Graphics\batchrenderer2D.cpp" />
-    <ClCompile Include="src\Graphics\Buffers\Buffer.cpp" />
-    <ClCompile Include="src\Graphics\Buffers\VertexArray.cpp" />
-    <ClCompile Include="src\Graphics\Camera.cpp" />
-    <ClCompile Include="src\Graphics\Layers\Layer.cpp" />
-    <ClCompile Include="src\Graphics\Layers\twoDimensionalLayer.cpp" />
-    <ClCompile Include="src\Graphics\Layers\LayerStack.cpp" />
-    <ClCompile Include="src\Graphics\Layers\tilelayer.cpp" />
-    <ClCompile Include="src\Graphics\mesh.cpp" />
-    <ClCompile Include="src\Graphics\model.cpp" />
-    <ClCompile Include="src\Graphics\renderable3D.cpp" />
-    <ClCompile Include="src\Renderer\Renderer.cpp" />
-    <ClCompile Include="src\Renderer\RendererCommand.cpp" />
-    <ClCompile Include="src\Graphics\simpleRenderer2D.cpp" />
-    <ClCompile Include="src\Graphics\shader.cpp" />
-    <ClCompile Include="src\Graphics\simplerenderer3D.cpp" />
-    <ClCompile Include="src\Graphics\sprite.cpp" />
-    <ClCompile Include="src\Graphics\static_sprite.cpp" />
-    <ClCompile Include="src\Graphics\texture.cpp" />
-    <ClCompile Include="src\Graphics\OpenGLWindow.cpp" />
-    <ClCompile Include="src\ImGuiExampleBuilds\imgui_impl_glfw.cpp" />
-    <ClCompile Include="src\ImGuiExampleBuilds\imgui_impl_opengl3.cpp" />
-    <ClCompile Include="src\ImGui\ImGuiLayer.cpp" />
-    <ClCompile Include="src\Math\mat4.cpp" />
-    <ClCompile Include="src\Math\vec2.cpp" />
-    <ClCompile Include="src\Math\vec3.cpp" />
-    <ClCompile Include="src\Math\vec4.cpp" />
-    <ClCompile Include="src\pch.cpp">
+    <ClCompile Include="Source\Application.cpp" />
+    <ClCompile Include="Source\Events\EventHandler.cpp" />
+    <ClCompile Include="Source\Graphics\batchrenderer2D.cpp" />
+    <ClCompile Include="Source\Graphics\Buffers\Buffer.cpp" />
+    <ClCompile Include="Source\Graphics\Buffers\VertexArray.cpp" />
+    <ClCompile Include="Source\Graphics\Camera.cpp" />
+    <ClCompile Include="Source\Graphics\Layers\Layer.cpp" />
+    <ClCompile Include="Source\Graphics\Layers\twoDimensionalLayer.cpp" />
+    <ClCompile Include="Source\Graphics\Layers\LayerStack.cpp" />
+    <ClCompile Include="Source\Graphics\Layers\tilelayer.cpp" />
+    <ClCompile Include="Source\Graphics\mesh.cpp" />
+    <ClCompile Include="Source\Graphics\model.cpp" />
+    <ClCompile Include="Source\Graphics\renderable3D.cpp" />
+    <ClCompile Include="Source\Renderer\Renderer.cpp" />
+    <ClCompile Include="Source\Renderer\RendererCommand.cpp" />
+    <ClCompile Include="Source\Graphics\simpleRenderer2D.cpp" />
+    <ClCompile Include="Source\Graphics\shader.cpp" />
+    <ClCompile Include="Source\Graphics\simplerenderer3D.cpp" />
+    <ClCompile Include="Source\Graphics\sprite.cpp" />
+    <ClCompile Include="Source\Graphics\static_sprite.cpp" />
+    <ClCompile Include="Source\Graphics\texture.cpp" />
+    <ClCompile Include="Source\Graphics\OpenGLWindow.cpp" />
+    <ClCompile Include="Source\ImGuiExampleBuilds\imgui_impl_glfw.cpp" />
+    <ClCompile Include="Source\ImGuiExampleBuilds\imgui_impl_opengl3.cpp" />
+    <ClCompile Include="Source\ImGui\ImGuiLayer.cpp" />
+    <ClCompile Include="Source\Math\mat4.cpp" />
+    <ClCompile Include="Source\Math\vec2.cpp" />
+    <ClCompile Include="Source\Math\vec3.cpp" />
+    <ClCompile Include="Source\Math\vec4.cpp" />
+    <ClCompile Include="Source\pch.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
       <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">pch.h</PrecompiledHeaderFile>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
       <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Release|x64'">pch.h</PrecompiledHeaderFile>
     </ClCompile>
-    <ClCompile Include="src\utils\Logger.cpp" />
-    <ClCompile Include="src\vendor\ImGUI\imgui.cpp" />
-    <ClCompile Include="src\vendor\ImGUI\imgui_demo.cpp" />
-    <ClCompile Include="src\vendor\ImGUI\imgui_draw.cpp" />
-    <ClCompile Include="src\vendor\ImGUI\imgui_tables.cpp" />
-    <ClCompile Include="src\vendor\ImGUI\imgui_widgets.cpp" />
-    <ClCompile Include="src\vendor\stb_image\stb_image.cpp" />
+    <ClCompile Include="Source\utils\Logger.cpp" />
+    <ClCompile Include="Vendor\ImGUI\imgui.cpp" />
+    <ClCompile Include="Vendor\ImGUI\imgui_demo.cpp" />
+    <ClCompile Include="Vendor\ImGUI\imgui_draw.cpp" />
+    <ClCompile Include="Vendor\ImGUI\imgui_tables.cpp" />
+    <ClCompile Include="Vendor\ImGUI\imgui_widgets.cpp" />
+    <ClCompile Include="Vendor\stb_image\stb_image.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="src\EngineKeyCodes.h" />
-    <ClInclude Include="src\Engine_Initializer.h" />
-    <ClInclude Include="src\Application.h" />
-    <ClInclude Include="src\core.h" />
-    <ClInclude Include="src\EntryPoint.h" />
-    <ClInclude Include="src\Events\Event.h" />
-    <ClInclude Include="src\Events\EventHandler.h" />
-    <ClInclude Include="src\Graphics\Camera.h" />
-    <ClInclude Include="src\Graphics\Layers\Layer.h" />
-    <ClInclude Include="src\Graphics\Layers\LayerStack.h" />
-    <ClInclude Include="src\Renderer\Renderer.h" />
-    <ClInclude Include="src\Renderer\RendererCommand.h" />
-    <ClInclude Include="src\ImGuiExampleBuilds\imgui_impl_glfw.h" />
-    <ClInclude Include="src\ImGuiExampleBuilds\imgui_impl_opengl3.h" />
-    <ClInclude Include="src\ImGui\ImGuiLayer.h" />
-    <ClInclude Include="src\MouseButtonCodes.h" />
-    <ClInclude Include="src\pch.h" />
-    <ClInclude Include="src\utils\Logger.h" />
-    <ClInclude Include="src\Engine.h" />
-    <ClInclude Include="src\Graphics\batchrenderer2D.h" />
-    <ClInclude Include="src\Graphics\Buffers\Buffer.h" />
-    <ClInclude Include="src\Graphics\Buffers\VertexArray.h" />
-    <ClInclude Include="src\Graphics\Layers\group.h" />
-    <ClInclude Include="src\Graphics\Layers\twoDimensionalLayer.h" />
-    <ClInclude Include="src\Graphics\Layers\tilelayer.h" />
-    <ClInclude Include="src\Graphics\mesh.h" />
-    <ClInclude Include="src\Graphics\model.h" />
-    <ClInclude Include="src\Graphics\renderable2D.h" />
-    <ClInclude Include="src\Graphics\renderable3D.h" />
-    <ClInclude Include="src\Graphics\renderer2D.h" />
-    <ClInclude Include="src\Graphics\shader.h" />
-    <ClInclude Include="src\Graphics\simpleRenderer2D.h" />
-    <ClInclude Include="src\Graphics\simplerenderer3D.h" />
-    <ClInclude Include="src\Graphics\sprite.h" />
-    <ClInclude Include="src\Graphics\static_sprite.h" />
-    <ClInclude Include="src\Graphics\texture.h" />
-    <ClInclude Include="src\Graphics\OpenGLWindow.h" />
-    <ClInclude Include="src\Math\mat4.h" />
-    <ClInclude Include="src\Math\maths.h" />
-    <ClInclude Include="src\Math\vec2.h" />
-    <ClInclude Include="src\Math\vec3.h" />
-    <ClInclude Include="src\Math\vec4.h" />
-    <ClInclude Include="src\utils\fileutils.h" />
-    <ClInclude Include="src\vendor\ImGUI\imconfig.h" />
-    <ClInclude Include="src\vendor\ImGUI\imgui.h" />
-    <ClInclude Include="src\vendor\ImGUI\imgui_internal.h" />
-    <ClInclude Include="src\vendor\ImGUI\imstb_rectpack.h" />
-    <ClInclude Include="src\vendor\ImGUI\imstb_textedit.h" />
-    <ClInclude Include="src\vendor\ImGUI\imstb_truetype.h" />
-    <ClInclude Include="src\vendor\Models\cube.h" />
-    <ClInclude Include="src\vendor\stb_image\stb_image.h" />
+    <ClInclude Include="Assets\Models\cube.h" />
+    <ClInclude Include="Source\EngineKeyCodes.h" />
+    <ClInclude Include="Source\Engine_Initializer.h" />
+    <ClInclude Include="Source\Application.h" />
+    <ClInclude Include="Source\core.h" />
+    <ClInclude Include="Source\EntryPoint.h" />
+    <ClInclude Include="Source\Events\Event.h" />
+    <ClInclude Include="Source\Events\EventHandler.h" />
+    <ClInclude Include="Source\Graphics\Camera.h" />
+    <ClInclude Include="Source\Graphics\Layers\Layer.h" />
+    <ClInclude Include="Source\Graphics\Layers\LayerStack.h" />
+    <ClInclude Include="Source\Renderer\Renderer.h" />
+    <ClInclude Include="Source\Renderer\RendererCommand.h" />
+    <ClInclude Include="Source\ImGuiExampleBuilds\imgui_impl_glfw.h" />
+    <ClInclude Include="Source\ImGuiExampleBuilds\imgui_impl_opengl3.h" />
+    <ClInclude Include="Source\ImGui\ImGuiLayer.h" />
+    <ClInclude Include="Source\MouseButtonCodes.h" />
+    <ClInclude Include="Source\pch.h" />
+    <ClInclude Include="Source\utils\Logger.h" />
+    <ClInclude Include="Source\Engine.h" />
+    <ClInclude Include="Source\Graphics\batchrenderer2D.h" />
+    <ClInclude Include="Source\Graphics\Buffers\Buffer.h" />
+    <ClInclude Include="Source\Graphics\Buffers\VertexArray.h" />
+    <ClInclude Include="Source\Graphics\Layers\group.h" />
+    <ClInclude Include="Source\Graphics\Layers\twoDimensionalLayer.h" />
+    <ClInclude Include="Source\Graphics\Layers\tilelayer.h" />
+    <ClInclude Include="Source\Graphics\mesh.h" />
+    <ClInclude Include="Source\Graphics\model.h" />
+    <ClInclude Include="Source\Graphics\renderable2D.h" />
+    <ClInclude Include="Source\Graphics\renderable3D.h" />
+    <ClInclude Include="Source\Graphics\renderer2D.h" />
+    <ClInclude Include="Source\Graphics\shader.h" />
+    <ClInclude Include="Source\Graphics\simpleRenderer2D.h" />
+    <ClInclude Include="Source\Graphics\simplerenderer3D.h" />
+    <ClInclude Include="Source\Graphics\sprite.h" />
+    <ClInclude Include="Source\Graphics\static_sprite.h" />
+    <ClInclude Include="Source\Graphics\texture.h" />
+    <ClInclude Include="Source\Graphics\OpenGLWindow.h" />
+    <ClInclude Include="Source\Math\mat4.h" />
+    <ClInclude Include="Source\Math\maths.h" />
+    <ClInclude Include="Source\Math\vec2.h" />
+    <ClInclude Include="Source\Math\vec3.h" />
+    <ClInclude Include="Source\Math\vec4.h" />
+    <ClInclude Include="Source\utils\fileutils.h" />
+    <ClInclude Include="Vendor\ImGUI\imconfig.h" />
+    <ClInclude Include="Vendor\ImGUI\imgui.h" />
+    <ClInclude Include="Vendor\ImGUI\imgui_internal.h" />
+    <ClInclude Include="Vendor\ImGUI\imstb_rectpack.h" />
+    <ClInclude Include="Vendor\ImGUI\imstb_textedit.h" />
+    <ClInclude Include="Vendor\ImGUI\imstb_truetype.h" />
+    <ClInclude Include="Vendor\Models\cube.h" />
+    <ClInclude Include="Vendor\stb_image\stb_image.h" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Models\Backpack\backpack.mtl" />
-    <None Include="src\shaders\2DFragment.shader" />
-    <None Include="src\shaders\2DFragmentTexture.shader" />
-    <None Include="src\shaders\2DVertex.shader" />
-    <None Include="src\shaders\2DVertexTexture.shader" />
-    <None Include="src\shaders\fragment.shader" />
-    <None Include="src\shaders\vertex.shader" />
-    <None Include="src\shaders\lightsourceFrag.shader" />
-    <None Include="src\shaders\Test.shader" />
-    <None Include="src\vendor\ImGUI\.editorconfig" />
-    <None Include="src\vendor\ImGUI\.gitattributes" />
-    <None Include="src\vendor\ImGUI\.gitignore" />
+    <None Include="Assets\Models\Backpack\backpack.mtl" />
+    <None Include="Assets\Models\ball\uploads_files_2222080_ball_obj.mtl" />
+    <None Include="Assets\shaders\2DFragment.shader" />
+    <None Include="Assets\shaders\2DFragmentTexture.shader" />
+    <None Include="Assets\shaders\2DVertex.shader" />
+    <None Include="Assets\shaders\2DVertexTexture.shader" />
+    <None Include="Assets\shaders\fragment.shader" />
+    <None Include="Assets\shaders\vertex.shader" />
+    <None Include="Assets\shaders\lightsourceFrag.shader" />
+    <None Include="Assets\shaders\Test.shader" />
+    <None Include="Vendor\ImGUI\.editorconfig" />
+    <None Include="Vendor\ImGUI\.gitattributes" />
+    <None Include="Vendor\ImGUI\.gitignore" />
   </ItemGroup>
   <ItemGroup>
-    <Image Include="Models\Backpack\ao.jpg" />
-    <Image Include="Models\Backpack\diffuse.jpg" />
-    <Image Include="Models\Backpack\normal.png" />
-    <Image Include="Models\Backpack\roughness.jpg" />
-    <Image Include="Models\Backpack\specular.jpg" />
-    <Image Include="textures\381f5a63791945.5abc4ccf1297d.png" />
-    <Image Include="textures\minecraft-diamond.png" />
-    <Image Include="textures\sample_gigatextures_4096_seamless2.png" />
-    <Image Include="textures\tileable-grass_clover_tt7010116-sample_1.png" />
+    <Image Include="Assets\Models\Backpack\ao.jpg" />
+    <Image Include="Assets\Models\Backpack\diffuse.jpg" />
+    <Image Include="Assets\Models\Backpack\normal.png" />
+    <Image Include="Assets\Models\Backpack\roughness.jpg" />
+    <Image Include="Assets\Models\Backpack\specular.jpg" />
+    <Image Include="Assets\Models\ball\ball_ball_BaseColor.png" />
+    <Image Include="Assets\Models\ball\ball_ball_Metallic.png" />
+    <Image Include="Assets\Models\ball\ball_ball_Normal.png" />
+    <Image Include="Assets\Models\ball\ball_ball_Roughness.png" />
+    <Image Include="Assets\Textures\381f5a63791945.5abc4ccf1297d.png" />
+    <Image Include="Assets\Textures\minecraft-diamond.png" />
+    <Image Include="Assets\Textures\sample_gigatextures_4096_seamless2.png" />
+    <Image Include="Assets\Textures\tileable-grass_clover_tt7010116-sample_1.png" />
     <Image Include="vertexLayoutExample.PNG" />
   </ItemGroup>
   <ItemGroup>
-    <Text Include="Models\Backpack\source_attribution.txt" />
-    <Text Include="src\vendor\ImGUI\LICENSE.txt" />
+    <Text Include="Assets\Models\Backpack\source_attribution.txt" />
+    <Text Include="Vendor\ImGUI\LICENSE.txt" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

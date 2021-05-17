@@ -159,6 +159,7 @@ namespace AnorEngine {
 				stbi_image_free(data);
 				INFO("Textures succesfuly loaded from path: {0}", path);
 				//std::cout << "LOAD SUCCSESFUL FROM: " << path << std::endl;
+				glBindTexture(GL_TEXTURE_2D, 0);
 			}
 			else
 			{
