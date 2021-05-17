@@ -14,7 +14,9 @@ namespace AnorEngine
 		AnorEngine::EngineInitializer::init();
 		m_OpenGLWindow = std::make_shared<Graphics::OpenGLWindow>("Anor Engine", 1920, 1080);  //window creation
 		if (!m_OpenGLWindow)
-			CRITICAL("APP::{0}", "Application failed to initialize the OpenGLWindow");
+		{
+			CRITICAL_ASSERT("APP::{0}", "Application failed to initialize the OpenGLWindow");
+		}
 		else
 			WARN("APP::{0}", "OpenGLWindow was successfuly created");
 

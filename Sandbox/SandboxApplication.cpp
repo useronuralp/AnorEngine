@@ -106,9 +106,9 @@ namespace Game
 	{
 		float vertices[24] =
 		{
-			-3.0f, -1.6f, 0.0f,  0.33f, 0.9f, 0.7f, 0.5f,
-			 3.0f, -1.6f, 0.0f,  0.18f, 0.2f, 0.7f, 0.5f,
-			 0.0f,  1.6f, 0.0f,  0.69f, 0.01f, 0.7f, 0.5f
+			-3.0f, -1.6f, 0.0f,  0.33f, 0.9f, 0.7f, 0.25f,
+			 3.0f, -1.6f, 0.0f,  0.18f, 0.2f, 0.7f, 0.25f,
+			 0.0f,  1.6f, 0.0f,  0.69f, 0.01f, 0.7f, 0.25f
 		};
 		uint32_t indices[3] =
 		{
@@ -124,7 +124,7 @@ namespace Game
 		{
 			myVAO = std::make_shared<VertexArray>();
 			std::string solutionDir= __SOLUTION_DIR;
-			shader = std::make_shared<Shader>((solutionDir + "AnorEngine\\Assets\\Shaders\\2DVertex.shader").c_str(), (solutionDir + "AnorEngine\\Assets\\Shaders\\2DFragment.shader").c_str());
+			shader = std::make_shared<Shader>(solutionDir + "AnorEngine\\Assets\\Shaders\\2DShader.shader");
 		}
 		void OnAttach() override
 		{
@@ -163,7 +163,7 @@ namespace Game
 			m_ModelMatrix = glm::translate(m_ModelMatrix, { 1,2,0 });
 			myVAO = std::make_shared<VertexArray>();
 			std::string solutionDir = __SOLUTION_DIR;
-			shader = std::make_shared<Shader>((solutionDir + "AnorEngine\\Assets\\Shaders\\2DVertex.shader").c_str(), (solutionDir + "AnorEngine\\Assets\\Shaders\\2DFragment.shader").c_str());
+			shader = std::make_shared<Shader>(solutionDir + "AnorEngine\\Assets\\Shaders\\2DShader.shader");
 		}
 		void OnAttach() override
 		{
@@ -197,17 +197,17 @@ namespace Game
 		bool isInitialMouseCaptured = false;
 		//My Quad Info------------------------------------
 		//------------------------------------------------
-		float vertices[5 * 6] =
+		float vertices[5 * 4] =
 		{
-			//-1.0f, -1.0f, 0.0f, 0.0f, 0.0f,
-			// 1.0f, -1.0f, 0.0f, 0.0f, 1.0f,
-			// 1.0f,  1.0f, 0.0f, 1.0f, 1.0f,
-			//-1.0f,  1.0f, 0.0f, 0.0f, 1.0f
+			-1.0f, -1.0f, 0.0f, 0.0f, 0.0f,
+			 1.0f, -1.0f, 0.0f, 0.0f, 1.0f,
+			 1.0f,  1.0f, 0.0f, 1.0f, 1.0f,
+			-1.0f,  1.0f, 0.0f, 0.0f, 1.0f
 
-			- 1.0f, -1.0f, 0.0f, 0.5f, 1.0f, 0.1f,  0.1f,
-			 1.0f, -1.0f, 0.0f, 0.4f, 1.0f, 0.1f,  0.1f,
-			 1.0f,  1.0f, 0.0f, 0.2f, 1.0f, 0.1f,  0.1f,
-			-1.0f,  1.0f, 0.0f, 0.1f, 1.0f, 0.1f,   0.1f
+			//- 1.0f, -1.0f, 0.0f, 0.5f, 1.0f, 0.1f,  0.1f,
+			// 1.0f, -1.0f, 0.0f, 0.4f, 1.0f, 0.1f,  0.1f,
+			// 1.0f,  1.0f, 0.0f, 0.2f, 1.0f, 0.1f,  0.1f, //example without textures
+			//-1.0f,  1.0f, 0.0f, 0.1f, 1.0f, 0.1f,   0.1f
 		};
 		uint32_t indices[6] =
 		{
@@ -234,22 +234,19 @@ namespace Game
 			:m_OrthoCamera(new OrthographicCamera(-1.6f * 5, 1.6f * 5, -0.9f * 5, 0.9f * 5)), m_PersCamera(new PerspectiveCamera(1920, 1080))
 		{	
 			Input::EventHandler::SetTargetApplication(this); //Important to set this to the active Application else, you won't get your input processed.
-			
 			m_QuadVAO = std::make_shared<VertexArray>();
-			m_QuadShader = std::make_shared<Shader>((solutionDir + "AnorEngine\\Assets\\Shaders\\2DVertex.shader").c_str(), (solutionDir + "AnorEngine\\Assets\\Shaders\\2DFragment.shader").c_str());
+			m_QuadShader = std::make_shared<Shader>(solutionDir + "AnorEngine\\Assets\\Shaders\\2DTextureShader.shader");
 			m_QuadTexture = std::make_shared<Texture>(solutionDir + "AnorEngine\\Assets\\Textures\\transparent.png");
 			m_QuadShader->UploadInteger("u_Sampler", 0);
-			BufferLayout QuadLayout = { {ShaderDataType::vec3, "a_Position", 0} ,  {ShaderDataType::vec4, "a_TexCoord", 1} };
-			m_QuadVAO->AddVertexBuffer(std::make_shared<Buffer>(vertices, 5 * 6 * sizeof(float), QuadLayout));
+			BufferLayout QuadLayout = { {ShaderDataType::vec3, "a_Position", 0} ,  {ShaderDataType::vec2, "a_TexCoord", 1} };
+			m_QuadVAO->AddVertexBuffer(std::make_shared<Buffer>(vertices, 5 * 4 * sizeof(float), QuadLayout));
 			m_QuadVAO->SetIndexBuffer(std::make_shared<IndexBuffer>(indices, 6));
 #ifdef RENDER_MY_SCENE
 			pushLayer(scene);
 #endif			
 			pushLayer(layer);
+			ImGui->color = &layer->color;
 			//pushLayer(layer2);
-			//ImGuiEditorLayer->color1 = &m_QuadColor;
-			ImGui->color2 = &layer->color;
-			//ImGuiEditorLayer->color3 = &layer2->color;
 			pushLayer(ImGui);
 			logInfoDebug();
 		}

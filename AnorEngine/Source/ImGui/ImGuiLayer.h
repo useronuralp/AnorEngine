@@ -12,9 +12,7 @@ namespace AnorEngine
 		{
 		private:
 		public:
-			glm::vec4* color1;
-			glm::vec4* color2;
-			glm::vec4* color3;
+			glm::vec4* color;
 			bool wantToCaptureMouseInput = true;
 			ImGuiLayer();
 			virtual ~ImGuiLayer();

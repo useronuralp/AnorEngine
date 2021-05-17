@@ -43,10 +43,8 @@ namespace AnorEngine
 			Begin();
 
 			static bool show = true;
-			ImGui::ShowDemoWindow(&show);
-			//ImGui::ColorEdit3("I dont even know", glm::value_ptr(*color1));		
-			ImGui::ColorEdit3("I dont even know2", glm::value_ptr(*color2));
-			//ImGui::ColorEdit3("I dont even know3", glm::value_ptr(*color3));
+			ImGui::ShowDemoWindow(&show);	
+			ImGui::ColorEdit3("I dont even know", glm::value_ptr(*color));
 
 			End();
 

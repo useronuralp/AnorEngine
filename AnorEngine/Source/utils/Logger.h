@@ -3,7 +3,7 @@
 #include "spdlog/spdlog.h"
 #include "spdlog/sinks/stdout_color_sinks.h"
 #define WARN(...) AnorEngine::Logger::getConsole()->warn(__VA_ARGS__)
-#define CRITICAL(...) AnorEngine::Logger::getConsole()->critical(__VA_ARGS__)
+#define CRITICAL_ASSERT(...) AnorEngine::Logger::getConsole()->critical(__VA_ARGS__); __debugbreak()
 #define INFO(...) AnorEngine::Logger::getConsole()->info(__VA_ARGS__)
 
 namespace AnorEngine {

@@ -287,18 +287,15 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="Assets\Models\Backpack\backpack.mtl" />
-    <None Include="Assets\shaders\2DFragment.shader" />
-    <None Include="Assets\shaders\2DFragmentTexture.shader" />
-    <None Include="Assets\shaders\2DVertex.shader" />
-    <None Include="Assets\shaders\2DVertexTexture.shader" />
     <None Include="Assets\shaders\fragment.shader" />
     <None Include="Assets\shaders\vertex.shader" />
     <None Include="Assets\shaders\lightsourceFrag.shader" />
-    <None Include="Assets\shaders\Test.shader" />
+    <None Include="Assets\shaders\2DTextureShader.shader" />
     <None Include="Vendor\ImGUI\.editorconfig" />
     <None Include="Vendor\ImGUI\.gitattributes" />
     <None Include="Vendor\ImGUI\.gitignore" />
     <None Include="Assets\Models\ball\uploads_files_2222080_ball_obj.mtl" />
+    <None Include="Assets\Shaders\2DShader.shader" />
   </ItemGroup>
   <ItemGroup>
     <Image Include="vertexLayoutExample.PNG">

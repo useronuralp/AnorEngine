@@ -15,7 +15,7 @@ namespace AnorEngine {
 
 			if (!scene || scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !scene->mRootNode)
 			{	
-				CRITICAL("ERROR::ASSIMP:: {0}", import.GetErrorString());
+				CRITICAL_ASSERT("ERROR::ASSIMP:: {0}", import.GetErrorString());
 				//std::cout << "ERROR::ASSIMP::" << import.GetErrorString() << std::endl;
 				return;
 			}
@@ -163,7 +163,7 @@ namespace AnorEngine {
 			}
 			else
 			{
-				CRITICAL("Textures failed to load from path: {0}", path);
+				CRITICAL_ASSERT("Textures failed to load from path: {0}", path);
 				//std::cout << "Texture failed to load at path: " << path << std::endl;
 				stbi_image_free(data);
 			}

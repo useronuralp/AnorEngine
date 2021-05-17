@@ -23,8 +23,7 @@ namespace AnorEngine {
 			case ShaderDataType::Int4: return GL_INT;
 			case ShaderDataType::Bool: return GL_BOOL;
 			}
-			CRITICAL("Unknown ShaderDataType");
-			__debugbreak;
+			CRITICAL_ASSERT("Unknown ShaderDataType");
 			return 0;
 		}
 		static uint32_t ShaderDataTypeConverter(ShaderDataType type)
@@ -44,8 +43,7 @@ namespace AnorEngine {
 				case ShaderDataType::Bool:	return 1;
 			}
 
-			CRITICAL("Unknown ShaderDataType!!");
-			__debugbreak;
+			CRITICAL_ASSERT("Unknown ShaderDataType!!");
 			return 0;
 		}
 		struct ANOR_API BufferElement
