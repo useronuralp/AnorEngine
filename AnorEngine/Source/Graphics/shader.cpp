@@ -1,18 +1,19 @@
 #include "pch.h"
 #include "shader.h"
 namespace AnorEngine {
-	namespace Graphics {	
+	namespace Graphics {
 
 		static GLenum ShaderTypeFromString(std::string type)
 		{
-			if (type == "vertex") 
+			if (type == "vertex")
 				return GL_VERTEX_SHADER;
 			if (type == "pixel" || type == "fragment")
 				return GL_FRAGMENT_SHADER;
 		}
 
-		Shader::Shader(std::string vertPath, std::string fragPath)
-		{	
+		Shader::Shader(std::string name, std::string vertPath, std::string fragPath)
+			:m_Name(name)
+		{
 			std::unordered_map<GLenum, std::string> shaderSources;
 			shaderSources[GL_VERTEX_SHADER] = ReadFile(vertPath);
 			shaderSources[GL_FRAGMENT_SHADER] = ReadFile(fragPath);
@@ -20,8 +21,9 @@ namespace AnorEngine {
 			m_FragPath = fragPath;
 			Compile(shaderSources);
 		}
-		Shader::Shader(std::string filepath)
-		{	
+		Shader::Shader(std::string name, std::string filepath)
+			:m_Name(name)
+		{
 			m_FilePath = filepath;
 			std::string source = ReadFile(filepath);
 			std::unordered_map<GLenum, std::string> shaderSources = PreProcess(source);
@@ -102,7 +104,7 @@ namespace AnorEngine {
 		{
 			std::string result;
 			std::ifstream in(filepath, std::ios::in | std::ios::binary);
-			if(in)
+			if (in)
 			{
 				in.seekg(0, std::ios::end);
 				result.resize(in.tellg());
@@ -158,31 +160,31 @@ namespace AnorEngine {
 			return glGetUniformLocation(m_ShaderID, arr);
 		}
 		void Shader::UploadFloat(const GLchar* name, const float value)
-		{	
+		{
 			enable();
 			glUniform1f(GetUniformLocation(name), value);
 		}
-		void Shader::UploadFloatArray(const GLchar* name, float* value ,int count)
-		{	
+		void Shader::UploadFloatArray(const GLchar* name, float* value, int count)
+		{
 			enable();
 			glUniform1fv(GetUniformLocation(name), count, value);
 		}
-		void Shader::UploadInteger(const GLchar* name, const int value) 
-		{	
+		void Shader::UploadInteger(const GLchar* name, const int value)
+		{
 			enable();
 			glUniform1i(GetUniformLocation(name), value);
 		}
 		void Shader::UploadIntegerArray(const GLchar* name, int* value, int count)
-		{	
+		{
 			enable();
 			glUniform1iv(GetUniformLocation(name), count, value);
 		}
-		void Shader::UploadFloat2(const GLchar* name, const Math::vec2& vector) 
+		void Shader::UploadFloat2(const GLchar* name, const Math::vec2& vector)
 		{
 			enable();
 			glUniform2f(GetUniformLocation(name), vector.x, vector.y);
 		}
-		void Shader::UploadFloat2(const std::string name , const Math::vec2& vector)
+		void Shader::UploadFloat2(const std::string name, const Math::vec2& vector)
 		{
 			enable();
 			glUniform2f(GetUniformLocation(name), vector.x, vector.y);
@@ -200,12 +202,36 @@ namespace AnorEngine {
 		void Shader::UploadFloat4(const GLchar* name, const glm::vec4& vector)
 		{
 			enable();
-			glUniform4f(GetUniformLocation(name), vector.x ,vector.y, vector.z, vector.w);
+			glUniform4f(GetUniformLocation(name), vector.x, vector.y, vector.z, vector.w);
 		}
 		void Shader::UploadMat4(const char* name, const glm::mat4& matrix)
 		{
 			enable();
 			glUniformMatrix4fv(GetUniformLocation(name), 1, GL_FALSE, glm::value_ptr(matrix));
+		}
+
+		std::unordered_map<std::string, Ref<Shader>> ShaderLibrary::m_Shaders;
+		Ref<Shader> ShaderLibrary::AddShader(const Ref<Shader>& shader)
+		{
+			bool found = false;
+			std::string name = shader->GetName();
+			//if the shader already exists in the library. We return a reference to that.
+			for (auto& shdr : m_Shaders)
+			{
+				if (shdr.first == name)
+				{
+					found = true;
+					WARN("The shader you wanted to push is already present in the shader library.");		
+					return m_Shaders[name];
+				}
+			}
+			//if the shader we want to add to the library does not exist in the library, we create a new shader, add it to the library and then retun a reference to the newly created shader.
+			if (!found)			
+				return m_Shaders[name] = shader;
+		}
+		Ref<Shader> ShaderLibrary::LoadShader(const std::string& name, const std::string& filepath)
+		{
+			return AddShader(std::make_shared<Shader>(name, filepath));
 		}
 	}
 }

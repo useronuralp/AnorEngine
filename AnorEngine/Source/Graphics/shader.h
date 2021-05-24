@@ -11,13 +11,17 @@ namespace AnorEngine {
 
 		private:
 			GLuint m_ShaderID;
+			std::string m_Name;
 			std::string m_VertPath = "Empty";
 			std::string m_FragPath = "Empty";
 			std::string m_FilePath = "Empty";
 		public:
-			Shader(std::string vertPath, std::string fragPath);
-			Shader(std::string filepath);
-			~Shader();		
+			Shader(std::string name, std::string vertPath, std::string fragPath);
+			Shader(std::string name, std::string filepath);
+			~Shader();	
+		public:
+			inline const std::string& GetName() const { return m_Name; }
+		public:
 			void UploadFloat(const GLchar* name, const float value);
 			void UploadFloatArray(const GLchar* name, float* value,int count);
 			void UploadInteger(const GLchar* name, const int value);
@@ -38,6 +42,20 @@ namespace AnorEngine {
 			GLint GetUniformLocation(std::string name);
 		public:
 			inline GLuint getShaderID() const { return m_ShaderID; }
+		};
+
+		//This library will hold a reference to every shader you create in your program. Which means every shader will have a minimum of 1 strong reference in your program.
+		class ANOR_API ShaderLibrary
+		{
+		public:
+			//Returns a shader reference.
+			static Ref<Shader> LoadShader(const std::string& name, const std::string& filepath);
+			//Returns a shader reference.
+			static Ref<Shader> AddShader(const Ref<Shader>& shader);
+			//Returns an empty pointer if the specified shader was not found.
+			static Ref<Shader> GetShader(const std::string& shaderName) { return m_Shaders.count(shaderName) > 0 ? m_Shaders[shaderName] : Ref<Shader>() = nullptr; }; 
+		private:
+			static std::unordered_map<std::string, Ref<Shader>> m_Shaders;
 		};
 	}
 }

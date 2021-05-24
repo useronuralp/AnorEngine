@@ -15,7 +15,7 @@ namespace AnorEngine {
 		}
 		void mouse_button_callback(GLFWwindow* window, int button, int action, int mods)
 		{
-			OpenGLWindow* win = (OpenGLWindow*)glfwGetWindowUserPointer(window);
+			//OpenGLWindow* win = (OpenGLWindow*)glfwGetWindowUserPointer(window);
 			if(action == GLFW_PRESS)
 				Input::EventHandler::SubmitEvent(std::make_shared<Input::MouseClickEvent>(button, action));
 			else
@@ -23,12 +23,17 @@ namespace AnorEngine {
 		}
 		void cursor_position_callback(GLFWwindow* window, double xpos, double ypos)
 		{
-			OpenGLWindow* win = (OpenGLWindow*)glfwGetWindowUserPointer(window);
+			//OpenGLWindow* win = (OpenGLWindow*)glfwGetWindowUserPointer(window);
 			Input::EventHandler::SubmitEvent(std::make_shared<Input::MouseMoveEvent>(xpos, ypos));
 		}
 		void mouse_scroll_callback(GLFWwindow* window, double xoffset, double yoffset)
 		{
 			//OpenGLWindow* win = (OpenGLWindow*)glfwGetWindowUserPointer(window);
+			Input::EventHandler::SubmitEvent(std::make_shared<Input::MouseScrollEvent>(xoffset, yoffset));
+		}
+		void window_resize_callback(GLFWwindow* window, int width, int height)
+		{
+			Input::EventHandler::SubmitEvent(std::make_shared<Input::WindowResizeEvent>(width, height));
 		}
 		void APIENTRY openglErrorCallbackFunction(GLenum source, GLenum type, GLuint id, GLenum severity, GLsizei length, const GLchar* message, const void* userParam)
 		{
@@ -124,7 +129,7 @@ namespace AnorEngine {
 			glfwSetMouseButtonCallback(m_Window, mouse_button_callback);
 			glfwSetCursorPosCallback(m_Window, cursor_position_callback);
 			glfwSetScrollCallback(m_Window, mouse_scroll_callback);
-
+			glfwSetWindowSizeCallback(m_Window, window_resize_callback);
 			glfwSetWindowUserPointer(m_Window, this);// need this to access the currently active window. This is very important.
 			glfwSwapInterval(0);// Vsync
 

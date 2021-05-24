@@ -6,7 +6,8 @@ namespace AnorEngine
 		enum class ANOR_API EventType
 		{
 			None = 0, KeyPressEvent, KeyReleaseEvent,
-			MouseClickEvent, MouseReleaseEvent, MouseMoveEvent
+			MouseClickEvent, MouseReleaseEvent, MouseMoveEvent, MouseScrollEvent,
+			WindowResizeEvent
 		};
 
 		class ANOR_API Event
@@ -101,18 +102,52 @@ namespace AnorEngine
 		{
 		public:
 			MouseMoveEvent(float mouseXpos, float mouseYpos)
-				:m_MouseXOffset(mouseXpos), m_MouseYOffset(mouseYpos)
+				:m_MouseXPosition(mouseXpos), m_MouseYPosition(mouseYpos)
 			{
 				Event::m_EventType = EventType::MouseMoveEvent;
 			}
 		public:
-			void Log() override { INFO("Mouse Move Event. Mouse Position: X: {0}, Y: {1}", m_MouseXOffset, m_MouseYOffset); }
-			int GetMouseXOffset() { return m_MouseXOffset; }
-			int GetMouseYOffset() { return m_MouseYOffset; }
+			void Log() override { INFO("Mouse Move Event. Mouse Position: X: {0}, Y: {1}", m_MouseXPosition, m_MouseYPosition); }
+			int GetMouseXPosition() { return m_MouseXPosition; }
+			int GetMouseYPosition() { return m_MouseYPosition; }
 		public:
 			virtual ~MouseMoveEvent() override {}
 		private:
+			float m_MouseXPosition, m_MouseYPosition;
+		};
+		//--------------------------------------------------------------------
+		//--------------------------------------------------------------------
+		class ANOR_API MouseScrollEvent : public Event
+		{
+		public:
+			MouseScrollEvent(float mouseXpos, float mouseYpos)
+				:m_MouseXOffset(mouseXpos), m_MouseYOffset(mouseYpos)
+			{
+				Event::m_EventType = EventType::MouseScrollEvent;
+			}
+		public:
+			void Log() override { INFO("Mouse Scroll Event."); }
+			int GetXOffset() { return m_MouseXOffset; }
+			int GetYOffset() { return m_MouseYOffset; }
+		private:
 			float m_MouseXOffset, m_MouseYOffset;
+		};
+		//--------------------------------------------------------------------
+		//--------------------------------------------------------------------
+		class ANOR_API WindowResizeEvent : public Event
+		{
+		public:
+			WindowResizeEvent(int width, int height)
+				:m_Width(width), m_Height(height)
+			{
+				Event::m_EventType = EventType::WindowResizeEvent;
+			}
+		public:
+			void Log() override { INFO("Window Resize Event. Width: {0}, Height: {1}", m_Width, m_Height); }
+			int GetWidth() { return m_Width; }
+			int GetHeight() { return m_Height; }
+		private:
+			int m_Width, m_Height;
 		};
 	}
 }

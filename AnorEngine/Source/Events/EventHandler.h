@@ -11,6 +11,7 @@ namespace AnorEngine
 			static Application* s_TargetApplication;
 		public:
 			static void SubmitEvent(Ref<Event> event);
+			//Important to set this to the active Application else, you won't get your input processed.
 			inline static void SetTargetApplication(Application* target) { s_TargetApplication = target; }
 			static bool IsKeyDown(int keyCode);
 			static bool IsMousePressed(int button);

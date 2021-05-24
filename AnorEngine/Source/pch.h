@@ -18,4 +18,5 @@
 #include <typeinfo>
 #include <time.h>
 
+#include <cmath>
 #include <utils/Logger.h>

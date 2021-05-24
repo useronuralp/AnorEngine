@@ -187,6 +187,7 @@
     <ClCompile Include="Source\Graphics\Layers\tilelayer.cpp" />
     <ClCompile Include="Source\Graphics\mesh.cpp" />
     <ClCompile Include="Source\Graphics\model.cpp" />
+    <ClCompile Include="Source\Graphics\OrthographicCameraController.cpp" />
     <ClCompile Include="Source\Graphics\renderable3D.cpp" />
     <ClCompile Include="Source\Renderer\Renderer.cpp" />
     <ClCompile Include="Source\Renderer\RendererCommand.cpp" />
@@ -230,6 +231,7 @@
     <ClInclude Include="Source\Graphics\Camera.h" />
     <ClInclude Include="Source\Graphics\Layers\Layer.h" />
     <ClInclude Include="Source\Graphics\Layers\LayerStack.h" />
+    <ClInclude Include="Source\Graphics\OrthographicCameraController.h" />
     <ClInclude Include="Source\Renderer\Renderer.h" />
     <ClInclude Include="Source\Renderer\RendererCommand.h" />
     <ClInclude Include="Source\ImGuiExampleBuilds\imgui_impl_glfw.h" />

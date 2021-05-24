@@ -124,7 +124,7 @@ namespace Game
 		{
 			myVAO = std::make_shared<VertexArray>();
 			std::string solutionDir= __SOLUTION_DIR;
-			shader = std::make_shared<Shader>(solutionDir + "AnorEngine\\Assets\\Shaders\\2DShader.shader");
+			shader = ShaderLibrary::LoadShader("2DShader", solutionDir + "AnorEngine\\Assets\\Shaders\\2DShader.shader");
 		}
 		void OnAttach() override
 		{
@@ -163,7 +163,7 @@ namespace Game
 			m_ModelMatrix = glm::translate(m_ModelMatrix, { 1,2,0 });
 			myVAO = std::make_shared<VertexArray>();
 			std::string solutionDir = __SOLUTION_DIR;
-			shader = std::make_shared<Shader>(solutionDir + "AnorEngine\\Assets\\Shaders\\2DShader.shader");
+			shader = ShaderLibrary::LoadShader("2DShader", solutionDir + "AnorEngine\\Assets\\Shaders\\2DShader.shader");
 		}
 		void OnAttach() override
 		{
@@ -189,12 +189,14 @@ namespace Game
 	private:
 		LayerStack m_LayerStack; //its a queue really
 		Ref<OrthographicCamera> m_OrthoCamera;
+		Ref<OrthographicCameraController> m_OrthoGraphicCameraController;
 		Ref<PerspectiveCamera> m_PersCamera;
 		float cameraSpeed = 1;
 		glm::vec3 cameraPos = { 0.0f, 0.0f, 0.0f };
 		float lastFrame;
 		bool isMouseCaptured = false;
 		bool isInitialMouseCaptured = false;
+
 		//My Quad Info------------------------------------
 		//------------------------------------------------
 		float vertices[5 * 4] =
@@ -215,15 +217,15 @@ namespace Game
 		};
 		Ref<VertexArray> m_QuadVAO;
 		Ref<Shader> m_QuadShader;
+		Ref<Texture> m_QuadTexture;
+		Ref<ExampleLayer> layer = std::make_shared<ExampleLayer>();
+		Ref<ExampleLayer2> layer2 = std::make_shared<ExampleLayer2>();
+		Ref<ImGuiLayer> ImGui = std::make_shared<ImGuiLayer>();
 		glm::mat4 m_QuadModelMatrix = glm::mat4(1.0f);
 		glm::vec3 m_QuadTranslation = { 0.0f, 0.0f, 0.0f };
 		glm::vec4 m_QuadColor = { 1,0,0,1 };
 		std::string solutionDir = __SOLUTION_DIR;
-		Ref<Texture> m_QuadTexture;
 		float quadMoveSpeed = 0.1f;
-		Ref<ExampleLayer> layer = std::make_shared<ExampleLayer>();
-		Ref<ExampleLayer2> layer2 = std::make_shared<ExampleLayer2>();
-		Ref<ImGuiLayer> ImGui = std::make_shared<ImGuiLayer>();
 		//My Quad Info------------------------------------
 		//------------------------------------------------
 #ifdef RENDER_MY_SCENE
@@ -231,11 +233,12 @@ namespace Game
 #endif
 	public:
 		Sandbox()
-			:m_OrthoCamera(new OrthographicCamera(-1.6f * 5, 1.6f * 5, -0.9f * 5, 0.9f * 5)), m_PersCamera(new PerspectiveCamera(1920, 1080))
+			:m_OrthoCamera(std::make_shared<OrthographicCamera>(-1.6f * (5), 1.6f * (5), -0.9f * (5), 0.9f * (5) )), m_PersCamera(std::make_shared<PerspectiveCamera>(1920, 1080))
 		{	
+			m_OrthoGraphicCameraController = std::make_shared<OrthographicCameraController>(m_OrthoCamera, (1920.0f / 1080.0f));
 			Input::EventHandler::SetTargetApplication(this); //Important to set this to the active Application else, you won't get your input processed.
 			m_QuadVAO = std::make_shared<VertexArray>();
-			m_QuadShader = std::make_shared<Shader>(solutionDir + "AnorEngine\\Assets\\Shaders\\2DTextureShader.shader");
+			m_QuadShader = ShaderLibrary::LoadShader("TextureShader", solutionDir + "AnorEngine\\Assets\\Shaders\\2DTextureShader.shader");
 			m_QuadTexture = std::make_shared<Texture>(solutionDir + "AnorEngine\\Assets\\Textures\\transparent.png");
 			m_QuadShader->UploadInteger("u_Sampler", 0);
 			BufferLayout QuadLayout = { {ShaderDataType::vec3, "a_Position", 0} ,  {ShaderDataType::vec2, "a_TexCoord", 1} };
@@ -246,7 +249,6 @@ namespace Game
 #endif			
 			pushLayer(layer);
 			ImGui->color = &layer->color;
-			//pushLayer(layer2);
 			pushLayer(ImGui);
 			logInfoDebug();
 		}
@@ -261,30 +263,32 @@ namespace Game
 			WARN("APP::{0}", "Custom sandbox application has been created!!");
 		}
 		void Run() override
-		{					
+		{	
 			while (!m_OpenGLWindow->IsClosed())
-			{			
+			{
+				float deltaTime = DeltaTime();
+				m_OrthoGraphicCameraController->OnUpdate(deltaTime);
+				quadMoveSpeed = 3 * deltaTime;			
+				ProcessMovementInput(); //this is where we check if we want to do input related stuff. Like for example to check if a key is pressed.
+				m_QuadModelMatrix = glm::translate(m_QuadModelMatrix, m_QuadTranslation);
+
+				//Scene setup
 				Renderer::BeginScene(m_OrthoCamera);
 				Renderer::ClearColor(glm::vec4(0.1f, 0.1f, 0.1f, 1));
 				Renderer::Clear();
-				float deltaTime = DeltaTime();
-				cameraSpeed =  10 * deltaTime;
-				quadMoveSpeed = 3 * deltaTime;
-				m_QuadTranslation = {0,0,0};
-				ProcessCamera();
-				m_OrthoCamera->SetPosition(cameraPos);
-				m_QuadModelMatrix = glm::translate(m_QuadModelMatrix, m_QuadTranslation);
 
+				//Rendering starts
 				for (Ref<Layer> layer : m_LayerStack)
 				{	
 					layer->OnUpdate();
 				}
-
 				m_QuadTexture->Bind();
 				Renderer::Submit(m_QuadVAO, m_QuadShader, m_QuadModelMatrix, m_QuadColor);
 				m_QuadTexture->Unbind();
-
+				m_QuadTranslation = { 0,0,0 };//Reset translation after rendering
 				ImGui->OnImGuiRender();
+				//Rendering ends
+
 				m_OpenGLWindow->Update();
 				Renderer::EndScene();
 			}
@@ -360,49 +364,38 @@ namespace Game
 				}
 			}
 #endif
+			//Passing every single event that I get from the OpenGLWindow to this controller. Will change.
+			m_OrthoGraphicCameraController->OnEvent(event);
 		}
-		void ProcessCamera()
-		{		
+		void ProcessMovementInput()
+		{	
+#ifdef RENDER_MY_SCENE
+			//3D Stuff
 			if (Input::EventHandler::IsKeyDown(ANOR_KEY_W))
 			{
-#ifdef RENDER_MY_SCENE
 				m_PersCamera->cameraPos += cameraSpeed * m_PersCamera->cameraFront;
-#else
-				cameraPos.y += cameraSpeed;
-#endif
 			}
 			else if (Input::EventHandler::IsKeyDown(ANOR_KEY_S))
 			{
-#ifdef RENDER_MY_SCENE
 				m_PersCamera->cameraPos -= cameraSpeed * m_PersCamera->cameraFront;
-#else
-				cameraPos.y -= cameraSpeed;
-#endif
 			}
 			if (Input::EventHandler::IsKeyDown(ANOR_KEY_A))
 			{
-#ifdef RENDER_MY_SCENE
 				m_PersCamera->cameraPos -= glm::normalize(glm::cross(m_PersCamera->cameraFront, m_PersCamera->cameraUp)) * cameraSpeed;
-#else
-				cameraPos.x -= cameraSpeed;
-#endif
 			}
 			else if (Input::EventHandler::IsKeyDown(ANOR_KEY_D))
-			{
-#ifdef RENDER_MY_SCENE
 				m_PersCamera->cameraPos += glm::normalize(glm::cross(m_PersCamera->cameraFront, m_PersCamera->cameraUp)) * cameraSpeed;
-#else
-				cameraPos.x += cameraSpeed;
-#endif
 			}
-			if (Input::EventHandler::IsKeyDown(ANOR_KEY_I))
-				m_QuadTranslation.y += quadMoveSpeed;
-			else if(Input::EventHandler::IsKeyDown(ANOR_KEY_K))
-				m_QuadTranslation.y -= quadMoveSpeed;
-			if(Input::EventHandler::IsKeyDown(ANOR_KEY_J))
-				m_QuadTranslation.x -= quadMoveSpeed;
-			else if(Input::EventHandler::IsKeyDown(ANOR_KEY_L))
-				m_QuadTranslation.x += quadMoveSpeed;
+#endif
+
+		if (Input::EventHandler::IsKeyDown(ANOR_KEY_I))
+			m_QuadTranslation.y += quadMoveSpeed;
+		else if(Input::EventHandler::IsKeyDown(ANOR_KEY_K))
+			m_QuadTranslation.y -= quadMoveSpeed;
+		if(Input::EventHandler::IsKeyDown(ANOR_KEY_J))
+			m_QuadTranslation.x -= quadMoveSpeed;
+		else if(Input::EventHandler::IsKeyDown(ANOR_KEY_L))
+			m_QuadTranslation.x += quadMoveSpeed;
 		}
 		float DeltaTime()
 		{

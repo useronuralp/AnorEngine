@@ -1,8 +1,8 @@
 #pragma once
+#include <GLFW/glfw3.h>
 #include <glm.hpp>
 #include <gtc/type_ptr.hpp>
 #include <gtc/matrix_transform.hpp>
-#include <GLFW/glfw3.h>
 namespace AnorEngine
 {
 	namespace Graphics
@@ -37,6 +37,7 @@ namespace AnorEngine
 			OrthographicCamera(float left, float right, float bottom, float top);
 			const glm::vec3& GetPosition() const { return m_Position; }
 			const float& GetRotation() const { return m_Rotation; }
+			void SetProjectionMatrix(float left, float right, float bottom, float top);
 			void SetPosition(glm::vec3 position) { m_Position = position; RecalculateViewMatrix(); }
 			void SetRotation(float rotation) { m_Rotation = rotation; RecalculateViewMatrix(); }
 
@@ -52,7 +53,7 @@ namespace AnorEngine
 			glm::mat4 m_ViewMatrix;
 			glm::mat4 m_ViewProjectionMatrix;
 
-			glm::vec3 m_Position = { 0.0f,0.0f,0.0f };
+			glm::vec3 m_Position = { 0.0f, 0.0f, 0.0f };
 			float m_Rotation = 0.0f;
 		};
 	}
