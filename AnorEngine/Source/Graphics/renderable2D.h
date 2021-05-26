@@ -1,5 +1,4 @@
 #pragma once
-#include "pch.h"
 #include "Buffers/Buffer.h"
 #include "Buffers/Vertexarray.h"
 #include "../Math/maths.h"

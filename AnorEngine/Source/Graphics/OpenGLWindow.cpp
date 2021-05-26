@@ -33,6 +33,10 @@ namespace AnorEngine {
 		}
 		void window_resize_callback(GLFWwindow* window, int width, int height)
 		{
+			OpenGLWindow* win = (OpenGLWindow*)glfwGetWindowUserPointer(window);
+			glfwGetFramebufferSize(win->m_Window, &win->m_Width, &win->m_Height);
+			glViewport(0, 0, width, height); 
+
 			Input::EventHandler::SubmitEvent(std::make_shared<Input::WindowResizeEvent>(width, height));
 		}
 		void APIENTRY openglErrorCallbackFunction(GLenum source, GLenum type, GLuint id, GLenum severity, GLsizei length, const GLchar* message, const void* userParam)
@@ -81,12 +85,10 @@ namespace AnorEngine {
 			cout << "---------------------opengl-callback-end--------------" << endl;
 		}
 		OpenGLWindow::OpenGLWindow(const char* title, int width, int height) 
-		{	
-			
+		{				
 			m_Title = title;
 			m_Height = height;
-			m_Width = width;
-	
+			m_Width = width;	
 			if (!init())
 			{ // this is how you call init function. Inside an if statement. It is a little bit tricky.
 				glfwTerminate();
@@ -152,8 +154,6 @@ namespace AnorEngine {
 			m_Time = glfwGetTime();
 			glfwPollEvents();
 			glfwSwapBuffers(m_Window);
-			glfwGetFramebufferSize(m_Window, &m_Width, &m_Height);
-			glViewport(0, 0, m_Width, m_Height);
 		}
 
 		bool OpenGLWindow::IsClosed() const

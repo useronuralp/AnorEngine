@@ -175,7 +175,11 @@
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="Source\Application.cpp" />
+    <ClCompile Include="Source\Core\Application.cpp" />
+    <ClCompile Include="Source\pch.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
+    </ClCompile>
     <ClCompile Include="Source\Events\EventHandler.cpp" />
     <ClCompile Include="Source\Graphics\batchrenderer2D.cpp" />
     <ClCompile Include="Source\Graphics\Buffers\Buffer.cpp" />
@@ -205,12 +209,6 @@
     <ClCompile Include="Source\Math\vec2.cpp" />
     <ClCompile Include="Source\Math\vec3.cpp" />
     <ClCompile Include="Source\Math\vec4.cpp" />
-    <ClCompile Include="Source\pch.cpp">
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
-      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">pch.h</PrecompiledHeaderFile>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
-      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Release|x64'">pch.h</PrecompiledHeaderFile>
-    </ClCompile>
     <ClCompile Include="Source\utils\Logger.cpp" />
     <ClCompile Include="Vendor\ImGUI\imgui.cpp" />
     <ClCompile Include="Vendor\ImGUI\imgui_demo.cpp" />
@@ -221,26 +219,26 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Assets\Models\cube.h" />
-    <ClInclude Include="Source\EngineKeyCodes.h" />
-    <ClInclude Include="Source\Engine_Initializer.h" />
-    <ClInclude Include="Source\Application.h" />
-    <ClInclude Include="Source\core.h" />
-    <ClInclude Include="Source\EntryPoint.h" />
+    <ClInclude Include="Source\Core\Application.h" />
+    <ClInclude Include="Source\Core\core.h" />
+    <ClInclude Include="Source\Core\Engine.h" />
+    <ClInclude Include="Source\Core\EngineKeyCodes.h" />
+    <ClInclude Include="Source\Core\Engine_Initializer.h" />
+    <ClInclude Include="Source\Core\EntryPoint.h" />
+    <ClInclude Include="Source\Core\MouseButtonCodes.h" />
     <ClInclude Include="Source\Events\Event.h" />
     <ClInclude Include="Source\Events\EventHandler.h" />
     <ClInclude Include="Source\Graphics\Camera.h" />
     <ClInclude Include="Source\Graphics\Layers\Layer.h" />
     <ClInclude Include="Source\Graphics\Layers\LayerStack.h" />
     <ClInclude Include="Source\Graphics\OrthographicCameraController.h" />
+    <ClInclude Include="Source\pch.h" />
     <ClInclude Include="Source\Renderer\Renderer.h" />
     <ClInclude Include="Source\Renderer\RendererCommand.h" />
     <ClInclude Include="Source\ImGuiExampleBuilds\imgui_impl_glfw.h" />
     <ClInclude Include="Source\ImGuiExampleBuilds\imgui_impl_opengl3.h" />
     <ClInclude Include="Source\ImGui\ImGuiLayer.h" />
-    <ClInclude Include="Source\MouseButtonCodes.h" />
-    <ClInclude Include="Source\pch.h" />
     <ClInclude Include="Source\utils\Logger.h" />
-    <ClInclude Include="Source\Engine.h" />
     <ClInclude Include="Source\Graphics\batchrenderer2D.h" />
     <ClInclude Include="Source\Graphics\Buffers\Buffer.h" />
     <ClInclude Include="Source\Graphics\Buffers\VertexArray.h" />

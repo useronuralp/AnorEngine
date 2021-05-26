@@ -5,7 +5,7 @@ namespace AnorEngine
 	namespace Graphics
 	{
 		PerspectiveCamera::PerspectiveCamera(float height, float width)
-			:m_Height(height), m_Width(width)
+			:m_Height(height), m_Width(width), m_ProjectionMatrix(glm::perspective(-1280.0f / 720.0f * (5), 1280.0f / 720.0f * (5), -1.0f * (5), 1.0f * (5)))
 		{
 			deltaTime = 0.0f;
 			lastFrame = 0.0f;
@@ -15,6 +15,10 @@ namespace AnorEngine
 			PITCH = 0.0f;
 			sensitivity = 0.05f;
 			OnUpdate();
+
+			cameraPos = glm::vec3(0.0f, 2.0f, 5.0f);
+			cameraFront = glm::vec3(0.0f, 0.0f, -1.0f);
+			cameraUp = glm::vec3(0.0f, 1.0f, 0.0f);
 		}
 		void PerspectiveCamera::OnUpdate()
 		{

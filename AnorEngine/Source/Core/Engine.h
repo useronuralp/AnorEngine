@@ -1,8 +1,8 @@
 #pragma once
 #include "core.h"
 
-#include <EngineKeyCodes.h>
-#include <MouseButtonCodes.h>
+#include "EngineKeyCodes.h"
+#include "MouseButtonCodes.h"
 
 //-----Engine modules---------------
 #include "Graphics/shader.h"

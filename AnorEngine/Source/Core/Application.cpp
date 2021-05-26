@@ -12,7 +12,7 @@ namespace AnorEngine
 	{	
 		s_Instance = this; //static setup of instance of this singleton class.
 		AnorEngine::EngineInitializer::init();
-		m_OpenGLWindow = std::make_shared<Graphics::OpenGLWindow>("Anor Engine", 1920, 1080);  //window creation
+		m_OpenGLWindow = std::make_shared<Graphics::OpenGLWindow>("Anor Engine", 1280, 720);  //window creation
 		if (!m_OpenGLWindow)
 		{
 			CRITICAL_ASSERT("APP::{0}", "Application failed to initialize the OpenGLWindow");

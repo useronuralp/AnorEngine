@@ -1,4 +1,4 @@
-#include "Engine.h"
+#include <Core/Engine.h>
 namespace Game
 {	
 	using namespace AnorEngine;
@@ -144,9 +144,9 @@ namespace Game
 	{
 		float vertices[21] =
 		{
-			-1.0f, -1.0f, 0.0f, 0.3f, 0.01f, 0.2f,  1.0f,
-			 1.0f, -1.0f, 0.0f, 0.3f, 0.18f, 0.15f, 1.0f,
-			 0.0f,  1.0f, 0.0f, 0.3f, 0.09f, 0.07f, 1.0f
+			-1.0f, -1.0f, 0.0f, 0.11f, 0.9f, 0.05f,  0.5f,
+			 1.0f, -1.0f, 0.0f, 0.3f, 0.2f, 1.0f, 0.5f,
+			 0.0f,  1.0f, 0.0f, 0.92f, 0.23f, 0.3f, 0.5f
 		};
 		uint32_t indices[3] =
 		{
@@ -163,7 +163,8 @@ namespace Game
 			m_ModelMatrix = glm::translate(m_ModelMatrix, { 1,2,0 });
 			myVAO = std::make_shared<VertexArray>();
 			std::string solutionDir = __SOLUTION_DIR;
-			shader = ShaderLibrary::LoadShader("2DShader", solutionDir + "AnorEngine\\Assets\\Shaders\\2DShader.shader");
+			shader = ShaderLibrary::GetShader("2DShader");
+			//shader = ShaderLibrary::LoadShader("2DShader", solutionDir + "AnorEngine\\Assets\\Shaders\\2DShader.shader");
 		}
 		void OnAttach() override
 		{
@@ -191,25 +192,25 @@ namespace Game
 		Ref<OrthographicCamera> m_OrthoCamera;
 		Ref<OrthographicCameraController> m_OrthoGraphicCameraController;
 		Ref<PerspectiveCamera> m_PersCamera;
-		float cameraSpeed = 1;
 		glm::vec3 cameraPos = { 0.0f, 0.0f, 0.0f };
+		float cameraSpeed = 1;
 		float lastFrame;
 		bool isMouseCaptured = false;
 		bool isInitialMouseCaptured = false;
-
+		bool m_Minimized = false;
 		//My Quad Info------------------------------------
 		//------------------------------------------------
-		float vertices[5 * 4] =
+		float vertices[7 * 4] =
 		{
-			-1.0f, -1.0f, 0.0f, 0.0f, 0.0f,
-			 1.0f, -1.0f, 0.0f, 0.0f, 1.0f,
-			 1.0f,  1.0f, 0.0f, 1.0f, 1.0f,
-			-1.0f,  1.0f, 0.0f, 0.0f, 1.0f
+			//-1.0f, -1.0f, 0.0f, 0.0f, 0.0f,
+			// 1.0f, -1.0f, 0.0f, 0.0f, 1.0f,
+			// 1.0f,  1.0f, 0.0f, 1.0f, 1.0f,
+			//-1.0f,  1.0f, 0.0f, 0.0f, 1.0f
 
-			//- 1.0f, -1.0f, 0.0f, 0.5f, 1.0f, 0.1f,  0.1f,
-			// 1.0f, -1.0f, 0.0f, 0.4f, 1.0f, 0.1f,  0.1f,
-			// 1.0f,  1.0f, 0.0f, 0.2f, 1.0f, 0.1f,  0.1f, //example without textures
-			//-1.0f,  1.0f, 0.0f, 0.1f, 1.0f, 0.1f,   0.1f
+			- 1.0f, -1.0f, 0.0f, 0.5f, 1.0f, 0.1f,  0.1f,
+			 1.0f, -1.0f, 0.0f, 0.4f, 1.0f, 0.1f,  0.1f,
+			 1.0f,  1.0f, 0.0f, 0.2f, 1.0f, 0.1f,  0.1f, //example without textures
+			-1.0f,  1.0f, 0.0f, 0.1f, 1.0f, 0.1f,   0.1f
 		};
 		uint32_t indices[6] =
 		{
@@ -233,21 +234,22 @@ namespace Game
 #endif
 	public:
 		Sandbox()
-			:m_OrthoCamera(std::make_shared<OrthographicCamera>(-1.6f * (5), 1.6f * (5), -0.9f * (5), 0.9f * (5) )), m_PersCamera(std::make_shared<PerspectiveCamera>(1920, 1080))
+			:m_OrthoCamera(std::make_shared<OrthographicCamera>(-1280.0f / 720.0f * (5), 1280.0f / 720.0f * (5), -1 * (5), 1 * (5))), m_PersCamera(std::make_shared<PerspectiveCamera>(1280, 720))
 		{	
-			m_OrthoGraphicCameraController = std::make_shared<OrthographicCameraController>(m_OrthoCamera, (1920.0f / 1080.0f));
+			m_OrthoGraphicCameraController = std::make_shared<OrthographicCameraController>(m_OrthoCamera, (1280.0f / 720.0f));
 			Input::EventHandler::SetTargetApplication(this); //Important to set this to the active Application else, you won't get your input processed.
 			m_QuadVAO = std::make_shared<VertexArray>();
-			m_QuadShader = ShaderLibrary::LoadShader("TextureShader", solutionDir + "AnorEngine\\Assets\\Shaders\\2DTextureShader.shader");
+			m_QuadShader = ShaderLibrary::LoadShader("TextureShader", solutionDir + "AnorEngine\\Assets\\Shaders\\2DShader.shader");
 			m_QuadTexture = std::make_shared<Texture>(solutionDir + "AnorEngine\\Assets\\Textures\\transparent.png");
 			m_QuadShader->UploadInteger("u_Sampler", 0);
-			BufferLayout QuadLayout = { {ShaderDataType::vec3, "a_Position", 0} ,  {ShaderDataType::vec2, "a_TexCoord", 1} };
-			m_QuadVAO->AddVertexBuffer(std::make_shared<Buffer>(vertices, 5 * 4 * sizeof(float), QuadLayout));
+			BufferLayout QuadLayout = { {ShaderDataType::vec3, "a_Position", 0} ,  {ShaderDataType::vec4, "a_TexCoord", 1} };
+			m_QuadVAO->AddVertexBuffer(std::make_shared<Buffer>(vertices, 7 * 4 * sizeof(float), QuadLayout));
 			m_QuadVAO->SetIndexBuffer(std::make_shared<IndexBuffer>(indices, 6));
 #ifdef RENDER_MY_SCENE
 			pushLayer(scene);
 #endif			
 			pushLayer(layer);
+			pushLayer(layer2);
 			ImGui->color = &layer->color;
 			pushLayer(ImGui);
 			logInfoDebug();
@@ -258,11 +260,7 @@ namespace Game
 			WARN("Sandbox destructor completed!!!");
 		}
 	public:
-		void logInfoDebug() override
-		{	
-			WARN("APP::{0}", "Custom sandbox application has been created!!");
-		}
-		void Run() override
+		virtual void Run() override
 		{	
 			while (!m_OpenGLWindow->IsClosed())
 			{
@@ -278,14 +276,17 @@ namespace Game
 				Renderer::Clear();
 
 				//Rendering starts
-				for (Ref<Layer> layer : m_LayerStack)
-				{	
-					layer->OnUpdate();
+				if (!m_Minimized) //We don't want to render if the window is minimized.
+				{
+					for (Ref<Layer> layer : m_LayerStack)
+					{	
+						layer->OnUpdate();
+					}
+					m_QuadTexture->Bind();
+					Renderer::Submit(m_QuadVAO, m_QuadShader, m_QuadModelMatrix, m_QuadColor);
+					m_QuadTexture->Unbind();
+					m_QuadTranslation = { 0,0,0 }; //Reset translation after rendering
 				}
-				m_QuadTexture->Bind();
-				Renderer::Submit(m_QuadVAO, m_QuadShader, m_QuadModelMatrix, m_QuadColor);
-				m_QuadTexture->Unbind();
-				m_QuadTranslation = { 0,0,0 };//Reset translation after rendering
 				ImGui->OnImGuiRender();
 				//Rendering ends
 
@@ -293,16 +294,7 @@ namespace Game
 				Renderer::EndScene();
 			}
 		}
-		void pushLayer(Ref<Layer> Layer)
-		{
-			Layer->OnAttach();
-			m_LayerStack.pushLayer(Layer);
-		}
-		void popLayer()
-		{
-			m_LayerStack.popLayer();
-		}
-		void OnEvent(Ref<Input::Event> event) override
+		virtual void OnEvent(Ref<Input::Event> event) override
 		{
 			event->Log();
 #ifdef RENDER_MY_SCENE
@@ -364,8 +356,32 @@ namespace Game
 				}
 			}
 #endif
+			if (event->GetEventType() == Input::EventType::WindowResizeEvent)
+			{
+				OnWindowResizeEvent(std::static_pointer_cast<Input::WindowResizeEvent>(event));
+			}
 			//Passing every single event that I get from the OpenGLWindow to this controller. Will change.
 			m_OrthoGraphicCameraController->OnEvent(event);
+		}
+		virtual void OnWindowResizeEvent(Ref<Input::WindowResizeEvent> event) override
+		{
+			if (event->GetHeight() == 0 || event->GetWidth() == 0)
+				m_Minimized = true;
+			else if (event->GetHeight() > 0 || event->GetWidth() > 0)
+				m_Minimized = false;
+		}
+		virtual void logInfoDebug() override
+		{	
+			WARN("APP::{0}", "Custom sandbox application has been created!!");
+		}
+		void pushLayer(Ref<Layer> Layer)
+		{
+			Layer->OnAttach();
+			m_LayerStack.pushLayer(Layer);
+		}
+		void popLayer()
+		{
+			m_LayerStack.popLayer();
 		}
 		void ProcessMovementInput()
 		{	

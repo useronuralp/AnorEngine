@@ -1,6 +1,5 @@
 #pragma once
 #include "renderer2D.h"
-//#include <deque>//
 #include "static_sprite.h"
 
 namespace AnorEngine {

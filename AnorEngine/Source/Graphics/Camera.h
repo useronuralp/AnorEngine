@@ -20,12 +20,12 @@ namespace AnorEngine
 			float PITCH;
 			float sensitivity;
 
-			glm::vec3 cameraPos = glm::vec3(0.0f, 2.0f, 5.0f);
-			glm::vec3 cameraFront = glm::vec3(0.0f, 0.0f, -1.0f);
-			glm::vec3 cameraUp = glm::vec3(0.0f, 1.0f, 0.0f);
+			glm::vec3 cameraPos;
+			glm::vec3 cameraFront;
+			glm::vec3 cameraUp;
 
-			glm::mat4 m_ProjectionMatrix = glm::perspective(glm::radians(45.0f), 1920.0f / 1080.0f, 0.01f, 1000.0f);
-			glm::mat4 m_ViewMatrix = glm::mat4(1.0f);
+			glm::mat4 m_ProjectionMatrix;
+			glm::mat4 m_ViewMatrix;
 			PerspectiveCamera(float height, float weight);
 			int GetRenderTime() { return glfwGetTime(); }
 			void OnUpdate();

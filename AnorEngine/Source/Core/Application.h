@@ -7,6 +7,7 @@ namespace AnorEngine
 	namespace Input
 	{
 		class Event; // forward declaring.
+		class WindowResizeEvent;
 	}
 	class ANOR_API Application
 	{
@@ -20,6 +21,7 @@ namespace AnorEngine
 	public:
 		virtual void OnImGuiRender() {};
 		virtual void OnEvent(Ref<Input::Event> event) {};
+		virtual void OnWindowResizeEvent(Ref<Input::WindowResizeEvent> event) {};
 		virtual void Run();
 		inline static Application& Get() { return *s_Instance; }
 		inline Ref<Graphics::OpenGLWindow> GetOpenGLWindow() { return m_OpenGLWindow; }
