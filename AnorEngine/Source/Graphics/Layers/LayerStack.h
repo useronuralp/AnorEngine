@@ -9,8 +9,8 @@ namespace AnorEngine {
 			void pushLayer(Ref<Layer> Layer);
 			void popLayer();
 
-			std::vector<Ref<Layer>>::iterator begin() { return m_LayerStack.begin(); }
-			std::vector<Ref<Layer>>::iterator end() { return m_LayerStack.end(); }
+			std::vector<Ref<Layer>>::reverse_iterator begin() { return m_LayerStack.rbegin(); }
+			std::vector<Ref<Layer>>::reverse_iterator end() { return m_LayerStack.rend(); }
 		private:
 			std::vector<Ref<Layer>> m_LayerStack;
 		};

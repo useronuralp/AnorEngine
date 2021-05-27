@@ -1,10 +1,8 @@
 #pragma once
-#include "pch.h"
 namespace AnorEngine
 {
-	class ANOR_API EngineInitializer
+	struct ANOR_API EngineInitializer
 	{
-	public:
 		static bool init()
 		{
 			//Usually, static classes and must be initialized stuff go here.
@@ -14,6 +12,5 @@ namespace AnorEngine
 			WARN("..............................");
 			return true;
 		}
-	private:
 	};
 }

@@ -108,8 +108,8 @@ namespace AnorEngine
 			}
 		public:
 			void Log() override { INFO("Mouse Move Event. Mouse Position: X: {0}, Y: {1}", m_MouseXPosition, m_MouseYPosition); }
-			int GetMouseXPosition() { return m_MouseXPosition; }
-			int GetMouseYPosition() { return m_MouseYPosition; }
+			float GetMouseXPosition() { return m_MouseXPosition; }
+			float GetMouseYPosition() { return m_MouseYPosition; }
 		public:
 			virtual ~MouseMoveEvent() override {}
 		private:
@@ -127,8 +127,8 @@ namespace AnorEngine
 			}
 		public:
 			void Log() override { INFO("Mouse Scroll Event."); }
-			int GetXOffset() { return m_MouseXOffset; }
-			int GetYOffset() { return m_MouseYOffset; }
+			float GetXOffset() { return m_MouseXOffset; }
+			float GetYOffset() { return m_MouseYOffset; }
 		private:
 			float m_MouseXOffset, m_MouseYOffset;
 		};

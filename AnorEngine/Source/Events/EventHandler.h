@@ -15,8 +15,8 @@ namespace AnorEngine
 			inline static void SetTargetApplication(Application* target) { s_TargetApplication = target; }
 			static bool IsKeyDown(int keyCode);
 			static bool IsMousePressed(int button);
-			static float GetMouseXOffset(GLFWwindow* windowPtr);
-			static float GetMouseYOffset(GLFWwindow* windowPtr);
+			static double GetMouseXOffset(GLFWwindow* windowPtr);
+			static double GetMouseYOffset(GLFWwindow* windowPtr);
 		};
 	}
 }

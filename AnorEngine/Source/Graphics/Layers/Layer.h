@@ -1,20 +1,18 @@
 #pragma once
+#include <Events/Event.h>
 namespace AnorEngine {
 	namespace Graphics
 	{
 		class ANOR_API Layer
 		{
-		public:
-			bool wantToCaptureMouse = true;
 		protected:
 			Layer();
 		public:
 			virtual ~Layer();
-		public:
 			Layer(const char* name);
 			virtual void OnAttach() {};
-			virtual void OnUpdate() {};
-			virtual void OnEvent() {};
+			virtual void OnUpdate(float deltaTime = 1.0f) {};
+			virtual void OnEvent(Ref<Input::Event> event) {};
 			virtual void OnImGuiRender() {};
 			inline const char* getName() { return m_LayerName; }
 			void logInfoDebug();

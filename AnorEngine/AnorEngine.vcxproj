@@ -204,7 +204,7 @@
     <ClCompile Include="Source\Graphics\OpenGLWindow.cpp" />
     <ClCompile Include="Source\ImGuiExampleBuilds\imgui_impl_glfw.cpp" />
     <ClCompile Include="Source\ImGuiExampleBuilds\imgui_impl_opengl3.cpp" />
-    <ClCompile Include="Source\ImGui\ImGuiLayer.cpp" />
+    <ClCompile Include="Source\Graphics\Layers\ImGuiBase.cpp" />
     <ClCompile Include="Source\Math\mat4.cpp" />
     <ClCompile Include="Source\Math\vec2.cpp" />
     <ClCompile Include="Source\Math\vec3.cpp" />
@@ -220,10 +220,10 @@
   <ItemGroup>
     <ClInclude Include="Assets\Models\cube.h" />
     <ClInclude Include="Source\Core\Application.h" />
-    <ClInclude Include="Source\Core\core.h" />
+    <ClInclude Include="Source\Core\Core.h" />
     <ClInclude Include="Source\Core\Engine.h" />
     <ClInclude Include="Source\Core\EngineKeyCodes.h" />
-    <ClInclude Include="Source\Core\Engine_Initializer.h" />
+    <ClInclude Include="Source\Core\EngineInitializer.h" />
     <ClInclude Include="Source\Core\EntryPoint.h" />
     <ClInclude Include="Source\Core\MouseButtonCodes.h" />
     <ClInclude Include="Source\Events\Event.h" />
@@ -237,7 +237,7 @@
     <ClInclude Include="Source\Renderer\RendererCommand.h" />
     <ClInclude Include="Source\ImGuiExampleBuilds\imgui_impl_glfw.h" />
     <ClInclude Include="Source\ImGuiExampleBuilds\imgui_impl_opengl3.h" />
-    <ClInclude Include="Source\ImGui\ImGuiLayer.h" />
+    <ClInclude Include="Source\Graphics\Layers\ImGuiBase.h" />
     <ClInclude Include="Source\utils\Logger.h" />
     <ClInclude Include="Source\Graphics\batchrenderer2D.h" />
     <ClInclude Include="Source\Graphics\Buffers\Buffer.h" />

@@ -213,21 +213,18 @@ namespace AnorEngine {
 		std::unordered_map<std::string, Ref<Shader>> ShaderLibrary::m_Shaders;
 		Ref<Shader> ShaderLibrary::AddShader(const Ref<Shader>& shader)
 		{
-			bool found = false;
 			std::string name = shader->GetName();
 			//if the shader already exists in the library. We return a reference to that.
 			for (auto& shdr : m_Shaders)
 			{
 				if (shdr.first == name)
 				{
-					found = true;
-					WARN("The shader you wanted to push is already present in the shader library.");		
+					WARN("The shader you wanted to load is already present in the shader library.");		
 					return m_Shaders[name];
 				}
 			}
 			//if the shader we want to add to the library does not exist in the library, we create a new shader, add it to the library and then retun a reference to the newly created shader.
-			if (!found)			
-				return m_Shaders[name] = shader;
+			return m_Shaders[name] = shader;
 		}
 		Ref<Shader> ShaderLibrary::LoadShader(const std::string& name, const std::string& filepath)
 		{

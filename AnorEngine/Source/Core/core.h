@@ -1,5 +1,6 @@
 #pragma once
 #include <memory>
+
 #ifdef ENGINE_PLATFORM_WINDOWS
 	#ifdef ENGINE_BUILD_DLL
 		#define ANOR_API //__declspec(dllexport)

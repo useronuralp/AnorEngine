@@ -1,6 +1,6 @@
 #include "pch.h"
 #include "Application.h"
-#include "Engine_Initializer.h"
+#include "EngineInitializer.h"
 namespace AnorEngine
 {	
 	Application* Application::s_Instance = nullptr;

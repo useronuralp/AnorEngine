@@ -1,4 +1,5 @@
 #include <Core/Engine.h>
+#include <Core/EntryPoint.h>
 namespace Game
 {	
 	using namespace AnorEngine;
@@ -99,12 +100,9 @@ namespace Game
 	};
 #endif
 
-
-
-
 	class ExampleLayer : public Layer
 	{
-		float vertices[24] =
+		float vertices[21] =
 		{
 			-3.0f, -1.6f, 0.0f,  0.33f, 0.9f, 0.7f, 0.25f,
 			 3.0f, -1.6f, 0.0f,  0.18f, 0.2f, 0.7f, 0.25f,
@@ -126,22 +124,34 @@ namespace Game
 			std::string solutionDir= __SOLUTION_DIR;
 			shader = ShaderLibrary::LoadShader("2DShader", solutionDir + "AnorEngine\\Assets\\Shaders\\2DShader.shader");
 		}
-		void OnAttach() override
+		virtual void OnAttach() override
 		{
 
 			BufferLayout Layout = { {ShaderDataType::vec3, "a_Position", 0} ,{ShaderDataType::vec4, "a_Color", 1} };
-			myVAO->AddVertexBuffer(std::make_shared<Buffer>(vertices, 24 * sizeof(float), Layout));
+			myVAO->AddVertexBuffer(std::make_shared<Buffer>(vertices, 21 * sizeof(float), Layout));
 			myVAO->SetIndexBuffer(std::make_shared<IndexBuffer>(indices, 3));
 			
 		}
-		void OnUpdate() override
+		virtual void OnUpdate(float deltaTime) override
 		{	
 			Renderer::Submit(myVAO, shader, m_ModelMatrix, color);
 		}
-		
+		virtual void OnImGuiRender() override
+		{
+			ImGui::ColorEdit4("Big Triangle Color", glm::value_ptr(color));
+		}
+		virtual void OnEvent(Ref<Input::Event> e) override
+		{
+			//Handle event if it was not handled before by a layer that resides higher in the LayerStack.
+			if (!e->m_Handled)
+			{
+				//Reminder: You can set the m_Handled to true. If you want to block the propogation of this event.
+			}
+		}
 	};
 	class ExampleLayer2 : public Layer
 	{
+	private:
 		float vertices[21] =
 		{
 			-1.0f, -1.0f, 0.0f, 0.11f, 0.9f, 0.05f,  0.5f,
@@ -166,137 +176,190 @@ namespace Game
 			shader = ShaderLibrary::GetShader("2DShader");
 			//shader = ShaderLibrary::LoadShader("2DShader", solutionDir + "AnorEngine\\Assets\\Shaders\\2DShader.shader");
 		}
-		void OnAttach() override
+		virtual void OnAttach() override
 		{
 			BufferLayout Layout = { {ShaderDataType::vec3, "a_Position", 0} ,  {ShaderDataType::vec4, "a_Color", 1} };
 			myVAO->AddVertexBuffer(std::make_shared<Buffer>(vertices, 21 * sizeof(float), Layout));
 			myVAO->SetIndexBuffer(std::make_shared<IndexBuffer>(indices, 3));
 			
 		}
-		void OnUpdate() override
+		virtual void OnUpdate(float deltaTime) override
 		{	
 			Renderer::Submit(myVAO, shader, m_ModelMatrix, color);
 		}
-		void OnImGuiRender()
+		virtual void OnImGuiRender() override
 		{
+			ImGui::ColorEdit4("Small Triangle Color", glm::value_ptr(color));
+		}
+		virtual void OnEvent(Ref<Input::Event> e) override
+		{
+			//Handle event if it was not handled before by a layer that resides higher in the LayerStack.
+			if (!e->m_Handled)
+			{
+				//Reminder: You can set the m_Handled to true. If you want to block the propogation of this event.
+			}
+		}
+	};
+	class ExampleLayer3 : public Layer
+	{
+	private:
+		float vertices[5 * 4] =
+		{
+			-1.0f, -1.0f, 0.0f, 0.0f, 0.0f,
+			 1.0f, -1.0f, 0.0f, 0.0f, 1.0f,
+			 1.0f,  1.0f, 0.0f, 1.0f, 1.0f,
+			-1.0f,  1.0f, 0.0f, 0.0f, 1.0f
+
+			//-1.0f, -1.0f, 0.0f, 0.5f, 1.0f, 0.1f,  0.1f,
+			// 1.0f, -1.0f, 0.0f, 0.4f, 1.0f, 0.1f,  0.1f,
+			// 1.0f,  1.0f, 0.0f, 0.2f, 1.0f, 0.1f,  0.1f, //example without textures
+			//-1.0f,  1.0f, 0.0f, 0.1f, 1.0f, 0.1f,   0.1f
+		};
+		uint32_t indices[6] =
+		{
+			0, 1, 2, 2, 3, 0
+		};
+		Ref<VertexArray> m_QuadVAO;
+		Ref<Shader> m_QuadShader;
+		Ref<Texture> m_QuadTexture;
+		glm::mat4 m_QuadModelMatrix = glm::mat4(1.0f);
+		glm::vec3 m_QuadTranslation = { 0.0f, 0.0f, 0.0f };
+		glm::vec4 m_QuadColor = { 1,0,0,1 };
+		float m_QuadMoveSpeed = 5.0f;
+		std::string solutionDir = __SOLUTION_DIR;
+	public:
+		ExampleLayer3()
+		{
+			m_QuadVAO = std::make_shared<VertexArray>();
+			m_QuadShader = ShaderLibrary::LoadShader("TextureShader", solutionDir + "AnorEngine\\Assets\\Shaders\\2DTextureShader.shader");
+			m_QuadTexture = std::make_shared<Texture>(solutionDir + "AnorEngine\\Assets\\Textures\\transparent.png");
+			m_QuadShader->UploadInteger("u_Sampler", 0);
+		}
+		virtual void OnAttach() override
+		{
+			BufferLayout QuadBufferLayout = { {ShaderDataType::vec3, "a_Position", 0}, { ShaderDataType::vec2, "a_TexCoord", 1 } };
+			m_QuadVAO->AddVertexBuffer(std::make_shared<Buffer>(vertices, 5 * 4 * sizeof(float), QuadBufferLayout));
+			m_QuadVAO->SetIndexBuffer(std::make_shared<IndexBuffer>(indices, 6));
+		}
+		virtual void OnUpdate(float deltaTime) override
+		{
+			//Querying the EventHandler here so that we can move the quad.
+			if (Input::EventHandler::IsKeyDown(ANOR_KEY_I))
+				m_QuadTranslation.y += m_QuadMoveSpeed * deltaTime;
+			else if (Input::EventHandler::IsKeyDown(ANOR_KEY_K))
+				m_QuadTranslation.y -= m_QuadMoveSpeed * deltaTime;
+			if (Input::EventHandler::IsKeyDown(ANOR_KEY_J))
+				m_QuadTranslation.x -= m_QuadMoveSpeed * deltaTime;
+			else if (Input::EventHandler::IsKeyDown(ANOR_KEY_L))
+				m_QuadTranslation.x += m_QuadMoveSpeed * deltaTime;
+
+			//Updating quad data here
+			m_QuadModelMatrix = glm::translate(m_QuadModelMatrix, m_QuadTranslation);
+			//Rendering here 
+			m_QuadTexture->Bind();
+			Renderer::Submit(m_QuadVAO, m_QuadShader, m_QuadModelMatrix, m_QuadColor);
+			m_QuadTexture->Unbind();
+			//Reset translation after rendering
+			m_QuadTranslation = { 0,0,0 }; 
+		}
+		virtual void OnImGuiRender() override
+		{
+			ImGui::ColorEdit4("Quad Color", glm::value_ptr(m_QuadColor));
+		}
+		virtual void OnEvent(Ref<Input::Event> e) override
+		{
+			//Handle the event if it was not handled before by a layer that resides higher in the LayerStack.
+			if (!e->m_Handled)
+			{
+				//Reminder: You can set the m_Handled to true. If you want to block the propogation of this event.
+			}
 		}
 	};
 
 
 
-
-	class Sandbox : public Application
+	class SandboxApp : public Application
 	{
 	private:
-		LayerStack m_LayerStack; //its a queue really
+		LayerStack m_LayerStack;
 		Ref<OrthographicCamera> m_OrthoCamera;
 		Ref<OrthographicCameraController> m_OrthoGraphicCameraController;
 		Ref<PerspectiveCamera> m_PersCamera;
+		Ref<ImGuiBase> m_ImGuiBase = std::make_shared<ImGuiBase>();
+		Ref<ExampleLayer>  layer  = std::make_shared<ExampleLayer> ();
+		Ref<ExampleLayer2> layer2 = std::make_shared<ExampleLayer2>();
+		Ref<ExampleLayer3> layer3 = std::make_shared<ExampleLayer3>();
+		std::string solutionDir = __SOLUTION_DIR;
 		glm::vec3 cameraPos = { 0.0f, 0.0f, 0.0f };
 		float cameraSpeed = 1;
 		float lastFrame;
-		bool isMouseCaptured = false;
-		bool isInitialMouseCaptured = false;
-		bool m_Minimized = false;
-		//My Quad Info------------------------------------
-		//------------------------------------------------
-		float vertices[7 * 4] =
-		{
-			//-1.0f, -1.0f, 0.0f, 0.0f, 0.0f,
-			// 1.0f, -1.0f, 0.0f, 0.0f, 1.0f,
-			// 1.0f,  1.0f, 0.0f, 1.0f, 1.0f,
-			//-1.0f,  1.0f, 0.0f, 0.0f, 1.0f
-
-			- 1.0f, -1.0f, 0.0f, 0.5f, 1.0f, 0.1f,  0.1f,
-			 1.0f, -1.0f, 0.0f, 0.4f, 1.0f, 0.1f,  0.1f,
-			 1.0f,  1.0f, 0.0f, 0.2f, 1.0f, 0.1f,  0.1f, //example without textures
-			-1.0f,  1.0f, 0.0f, 0.1f, 1.0f, 0.1f,   0.1f
-		};
-		uint32_t indices[6] =
-		{
-			0, 1, 2, 2, 3 ,0
-		};
-		Ref<VertexArray> m_QuadVAO;
-		Ref<Shader> m_QuadShader;
-		Ref<Texture> m_QuadTexture;
-		Ref<ExampleLayer> layer = std::make_shared<ExampleLayer>();
-		Ref<ExampleLayer2> layer2 = std::make_shared<ExampleLayer2>();
-		Ref<ImGuiLayer> ImGui = std::make_shared<ImGuiLayer>();
-		glm::mat4 m_QuadModelMatrix = glm::mat4(1.0f);
-		glm::vec3 m_QuadTranslation = { 0.0f, 0.0f, 0.0f };
-		glm::vec4 m_QuadColor = { 1,0,0,1 };
-		std::string solutionDir = __SOLUTION_DIR;
-		float quadMoveSpeed = 0.1f;
-		//My Quad Info------------------------------------
-		//------------------------------------------------
+		bool m_Minimized = false;	
 #ifdef RENDER_MY_SCENE
 		Ref<Scene> scene = std::make_shared<Scene>(m_PersCamera);
 #endif
 	public:
-		Sandbox()
+		SandboxApp()
 			:m_OrthoCamera(std::make_shared<OrthographicCamera>(-1280.0f / 720.0f * (5), 1280.0f / 720.0f * (5), -1 * (5), 1 * (5))), m_PersCamera(std::make_shared<PerspectiveCamera>(1280, 720))
 		{	
+			m_ImGuiBase->Init(); // Need to call the initialization code for imgui here.
 			m_OrthoGraphicCameraController = std::make_shared<OrthographicCameraController>(m_OrthoCamera, (1280.0f / 720.0f));
-			Input::EventHandler::SetTargetApplication(this); //Important to set this to the active Application else, you won't get your input processed.
-			m_QuadVAO = std::make_shared<VertexArray>();
-			m_QuadShader = ShaderLibrary::LoadShader("TextureShader", solutionDir + "AnorEngine\\Assets\\Shaders\\2DShader.shader");
-			m_QuadTexture = std::make_shared<Texture>(solutionDir + "AnorEngine\\Assets\\Textures\\transparent.png");
-			m_QuadShader->UploadInteger("u_Sampler", 0);
-			BufferLayout QuadLayout = { {ShaderDataType::vec3, "a_Position", 0} ,  {ShaderDataType::vec4, "a_TexCoord", 1} };
-			m_QuadVAO->AddVertexBuffer(std::make_shared<Buffer>(vertices, 7 * 4 * sizeof(float), QuadLayout));
-			m_QuadVAO->SetIndexBuffer(std::make_shared<IndexBuffer>(indices, 6));
+			Input::EventHandler::SetTargetApplication(this); //Important to set this to the active Application else, you won't get your input processed.		
 #ifdef RENDER_MY_SCENE
 			pushLayer(scene);
-#endif			
-			pushLayer(layer);
+#endif		
+			//Layer insertion
+			pushLayer(layer3);
 			pushLayer(layer2);
-			ImGui->color = &layer->color;
-			pushLayer(ImGui);
+			pushLayer(layer);
 			logInfoDebug();
 		}
 	protected:
-		virtual ~Sandbox() 
+		virtual ~SandboxApp()
 		{
-			WARN("Sandbox destructor completed!!!");
+			WARN("SandboxApp destructor completed!!!");
 		}
 	public:
 		virtual void Run() override
 		{	
 			while (!m_OpenGLWindow->IsClosed())
 			{
-				float deltaTime = DeltaTime();
-				m_OrthoGraphicCameraController->OnUpdate(deltaTime);
-				quadMoveSpeed = 3 * deltaTime;			
-				ProcessMovementInput(); //this is where we check if we want to do input related stuff. Like for example to check if a key is pressed.
-				m_QuadModelMatrix = glm::translate(m_QuadModelMatrix, m_QuadTranslation);
-
 				//Scene setup
+				float deltaTime = DeltaTime();
+				m_OrthoGraphicCameraController->OnUpdate(deltaTime);			
 				Renderer::BeginScene(m_OrthoCamera);
 				Renderer::ClearColor(glm::vec4(0.1f, 0.1f, 0.1f, 1));
 				Renderer::Clear();
 
-				//Rendering starts
+				//Rendering Layers starts
 				if (!m_Minimized) //We don't want to render if the window is minimized.
 				{
 					for (Ref<Layer> layer : m_LayerStack)
 					{	
-						layer->OnUpdate();
-					}
-					m_QuadTexture->Bind();
-					Renderer::Submit(m_QuadVAO, m_QuadShader, m_QuadModelMatrix, m_QuadColor);
-					m_QuadTexture->Unbind();
-					m_QuadTranslation = { 0,0,0 }; //Reset translation after rendering
+						layer->OnUpdate(deltaTime);
+					}				
 				}
-				ImGui->OnImGuiRender();
-				//Rendering ends
+				//Rendering Layers ends
+
+				//ImGuiRender starts
+					//ImGui Rendering for each layer starts.
+				m_ImGuiBase->Begin();
+				for (Ref<Layer> layer : m_LayerStack)
+				{
+					layer->OnImGuiRender();
+				}
+					//ImGui Rendering for each layer ends.
+					//Overlay Rendering ImGui.
+				OnImGuiOverlayRender();
+				m_ImGuiBase->End();
+				//ImGuiRender ends
 
 				m_OpenGLWindow->Update();
 				Renderer::EndScene();
 			}
 		}
-		virtual void OnEvent(Ref<Input::Event> event) override
+		virtual void OnEvent(Ref<Input::Event> e) override
 		{
-			event->Log();
+			e->Log();
 #ifdef RENDER_MY_SCENE
 			if (event.get()->GetEventType() == Input::EventType::KeyPressEvent)
 			{
@@ -355,24 +418,35 @@ namespace Game
 					m_PersCamera->cameraFront = glm::normalize(direction);
 				}
 			}
-#endif
-			if (event->GetEventType() == Input::EventType::WindowResizeEvent)
+#endif		
+			//Propogating the recieved event to layers.
+			//One of the layers can set the 'm_Handled' value of an event to true so that further propogation is prevented.
+			for (Ref<Layer> layer : m_LayerStack)
 			{
-				OnWindowResizeEvent(std::static_pointer_cast<Input::WindowResizeEvent>(event));
+				layer->OnEvent(e);
+			}
+			if (e->GetEventType() == Input::EventType::WindowResizeEvent)
+			{
+				OnWindowResizeEvent(std::static_pointer_cast<Input::WindowResizeEvent>(e));
 			}
 			//Passing every single event that I get from the OpenGLWindow to this controller. Will change.
-			m_OrthoGraphicCameraController->OnEvent(event);
+			m_OrthoGraphicCameraController->OnEvent(e);
 		}
-		virtual void OnWindowResizeEvent(Ref<Input::WindowResizeEvent> event) override
+		virtual void OnWindowResizeEvent(Ref<Input::WindowResizeEvent> e) override
 		{
-			if (event->GetHeight() == 0 || event->GetWidth() == 0)
+			if (e->GetHeight() == 0 || e->GetWidth() == 0)
 				m_Minimized = true;
-			else if (event->GetHeight() > 0 || event->GetWidth() > 0)
+			else if (e->GetHeight() > 0 || e->GetWidth() > 0)
 				m_Minimized = false;
 		}
 		virtual void logInfoDebug() override
 		{	
 			WARN("APP::{0}", "Custom sandbox application has been created!!");
+		}
+		void OnImGuiOverlayRender()
+		{
+			static bool show = true;
+			ImGui::ShowDemoWindow(&show);
 		}
 		void pushLayer(Ref<Layer> Layer)
 		{
@@ -383,7 +457,7 @@ namespace Game
 		{
 			m_LayerStack.popLayer();
 		}
-		void ProcessMovementInput()
+		void ProcessMovementInput() //TODO:Remove
 		{	
 #ifdef RENDER_MY_SCENE
 			//3D Stuff
@@ -403,15 +477,6 @@ namespace Game
 				m_PersCamera->cameraPos += glm::normalize(glm::cross(m_PersCamera->cameraFront, m_PersCamera->cameraUp)) * cameraSpeed;
 			}
 #endif
-
-		if (Input::EventHandler::IsKeyDown(ANOR_KEY_I))
-			m_QuadTranslation.y += quadMoveSpeed;
-		else if(Input::EventHandler::IsKeyDown(ANOR_KEY_K))
-			m_QuadTranslation.y -= quadMoveSpeed;
-		if(Input::EventHandler::IsKeyDown(ANOR_KEY_J))
-			m_QuadTranslation.x -= quadMoveSpeed;
-		else if(Input::EventHandler::IsKeyDown(ANOR_KEY_L))
-			m_QuadTranslation.x += quadMoveSpeed;
 		}
 		float DeltaTime()
 		{
@@ -424,7 +489,7 @@ namespace Game
 	};
 	AnorEngine::Application* CreateApplication()
 	{
-		return new Sandbox();
+		return new SandboxApp();
 	}
 }
 

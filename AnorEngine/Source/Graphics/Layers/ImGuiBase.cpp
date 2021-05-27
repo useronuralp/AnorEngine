@@ -1,18 +1,12 @@
 #include "pch.h"
-#include "ImGuiLayer.h"
+#include "ImGuiBase.h"
 #include <Core/Application.h>
 
 namespace AnorEngine
 {	namespace Graphics
 	{
-		ImGuiLayer::ImGuiLayer()
-			:Layer("ImGUILayer")
+		bool ImGuiBase::Init()
 		{
-			WARN("ImGUI default constructor that calls 'Layer(const char* name)'");
-		}
-		void ImGuiLayer::OnAttach()
-		{	
-			
 			IMGUI_CHECKVERSION();
 			ImGui::CreateContext();
 			ImGuiIO& io = ImGui::GetIO(); (void)io;
@@ -37,34 +31,15 @@ namespace AnorEngine
 			
 			ImGui_ImplGlfw_InitForOpenGL(window, true);
 			ImGui_ImplOpenGL3_Init("#version 460");
+			return true;
 		}
-		void ImGuiLayer::OnImGuiRender()
-		{
-			Begin();
-
-			static bool show = true;
-			ImGui::ShowDemoWindow(&show);	
-			ImGui::ColorEdit3("I dont even know", glm::value_ptr(*color));
-
-			End();
-
-		}
-		void ImGuiLayer::Begin()
+		void ImGuiBase::Begin()
 		{	
-			ImGuiIO& io = ImGui::GetIO();
-			if (!wantToCaptureMouse) //sets whether the mouse input will be captured by imgui. If the mouse is inivisible, that means the user interacts with the game scene so disable the imgui input.
-			{
-				io.ConfigFlags |= ImGuiConfigFlags_NoMouse; 
-			}
-			else
-			{
-				io.ConfigFlags &= ~ImGuiConfigFlags_NoMouse;
-			}
 			ImGui_ImplOpenGL3_NewFrame();
 			ImGui_ImplGlfw_NewFrame();
 			ImGui::NewFrame();
 		}
-		void ImGuiLayer::End()
+		void ImGuiBase::End()
 		{
 			Application& app = Application::Get();
 			ImGuiIO& io = ImGui::GetIO();
@@ -81,10 +56,6 @@ namespace AnorEngine
 				ImGui::RenderPlatformWindowsDefault();
 				glfwMakeContextCurrent(backup_current_context);
 			}
-		}
-		ImGuiLayer::~ImGuiLayer()
-		{
-			WARN("ImGuiLayer Destructor completed!!!");
 		}
 	}
 }

@@ -24,5 +24,5 @@ uniform vec4 u_Color;
 
 void main()
 {
-	color = m_Color;
+	color = u_Color;
 }

@@ -27,7 +27,7 @@ namespace AnorEngine
 			glm::mat4 m_ProjectionMatrix;
 			glm::mat4 m_ViewMatrix;
 			PerspectiveCamera(float height, float weight);
-			int GetRenderTime() { return glfwGetTime(); }
+			double GetRenderTime() { return glfwGetTime(); }
 			void OnUpdate();
 		};
 
@@ -45,7 +45,7 @@ namespace AnorEngine
 			const glm::mat4& GetViewMatrix() { return m_ViewMatrix; }
 			const glm::mat4& GetViewProjectionMatrix() { return m_ViewProjectionMatrix; }
 
-			int GetRenderTime() { return glfwGetTime(); }
+			double GetRenderTime() { return glfwGetTime(); }
 		private:
 			void RecalculateViewMatrix();
 		private:
