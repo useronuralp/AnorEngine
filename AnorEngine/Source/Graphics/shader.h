@@ -41,6 +41,7 @@ namespace AnorEngine {
 			GLint GetUniformLocation(const GLchar* name);
 			GLint GetUniformLocation(std::string name);
 		public:
+			inline const std::string GetFilePath() const { return m_FilePath; }
 			inline GLuint getShaderID() const { return m_ShaderID; }
 		};
 

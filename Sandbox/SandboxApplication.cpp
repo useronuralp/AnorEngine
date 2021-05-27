@@ -102,43 +102,42 @@ namespace Game
 
 	class ExampleLayer : public Layer
 	{
-		float vertices[21] =
+		float m_Vertices[21] =
 		{
 			-3.0f, -1.6f, 0.0f,  0.33f, 0.9f, 0.7f, 0.25f,
 			 3.0f, -1.6f, 0.0f,  0.18f, 0.2f, 0.7f, 0.25f,
 			 0.0f,  1.6f, 0.0f,  0.69f, 0.01f, 0.7f, 0.25f
 		};
-		uint32_t indices[3] =
+		uint32_t m_Indices[3] =
 		{
 			0, 1, 2
 		};
-		Ref<VertexArray> myVAO;
-		Ref<Shader> shader; 
+		Ref<VertexArray> m_TriangleVAO;
+		Ref<Shader> m_TriangleShader; 
 		glm::mat4 m_ModelMatrix = glm::mat4(1.0f);
-	public:
-		glm::vec4 color = { 0,1,1,1 };
+		glm::vec4 m_Color = { 0,1,1,1 };
 	public:
 		ExampleLayer()
 		{
-			myVAO = std::make_shared<VertexArray>();
+			m_TriangleVAO = std::make_shared<VertexArray>();
 			std::string solutionDir= __SOLUTION_DIR;
-			shader = ShaderLibrary::LoadShader("2DShader", solutionDir + "AnorEngine\\Assets\\Shaders\\2DShader.shader");
+			m_TriangleShader = ShaderLibrary::LoadShader("2DShader", solutionDir + "AnorEngine\\Assets\\Shaders\\2DShader.shader");
 		}
 		virtual void OnAttach() override
 		{
 
 			BufferLayout Layout = { {ShaderDataType::vec3, "a_Position", 0} ,{ShaderDataType::vec4, "a_Color", 1} };
-			myVAO->AddVertexBuffer(std::make_shared<Buffer>(vertices, 21 * sizeof(float), Layout));
-			myVAO->SetIndexBuffer(std::make_shared<IndexBuffer>(indices, 3));
+			m_TriangleVAO->AddVertexBuffer(std::make_shared<Buffer>(m_Vertices, 21 * sizeof(float), Layout));
+			m_TriangleVAO->SetIndexBuffer(std::make_shared<IndexBuffer>(m_Indices, 3));
 			
 		}
 		virtual void OnUpdate(float deltaTime) override
 		{	
-			Renderer::Submit(myVAO, shader, m_ModelMatrix, color);
+			Renderer::Submit(m_TriangleVAO, m_TriangleShader, m_ModelMatrix, m_Color);
 		}
 		virtual void OnImGuiRender() override
 		{
-			ImGui::ColorEdit4("Big Triangle Color", glm::value_ptr(color));
+			ImGui::ColorEdit4("Big Triangle Color", glm::value_ptr(m_Color));
 		}
 		virtual void OnEvent(Ref<Input::Event> e) override
 		{
@@ -152,44 +151,43 @@ namespace Game
 	class ExampleLayer2 : public Layer
 	{
 	private:
-		float vertices[21] =
+		float m_Vertices[21] =
 		{
 			-1.0f, -1.0f, 0.0f, 0.11f, 0.9f, 0.05f,  0.5f,
 			 1.0f, -1.0f, 0.0f, 0.3f, 0.2f, 1.0f, 0.5f,
 			 0.0f,  1.0f, 0.0f, 0.92f, 0.23f, 0.3f, 0.5f
 		};
-		uint32_t indices[3] =
+		uint32_t m_Indices[3] =
 		{
 			0, 1, 2
 		};
-		Ref<VertexArray> myVAO;
-		Ref<Shader> shader = nullptr;
+		Ref<VertexArray> m_TriangleVAO;
+		Ref<Shader> m_TriangleShader = nullptr;
 		glm::mat4 m_ModelMatrix = glm::mat4(1.0f);
-	public:
-		glm::vec4 color = { 0,1,0,1 };
+		glm::vec4 m_Color = { 0,1,0,1 };
 	public:
 		ExampleLayer2()
 		{			
 			m_ModelMatrix = glm::translate(m_ModelMatrix, { 1,2,0 });
-			myVAO = std::make_shared<VertexArray>();
+			m_TriangleVAO = std::make_shared<VertexArray>();
 			std::string solutionDir = __SOLUTION_DIR;
-			shader = ShaderLibrary::GetShader("2DShader");
+			m_TriangleShader = ShaderLibrary::GetShader("2DShader");
 			//shader = ShaderLibrary::LoadShader("2DShader", solutionDir + "AnorEngine\\Assets\\Shaders\\2DShader.shader");
 		}
 		virtual void OnAttach() override
 		{
 			BufferLayout Layout = { {ShaderDataType::vec3, "a_Position", 0} ,  {ShaderDataType::vec4, "a_Color", 1} };
-			myVAO->AddVertexBuffer(std::make_shared<Buffer>(vertices, 21 * sizeof(float), Layout));
-			myVAO->SetIndexBuffer(std::make_shared<IndexBuffer>(indices, 3));
+			m_TriangleVAO->AddVertexBuffer(std::make_shared<Buffer>(m_Vertices, 21 * sizeof(float), Layout));
+			m_TriangleVAO->SetIndexBuffer(std::make_shared<IndexBuffer>(m_Indices, 3));
 			
 		}
 		virtual void OnUpdate(float deltaTime) override
 		{	
-			Renderer::Submit(myVAO, shader, m_ModelMatrix, color);
+			Renderer::Submit(m_TriangleVAO, m_TriangleShader, m_ModelMatrix, m_Color);
 		}
 		virtual void OnImGuiRender() override
 		{
-			ImGui::ColorEdit4("Small Triangle Color", glm::value_ptr(color));
+			ImGui::ColorEdit4("Small Triangle Color", glm::value_ptr(m_Color));
 		}
 		virtual void OnEvent(Ref<Input::Event> e) override
 		{
@@ -203,19 +201,19 @@ namespace Game
 	class ExampleLayer3 : public Layer
 	{
 	private:
-		float vertices[5 * 4] =
+		float m_Vertices[7 * 4] =
 		{
-			-1.0f, -1.0f, 0.0f, 0.0f, 0.0f,
-			 1.0f, -1.0f, 0.0f, 0.0f, 1.0f,
-			 1.0f,  1.0f, 0.0f, 1.0f, 1.0f,
-			-1.0f,  1.0f, 0.0f, 0.0f, 1.0f
+			//-1.0f, -1.0f, 0.0f, 0.0f, 0.0f,
+			// 1.0f, -1.0f, 0.0f, 0.0f, 1.0f,
+			// 1.0f,  1.0f, 0.0f, 1.0f, 1.0f,
+			//-1.0f,  1.0f, 0.0f, 0.0f, 1.0f
 
-			//-1.0f, -1.0f, 0.0f, 0.5f, 1.0f, 0.1f,  0.1f,
-			// 1.0f, -1.0f, 0.0f, 0.4f, 1.0f, 0.1f,  0.1f,
-			// 1.0f,  1.0f, 0.0f, 0.2f, 1.0f, 0.1f,  0.1f, //example without textures
-			//-1.0f,  1.0f, 0.0f, 0.1f, 1.0f, 0.1f,   0.1f
+			-1.0f, -1.0f, 0.0f, 0.5f, 1.0f, 0.1f,  0.1f,
+			 1.0f, -1.0f, 0.0f, 0.4f, 1.0f, 0.1f,  0.1f,
+			 1.0f,  1.0f, 0.0f, 0.2f, 1.0f, 0.1f,  0.1f, //example without textures
+			-1.0f,  1.0f, 0.0f, 0.1f, 1.0f, 0.1f,   0.1f
 		};
-		uint32_t indices[6] =
+		uint32_t m_Indices[6] =
 		{
 			0, 1, 2, 2, 3, 0
 		};
@@ -231,15 +229,20 @@ namespace Game
 		ExampleLayer3()
 		{
 			m_QuadVAO = std::make_shared<VertexArray>();
-			m_QuadShader = ShaderLibrary::LoadShader("TextureShader", solutionDir + "AnorEngine\\Assets\\Shaders\\2DTextureShader.shader");
+			//m_QuadShader = ShaderLibrary::LoadShader("TextureShader", solutionDir + "AnorEngine\\Assets\\Shaders\\2DShader.shader");
+			m_QuadShader = ShaderLibrary::GetShader("2DShader");
+			if (!m_QuadShader)
+			{
+				CRITICAL_ASSERT("The Shader you tried to load is invalid. (Either the name is incorrect or there is no shader with that name in the Shader Library.)");
+			}
 			m_QuadTexture = std::make_shared<Texture>(solutionDir + "AnorEngine\\Assets\\Textures\\transparent.png");
 			m_QuadShader->UploadInteger("u_Sampler", 0);
 		}
 		virtual void OnAttach() override
 		{
-			BufferLayout QuadBufferLayout = { {ShaderDataType::vec3, "a_Position", 0}, { ShaderDataType::vec2, "a_TexCoord", 1 } };
-			m_QuadVAO->AddVertexBuffer(std::make_shared<Buffer>(vertices, 5 * 4 * sizeof(float), QuadBufferLayout));
-			m_QuadVAO->SetIndexBuffer(std::make_shared<IndexBuffer>(indices, 6));
+			BufferLayout QuadBufferLayout = { {ShaderDataType::vec3, "a_Position", 0}, { ShaderDataType::vec4, "a_TexCoord", 1 } };
+			m_QuadVAO->AddVertexBuffer(std::make_shared<Buffer>(m_Vertices, 7 * 4 * sizeof(float), QuadBufferLayout));
+			m_QuadVAO->SetIndexBuffer(std::make_shared<IndexBuffer>(m_Indices, 6));
 		}
 		virtual void OnUpdate(float deltaTime) override
 		{
