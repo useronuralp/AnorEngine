@@ -1,35 +1,30 @@
 #include "pch.h"
-#include "Renderer.h"
-
+#include "Renderer2D.h"
 namespace AnorEngine
 {
 	namespace Graphics
 	{
-		Ref<OrthographicCamera> Renderer::s_OrthoCamera;
-		void Renderer::Init()
+		Ref<OrthographicCamera> Renderer2D::s_OrthoCamera;
+		void Renderer2D::Init()
 		{
-			//glEnable(GL_BLEND);
-			//glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+			glEnable(GL_BLEND);
+			glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 		}
-		void Renderer::BeginScene(Ref<OrthographicCamera> camera)
-		{
-			Renderer::s_OrthoCamera = camera;
-		}
-		void Renderer::EndScene()
+
+		void Renderer2D::Shutdown()
 		{
 		}
 
-		void Renderer::ClearColor(const glm::vec4& color)
+		void Renderer2D::ClearColor(const glm::vec4& color)
 		{
 			glClearColor(color.r, color.g, color.b, color.a);
 		}
 
-		void Renderer::Clear()
+		void Renderer2D::Clear()
 		{
 			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		}
-
-		void Renderer::Submit(Ref<VertexArray> vertexArray, Ref<Shader> shader, const glm::mat4& modelMatrix, const glm::vec4& color)
+		void Renderer2D::DrawPrimitive(Ref<VertexArray> vertexArray, Ref<Shader> shader, const glm::mat4& modelMatrix, const glm::vec4& color)
 		{
 			shader->enable();
 			vertexArray->bind();
@@ -39,6 +34,14 @@ namespace AnorEngine
 			glDrawElements(GL_TRIANGLES, vertexArray->GetIndexBuffer()->GetCount(), GL_UNSIGNED_INT, NULL);
 			vertexArray->unbind();
 			shader->disable();
+		}	
+		void Renderer2D::BeginScene(Ref<OrthographicCamera> camera)
+		{
+			s_OrthoCamera = camera;
+		}
+
+		void Renderer2D::EndScene()
+		{
 		}
 	}
 }

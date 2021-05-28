@@ -1,4 +1,6 @@
 #include "pch.h"
+#include <GL/glew.h>
+#include "../vendor/stb_image/stb_image.h"
 #include "texture.h"
 
 namespace AnorEngine {

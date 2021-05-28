@@ -54,7 +54,13 @@ namespace AnorEngine {
 			//Returns a shader reference.
 			static Ref<Shader> AddShader(const Ref<Shader>& shader);
 			//Returns an empty pointer if the specified shader was not found.
-			static Ref<Shader> GetShader(const std::string& shaderName) { return m_Shaders.count(shaderName) > 0 ? m_Shaders[shaderName] : Ref<Shader>() = nullptr; }; 
+			static Ref<Shader> GetShader(const std::string& shaderName)
+			{
+				if (m_Shaders.count(shaderName) > 0)
+					return m_Shaders[shaderName];
+				else
+					CRITICAL_ASSERT("The Shader you tried to load is invalid. (Either the name is incorrect or there is no shader with that name in the Shader Library.)");
+			}
 		private:
 			static std::unordered_map<std::string, Ref<Shader>> m_Shaders;
 		};

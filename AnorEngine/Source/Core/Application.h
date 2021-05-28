@@ -1,10 +1,12 @@
 #pragma once
 #include "Graphics/OpenGLWindow.h"
 #include "Renderer/Renderer.h"
+#include "Renderer/Renderer2D.h"
 namespace AnorEngine
 {	
 	namespace Input
 	{
+		//TODO: Remove these
 		class Event; // forward declaring.
 		class WindowResizeEvent;
 	}
@@ -25,7 +27,7 @@ namespace AnorEngine
 		inline static Application& Get() { return *s_Instance; }
 		inline Ref<Graphics::OpenGLWindow> GetOpenGLWindow() { return m_OpenGLWindow; }
 	protected:
-		virtual void logInfoDebug();
+		virtual void LogInfoDebug();
 	};
 }
 

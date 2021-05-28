@@ -6,7 +6,6 @@
 
 //-----Engine modules---------------
 #include "Graphics/shader.h"
-#include "Graphics/simpleRenderer2D.h"
 #include "Graphics/texture.h"
 #include "Graphics/simplerenderer3D.h"
 #include <../Assets/Models/cube.h>
@@ -20,4 +19,3 @@
 
 //Try to include this at the bottom. I don't know what kind of circular header inclusion fuckery goes on in the code base but I could not find the problem lol
 #include "Renderer/Renderer.h"
-

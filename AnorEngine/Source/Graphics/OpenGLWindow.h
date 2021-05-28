@@ -1,12 +1,11 @@
 #pragma once 
 #include <GL/glew.h>
-#include <GLFW/glfw3.h>
+#include "Camera.h"
 #include <glm.hpp>
 #include "Layers/Layer.h"
 #include <Core/EngineKeyCodes.h>
 #include <Core/MouseButtonCodes.h>
 #include <map>
-#include "Camera.h"
 
 namespace AnorEngine {
 	namespace Graphics {

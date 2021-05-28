@@ -7,25 +7,6 @@ namespace AnorEngine {
 		{
 			None = 0, vec, vec2, vec3, vec4, mat3, mat4, Int, Int2, Int3, Int4, Bool
 		};
-		static GLenum ShaderDataTypeToOpenGLBaseType(ShaderDataType type)
-		{
-			switch (type)
-			{
-			case ShaderDataType::vec:  return GL_FLOAT;
-			case ShaderDataType::vec2: return GL_FLOAT;
-			case ShaderDataType::vec3: return GL_FLOAT;
-			case ShaderDataType::vec4: return GL_FLOAT;
-			case ShaderDataType::mat3: return GL_FLOAT;
-			case ShaderDataType::mat4: return GL_FLOAT;
-			case ShaderDataType::Int:  return GL_INT;
-			case ShaderDataType::Int2: return GL_INT;
-			case ShaderDataType::Int3: return GL_INT;
-			case ShaderDataType::Int4: return GL_INT;
-			case ShaderDataType::Bool: return GL_BOOL;
-			}
-			CRITICAL_ASSERT("Unknown ShaderDataType");
-			return 0;
-		}
 		static uint32_t ShaderDataTypeConverter(ShaderDataType type)
 		{
 			switch(type)
@@ -46,6 +27,27 @@ namespace AnorEngine {
 			CRITICAL_ASSERT("Unknown ShaderDataType!!");
 			return 0;
 		}
+
+		static GLenum ShaderDataTypeToOpenGLBaseType(ShaderDataType type)
+		{
+			switch (type)
+			{
+				case ShaderDataType::vec:  return GL_FLOAT;
+				case ShaderDataType::vec2: return GL_FLOAT;
+				case ShaderDataType::vec3: return GL_FLOAT;
+				case ShaderDataType::vec4: return GL_FLOAT;
+				case ShaderDataType::mat3: return GL_FLOAT;
+				case ShaderDataType::mat4: return GL_FLOAT;
+				case ShaderDataType::Int:  return GL_INT;
+				case ShaderDataType::Int2: return GL_INT;
+				case ShaderDataType::Int3: return GL_INT;
+				case ShaderDataType::Int4: return GL_INT;
+				case ShaderDataType::Bool: return GL_BOOL;
+			}
+			CRITICAL_ASSERT("Unknown ShaderDataType");
+			return 0;
+		}
+
 		struct ANOR_API BufferElement
 		{
 			std::string m_Name;

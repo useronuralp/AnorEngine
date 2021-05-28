@@ -1,10 +1,8 @@
 #pragma once
-#include <GL/glew.h>
+#include "Buffers/VertexArray.h"
 #include <glm.hpp>
 #include <gtc/type_ptr.hpp>
 #include <gtc/matrix_transform.hpp>
-#include "BUffers/vertexarray.h"
-//#include <memory>
 namespace AnorEngine {
 	namespace Graphics {
 

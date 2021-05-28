@@ -11,7 +11,7 @@ namespace AnorEngine
 	Application::Application()
 	{	
 		s_Instance = this; //static setup of instance of this singleton class.
-		AnorEngine::EngineInitializer::init();
+		EngineInitializer::init();
 		m_OpenGLWindow = std::make_shared<Graphics::OpenGLWindow>("Anor Engine", 1280, 720);  //window creation
 		if (!m_OpenGLWindow)
 		{
@@ -22,15 +22,15 @@ namespace AnorEngine
 
 
 		Graphics::Renderer::Init(); //Enables Blending for now.
-		
+		Graphics::Renderer2D::Init(); //Initializes 2DRenderer for now.
 
-		logInfoDebug();
+		LogInfoDebug();
 	}
 	Application::~Application()
 	{	
 		WARN("Application Destructor!!!");
 	}
-	void Application::logInfoDebug()
+	void Application::LogInfoDebug()
 	{
 		WARN("APP::{0}", "Application Default Constructor!!");
 		WARN("APP::{0}", "Press enter...");

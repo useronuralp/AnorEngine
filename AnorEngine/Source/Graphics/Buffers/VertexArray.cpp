@@ -3,7 +3,6 @@
 namespace AnorEngine {
 	namespace Graphics {
 
-
 		VertexArray::VertexArray()
 		{
 			glGenVertexArrays(1, &m_ArrayID);
