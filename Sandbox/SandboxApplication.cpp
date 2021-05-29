@@ -258,7 +258,7 @@ namespace Game
 		{
 			//Handle the event if it was not handled before by a layer that resides higher in the LayerStack.
 			if (!e->m_Handled)
-			{
+			{	
 				//Reminder: You can set the m_Handled to true. If you want to block the propogation of this event.
 			}
 		}

@@ -24,7 +24,7 @@ namespace AnorEngine
 		{
 			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		}
-		void Renderer2D::DrawPrimitive(Ref<VertexArray> vertexArray, Ref<Shader> shader, const glm::mat4& modelMatrix, const glm::vec4& color)
+		void Renderer2D::DrawPrimitive(const Ref<VertexArray> vertexArray, const Ref<Shader> shader, const glm::mat4& modelMatrix, const glm::vec4& color)
 		{
 			shader->enable();
 			vertexArray->bind();
@@ -35,7 +35,7 @@ namespace AnorEngine
 			vertexArray->unbind();
 			shader->disable();
 		}	
-		void Renderer2D::BeginScene(Ref<OrthographicCamera> camera)
+		void Renderer2D::BeginScene(const Ref<OrthographicCamera> camera)
 		{
 			s_OrthoCamera = camera;
 		}
