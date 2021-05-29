@@ -102,9 +102,9 @@ namespace Game
 			0, 1, 2
 		};
 		Ref<VertexArray> m_TriangleVAO;
-		Ref<Shader> m_TriangleShader; 
-		glm::mat4 m_ModelMatrix = glm::mat4(1.0f);
-		glm::vec4 m_Color = { 0,1,1,1 };
+		Ref<Shader>		 m_TriangleShader; 
+		glm::mat4		 m_ModelMatrix = glm::mat4(1.0f);
+		glm::vec4		 m_Color = { 0,1,1,1 };
 	public:
 		ExampleLayer()
 		{
@@ -151,9 +151,9 @@ namespace Game
 			0, 1, 2
 		};
 		Ref<VertexArray> m_TriangleVAO;
-		Ref<Shader> m_TriangleShader = nullptr;
-		glm::mat4 m_ModelMatrix = glm::mat4(1.0f);
-		glm::vec4 m_Color = { 0,1,0,1 };
+		Ref<Shader>		 m_TriangleShader = nullptr;
+		glm::mat4		 m_ModelMatrix = glm::mat4(1.0f);
+		glm::vec4		 m_Color = { 0,1,0,1 };
 	public:
 		ExampleLayer2()
 		{			
@@ -190,7 +190,7 @@ namespace Game
 	class ExampleLayer3 : public Layer
 	{
 	private:
-		float m_Vertices[7 * 4] =
+		float			 m_Vertices[7 * 4] =
 		{
 			//-1.0f, -1.0f, 0.0f, 0.0f, 0.0f,
 			// 1.0f, -1.0f, 0.0f, 0.0f, 1.0f,
@@ -202,17 +202,17 @@ namespace Game
 			 1.0f,  1.0f, 0.0f, 0.2f, 1.0f, 0.1f,  0.1f, //example without textures
 			-1.0f,  1.0f, 0.0f, 0.1f, 1.0f, 0.1f,   0.1f
 		};
-		uint32_t m_Indices[6] =
+		uint32_t		 m_Indices[6] =
 		{
 			0, 1, 2, 2, 3, 0
 		};
 		Ref<VertexArray> m_QuadVAO;
-		Ref<Shader> m_QuadShader;
-		Ref<Texture> m_QuadTexture;
-		glm::mat4 m_QuadModelMatrix = glm::mat4(1.0f);
-		glm::vec3 m_QuadTranslation = { 0.0f, 0.0f, 0.0f };
-		glm::vec4 m_QuadColor = { 1,0,0,1 };
-		float m_QuadMoveSpeed = 5.0f;
+		Ref<Shader>		 m_QuadShader;
+		Ref<Texture>	 m_QuadTexture;
+		glm::mat4		 m_QuadModelMatrix = glm::mat4(1.0f);
+		glm::vec3		 m_QuadTranslation = { 0.0f, 0.0f, 0.0f };
+		glm::vec4		 m_QuadColor = { 1,0,0,1 };
+		float			 m_QuadMoveSpeed = 5.0f;
 		std::string solutionDir = __SOLUTION_DIR;
 	public:
 		ExampleLayer3()
@@ -241,13 +241,13 @@ namespace Game
 			else if (Input::EventHandler::IsKeyDown(ANOR_KEY_L))
 				m_QuadTranslation.x += m_QuadMoveSpeed * deltaTime;
 
-			//Updating quad data here
+			//Updating quad transform data here
 			m_QuadModelMatrix = glm::translate(m_QuadModelMatrix, m_QuadTranslation);
 			//Rendering here 
 			m_QuadTexture->Bind();
 			Renderer2D::DrawPrimitive(m_QuadVAO, m_QuadShader, m_QuadModelMatrix, m_QuadColor);
 			m_QuadTexture->Unbind();
-			//Reset translation after rendering
+			//Reset translation after rendering for further use
 			m_QuadTranslation = { 0,0,0 }; 
 		}
 		virtual void OnImGuiRender() override
@@ -269,19 +269,19 @@ namespace Game
 	class SandboxApp2D : public Application
 	{
 	private:
-		LayerStack m_LayerStack;
-		Ref<OrthographicCamera> m_OrthoCamera;
+		LayerStack						  m_LayerStack;
+		Ref<OrthographicCamera>			  m_OrthoCamera;
 		Ref<OrthographicCameraController> m_OrthoGraphicCameraController;
-		Ref<PerspectiveCamera> m_PersCamera;
-		Ref<ImGuiBase> m_ImGuiBase = std::make_shared<ImGuiBase>();
-		Ref<ExampleLayer>  layer  = std::make_shared<ExampleLayer> ();
-		Ref<ExampleLayer2> layer2 = std::make_shared<ExampleLayer2>();
-		Ref<ExampleLayer3> layer3 = std::make_shared<ExampleLayer3>();
+		Ref<PerspectiveCamera>			  m_PersCamera;
+		Ref<ImGuiBase>					  m_ImGuiBase = std::make_shared<ImGuiBase>();
+		Ref<ExampleLayer>				  m_Layer  = std::make_shared<ExampleLayer> ();
+		Ref<ExampleLayer2>				  m_Layer2 = std::make_shared<ExampleLayer2>();
+		Ref<ExampleLayer3>				  m_Layer3 = std::make_shared<ExampleLayer3>();
+		glm::vec3						  m_CameraPos = { 0.0f, 0.0f, 0.0f };
+		float							  m_CameraSpeed = 1;
+		float							  lastFrame;
+		bool							  m_Minimized = false;	
 		std::string solutionDir = __SOLUTION_DIR;
-		glm::vec3 cameraPos = { 0.0f, 0.0f, 0.0f };
-		float cameraSpeed = 1;
-		float lastFrame;
-		bool m_Minimized = false;	
 #ifdef RENDER_MY_SCENE
 		Ref<Scene> scene = std::make_shared<Scene>(m_PersCamera);
 #endif
@@ -296,9 +296,9 @@ namespace Game
 			pushLayer(scene);
 #endif		
 			//Layer insertion
-			PushLayer(layer3);
-			PushLayer(layer2);
-			PushLayer(layer);
+			PushLayer(m_Layer3);
+			PushLayer(m_Layer2);
+			PushLayer(m_Layer);
 			LogInfoDebug();
 		}
 	protected:
