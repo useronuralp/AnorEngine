@@ -190,17 +190,17 @@ namespace Game
 	class ExampleLayer3 : public Layer
 	{
 	private:
-		float			 m_Vertices[7 * 4] =
+		float			 m_Vertices[5 * 4] =
 		{
-			//-1.0f, -1.0f, 0.0f, 0.0f, 0.0f,
-			// 1.0f, -1.0f, 0.0f, 0.0f, 1.0f,
-			// 1.0f,  1.0f, 0.0f, 1.0f, 1.0f,
-			//-1.0f,  1.0f, 0.0f, 0.0f, 1.0f
+			-1.0f, -1.0f, 0.0f, 0.0f, 0.0f,
+			 1.0f, -1.0f, 0.0f, 0.0f, 1.0f,
+			 1.0f,  1.0f, 0.0f, 1.0f, 1.0f,
+			-1.0f,  1.0f, 0.0f, 0.0f, 1.0f
 
-			-1.0f, -1.0f, 0.0f, 0.5f, 1.0f, 0.1f,  0.1f,
-			 1.0f, -1.0f, 0.0f, 0.4f, 1.0f, 0.1f,  0.1f,
-			 1.0f,  1.0f, 0.0f, 0.2f, 1.0f, 0.1f,  0.1f, //example without textures
-			-1.0f,  1.0f, 0.0f, 0.1f, 1.0f, 0.1f,   0.1f
+			//-1.0f, -1.0f, 0.0f, 0.5f, 1.0f, 0.1f,  0.1f,
+			// 1.0f, -1.0f, 0.0f, 0.4f, 1.0f, 0.1f,  0.1f,
+			// 1.0f,  1.0f, 0.0f, 0.2f, 1.0f, 0.1f,  0.1f, //example without textures
+			//-1.0f,  1.0f, 0.0f, 0.1f, 1.0f, 0.1f,   0.1f
 		};
 		uint32_t		 m_Indices[6] =
 		{
@@ -218,15 +218,15 @@ namespace Game
 		ExampleLayer3()
 		{
 			m_QuadVAO = std::make_shared<VertexArray>();
-			//m_QuadShader = ShaderLibrary::LoadShader("TextureShader", solutionDir + "AnorEngine\\Assets\\Shaders\\2DShader.shader");
-			m_QuadShader = ShaderLibrary::GetShader("2DShader");
+			m_QuadShader = ShaderLibrary::LoadShader("TextureShader", solutionDir + "AnorEngine\\Assets\\Shaders\\2DTextureShader.shader");
+			//m_QuadShader = ShaderLibrary::GetShader("2DShader");
 			m_QuadTexture = std::make_shared<Texture>(solutionDir + "AnorEngine\\Assets\\Textures\\transparent.png");
 			m_QuadShader->UploadInteger("u_Sampler", 0);
 		}
 		virtual void OnAttach() override
 		{
-			BufferLayout QuadBufferLayout = { {ShaderDataType::vec3, "a_Position", 0}, { ShaderDataType::vec4, "a_Color", 1 } };
-			m_QuadVAO->AddVertexBuffer(std::make_shared<Buffer>(m_Vertices, 7 * 4 * sizeof(float), QuadBufferLayout));
+			BufferLayout QuadBufferLayout = { {ShaderDataType::vec3, "a_Position", 0}, { ShaderDataType::vec2, "a_Tex", 1 } };
+			m_QuadVAO->AddVertexBuffer(std::make_shared<Buffer>(m_Vertices, 5 * 4 * sizeof(float), QuadBufferLayout));
 			m_QuadVAO->SetIndexBuffer(std::make_shared<IndexBuffer>(m_Indices, 6));
 		}
 		virtual void OnUpdate(float deltaTime) override
@@ -244,9 +244,7 @@ namespace Game
 			//Updating quad transform data here
 			m_QuadModelMatrix = glm::translate(m_QuadModelMatrix, m_QuadTranslation);
 			//Rendering here 
-			m_QuadTexture->Bind();
-			Renderer2D::DrawPrimitive(m_QuadVAO, m_QuadShader, m_QuadModelMatrix, m_QuadColor);
-			m_QuadTexture->Unbind();
+			Renderer2D::DrawPrimitive(m_QuadVAO, m_QuadShader, m_QuadModelMatrix, m_QuadColor, m_QuadTexture);
 			//Reset translation after rendering for further use
 			m_QuadTranslation = { 0,0,0 }; 
 		}

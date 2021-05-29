@@ -8,9 +8,8 @@
 #include "Graphics/shader.h"
 #include "Graphics/texture.h"
 #include "Graphics/simplerenderer3D.h"
-#include <../Assets/Models/cube.h>
-#include "Graphics/model.h"
-#include <imgui.h>
+#include "../Assets/Models/cube.h"
+#include "imgui.h"
 #include "utils/Logger.h"
 #include "Events/EventHandler.h"
 #include "Graphics/OrthographicCameraController.h"

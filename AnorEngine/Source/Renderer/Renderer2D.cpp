@@ -24,14 +24,18 @@ namespace AnorEngine
 		{
 			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		}
-		void Renderer2D::DrawPrimitive(const Ref<VertexArray> vertexArray, const Ref<Shader> shader, const glm::mat4& modelMatrix, const glm::vec4& color)
+		void Renderer2D::DrawPrimitive(const Ref<VertexArray> vertexArray, const Ref<Shader> shader, const glm::mat4& modelMatrix, const glm::vec4& color, const Ref<Texture> texture)
 		{
 			shader->enable();
 			vertexArray->bind();
 			shader->UploadMat4("u_ViewProjMat", s_OrthoCamera->GetViewProjectionMatrix());
 			shader->UploadMat4("u_ModelMatrix", modelMatrix);
 			shader->UploadFloat4("u_Color", color);
+			if(texture != nullptr)
+				texture->Bind();
 			glDrawElements(GL_TRIANGLES, vertexArray->GetIndexBuffer()->GetCount(), GL_UNSIGNED_INT, NULL);
+			if(texture != nullptr)
+				texture->Unbind();
 			vertexArray->unbind();
 			shader->disable();
 		}	
