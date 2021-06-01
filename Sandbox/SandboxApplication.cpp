@@ -107,7 +107,7 @@ namespace Game
 		glm::vec4		 m_Color = { 0,1,1,1 };
 	public:
 		ExampleLayer()
-		{
+		{		
 			m_TriangleVAO = std::make_shared<VertexArray>();
 			std::string solutionDir= __SOLUTION_DIR;
 			m_TriangleShader = ShaderLibrary::LoadShader("2DShader", solutionDir + "AnorEngine\\Assets\\Shaders\\2DShader.shader");
@@ -262,10 +262,8 @@ namespace Game
 		}
 	};
 
-
-
 	class SandboxApp2D : public Application
-	{
+	{		
 	private:
 		LayerStack						  m_LayerStack;
 		Ref<OrthographicCamera>			  m_OrthoCamera;
@@ -278,7 +276,9 @@ namespace Game
 		glm::vec3						  m_CameraPos = { 0.0f, 0.0f, 0.0f };
 		float							  m_CameraSpeed = 1;
 		float							  lastFrame;
-		bool							  m_Minimized = false;	
+		bool							  m_Minimized = false;
+		std::vector<ProfileResult>		  m_ProfileResults;
+		//-----------------
 		std::string solutionDir = __SOLUTION_DIR;
 #ifdef RENDER_MY_SCENE
 		Ref<Scene> scene = std::make_shared<Scene>(m_PersCamera);
@@ -309,35 +309,31 @@ namespace Game
 		{	
 			while (!m_OpenGLWindow->IsClosed())
 			{
-				//Scene setup
 				float deltaTime = DeltaTime();
-				m_OrthoGraphicCameraController->OnUpdate(deltaTime);			
-				Renderer2D::BeginScene(m_OrthoCamera);
-				Renderer2D::ClearColor(glm::vec4(0.1f, 0.1f, 0.1f, 1));
-				Renderer2D::Clear();
-
-				//Rendering Layers starts
-				if (!m_Minimized) //We don't want to render if the window is minimized.
 				{
-					for (Ref<Layer> layer : m_LayerStack)
-					{	
-						layer->OnUpdate(deltaTime);
-					}				
+					PROFILE_SCOPE("BeginScene");
+					m_OrthoGraphicCameraController->OnUpdate(deltaTime);			
+					Renderer2D::BeginScene(m_OrthoCamera);
+					Renderer2D::ClearColor(glm::vec4(0.1f, 0.1f, 0.1f, 1));
+					Renderer2D::Clear();
 				}
-				//Rendering Layers ends
-
-				//ImGuiRender starts
-					//ImGui Rendering for each layer starts.
+				{
+					PROFILE_SCOPE("OnUpdate");
+					if (!m_Minimized) //We don't want to render if the window is minimized.
+					{
+						for (Ref<Layer> layer : m_LayerStack)
+						{	
+							layer->OnUpdate(deltaTime);
+						}				
+					}
+				}
 				m_ImGuiBase->Begin();
 				for (Ref<Layer> layer : m_LayerStack)
 				{
 					layer->OnImGuiRender();
 				}
-					//ImGui Rendering for each layer ends.
-					//Overlay Rendering ImGui.
 				OnImGuiOverlayRender();
 				m_ImGuiBase->End();
-				//ImGuiRender ends
 
 				m_OpenGLWindow->Update();
 				Renderer2D::EndScene();
@@ -382,17 +378,21 @@ namespace Game
 #endif		
 			//Propogating the recieved event to layers.
 			//One of the layers can set the 'm_Handled' value of an event to true so that further propogation is prevented.
+			OnImGuiOverlayEvent(e);
 			for (auto layerIterator = m_LayerStack.rbegin(); layerIterator != m_LayerStack.rend(); layerIterator++)
 			{
 				//Sending the events in reverse order here
 				layerIterator->get()->OnEvent(e);
 			}
-			if (e->GetEventType() == Input::EventType::WindowResizeEvent)
+			if (!e->m_Handled)
 			{
-				OnWindowResizeEvent(std::static_pointer_cast<Input::WindowResizeEvent>(e));
+				if (e->GetEventType() == Input::EventType::WindowResizeEvent)
+				{
+					OnWindowResizeEvent(std::static_pointer_cast<Input::WindowResizeEvent>(e));
+				}
+				//Passing every single event that I get from the OpenGLWindow to this controller. Will change.
+				m_OrthoGraphicCameraController->OnEvent(e);
 			}
-			//Passing every single event that I get from the OpenGLWindow to this controller. Will change.
-			m_OrthoGraphicCameraController->OnEvent(e);
 		}
 		virtual void OnWindowResizeEvent(Ref<Input::WindowResizeEvent> e) override
 		{
@@ -408,8 +408,23 @@ namespace Game
 		void OnImGuiOverlayRender()
 		{
 			static bool show = true;
-			ImGui::ShowDemoWindow(&show);
+			for (auto& result : m_ProfileResults)
+			{
+				char buffer[50];
+				strcpy(buffer, "%.3f ms  ");
+				strcat(buffer, result.Name);
+				ImGui::Text(buffer, result.Time);
+			}
+			m_ProfileResults.clear();
 		}
+		void OnImGuiOverlayEvent(Ref<Input::Event>& e)
+		{
+			if (ImGui::IsAnyItemHovered())
+			{
+				//Block events if mouse is hovered over any imgui window.
+				e->m_Handled = true;
+			}
+;		}
 		void PushLayer(Ref<Layer> Layer)
 		{
 			Layer->OnAttach();

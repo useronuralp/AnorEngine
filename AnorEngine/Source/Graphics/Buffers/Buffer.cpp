@@ -19,11 +19,11 @@ namespace AnorEngine{
 		{	
 			glDeleteBuffers(1, &m_BufferID);
 		}
-		void Buffer::bind() const
+		void Buffer::Bind() const
 		{
 			glBindBuffer(GL_ARRAY_BUFFER, m_BufferID);
 		}
-		void Buffer::unbind() const
+		void Buffer::Unbind() const
 		{
 			glBindBuffer(GL_ARRAY_BUFFER, 0);
 		}
@@ -44,11 +44,11 @@ namespace AnorEngine{
 		{
 			glDeleteBuffers(1, &m_BufferID);
 		}
-		void IndexBuffer::bind() const
+		void IndexBuffer::Bind() const
 		{
 			glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_BufferID);
 		}
-		void IndexBuffer::unbind() const
+		void IndexBuffer::Unbind() const
 		{
 			glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 		}

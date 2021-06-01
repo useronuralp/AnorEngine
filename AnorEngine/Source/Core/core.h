@@ -11,6 +11,7 @@
 	#error Engine currently supports only windows!!!
 #endif
 
+#define PROFILE_SCOPE(name) Timer timer##timer__LINE__(name, [&](ProfileResult profileResult) { m_ProfileResults.push_back(profileResult); })
 namespace AnorEngine
 {
 	template<typename T>

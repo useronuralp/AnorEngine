@@ -15,8 +15,8 @@ namespace AnorEngine {
 
 			void AddVertexBuffer(const Ref<Buffer>& buffer);
 			void SetIndexBuffer(const Ref<IndexBuffer>& indexBuffer);
-			void bind() const;
-			void unbind() const;
+			void Bind() const;
+			void Unbind() const;
 
 			const std::vector<Ref<Buffer>>& GetVertexBuffers() const { return m_VertexBuffers; }
 			const Ref<IndexBuffer> GetIndexBuffer() const { return m_IndexBuffer; }

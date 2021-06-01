@@ -123,8 +123,8 @@ namespace AnorEngine {
 		public:
 			Buffer(float* vertices, uint32_t sizeByte, BufferLayout& layout); // size = total component count * sizeof(passed variable)
 			~Buffer();
-			void bind() const;
-			void unbind() const;
+			void Bind() const;
+			void Unbind() const;
 			const inline BufferLayout& GetBufferLayout() const { return m_Layout; }
 			//void SetLayout(BufferLayout& layout) { m_Layout = layout; }
 		};
@@ -140,8 +140,8 @@ namespace AnorEngine {
 		public:
 			IndexBuffer(uint32_t* data, uint32_t count);
 			~IndexBuffer();
-			void bind() const;
-			void unbind() const;
+			void Bind() const;
+			void Unbind() const;
 		public:
 			const uint32_t& GetCount() const { return m_Count; }
 		};

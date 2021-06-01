@@ -14,7 +14,7 @@ namespace AnorEngine {
 		void VertexArray::AddVertexBuffer(const Ref<Buffer>& buffer)
 		{
 			glBindVertexArray(m_ArrayID);
-			buffer->bind();
+			buffer->Bind();
 			auto& layout = buffer->GetBufferLayout();
 			for (const auto& element : layout) //This is a vector.
 			{
@@ -22,22 +22,22 @@ namespace AnorEngine {
 				glVertexAttribPointer(element.m_ShaderLayoutLocation, element.m_ComponentCount, ShaderDataTypeToOpenGLBaseType(element.m_Type), element.m_Normalized ? GL_TRUE : GL_FALSE, buffer->GetBufferLayout().GetStride(), (void*)element.m_Offset);
 			}
 			m_VertexBuffers.push_back(buffer);
-			buffer->unbind();
+			buffer->Unbind();
 			glBindVertexArray(0);
 		}
 		void VertexArray::SetIndexBuffer(const Ref<IndexBuffer>& indexBuffer)
 		{
 			glBindVertexArray(m_ArrayID);
-			indexBuffer->bind();
+			indexBuffer->Bind();
 
 			m_IndexBuffer = indexBuffer;
 			glBindVertexArray(0);
 		}
-		void VertexArray::bind() const
+		void VertexArray::Bind() const
 		{
 			glBindVertexArray(m_ArrayID);
 		}
-		void VertexArray::unbind() const
+		void VertexArray::Unbind() const
 		{
 			glBindVertexArray(0);
 		}

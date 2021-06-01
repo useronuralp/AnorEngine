@@ -22,7 +22,7 @@ namespace AnorEngine {
 		}
 		void Renderable3D::bindVAO()
 		{
-			m_VAO.bind();
+			m_VAO.Bind();
 		}
 		void Renderable3D::unbindVAO()
 		{
