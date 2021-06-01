@@ -267,6 +267,7 @@
   <ItemGroup>
     <None Include="Assets\Models\Backpack\backpack.mtl" />
     <None Include="Assets\Models\ball\uploads_files_2222080_ball_obj.mtl" />
+    <None Include="Assets\Shaders\2DBackgroundShader.shader" />
     <None Include="Assets\Shaders\2DShader.shader" />
     <None Include="Assets\shaders\3DShader.shader" />
     <None Include="Assets\shaders\3DLightSourceShader.shader" />

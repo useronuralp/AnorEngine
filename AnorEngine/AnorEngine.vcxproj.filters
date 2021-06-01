@@ -277,6 +277,7 @@
     <None Include="Vendor\ImGUI\.gitignore" />
     <None Include="Assets\Models\ball\uploads_files_2222080_ball_obj.mtl" />
     <None Include="Assets\Shaders\2DShader.shader" />
+    <None Include="Assets\Shaders\2DBackgroundShader.shader" />
   </ItemGroup>
   <ItemGroup>
     <Image Include="vertexLayoutExample.PNG">

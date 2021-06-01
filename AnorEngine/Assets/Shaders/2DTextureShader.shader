@@ -10,7 +10,7 @@ out vec4 m_Color;
 out vec2 m_texCoord;
 void main()
 {
-	gl_Position = (u_ViewProjMat) * (u_ModelMatrix)*vec4(position, 1.0f);
+	gl_Position = (u_ViewProjMat) * (u_ModelMatrix) * vec4(position, 1.0f);
 	m_texCoord = texCoord;
 }
 
@@ -28,4 +28,5 @@ uniform sampler2D u_Sampler;
 void main()
 {
 	color = texture(u_Sampler, m_texCoord);
+	//color = vec4(m_texCoord, 1.0f, 1.0f);
 }

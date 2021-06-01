@@ -193,7 +193,7 @@ namespace Game
 		float			 m_Vertices[5 * 4] =
 		{
 			-1.0f, -1.0f, 0.0f, 0.0f, 0.0f,
-			 1.0f, -1.0f, 0.0f, 0.0f, 1.0f,
+			 1.0f, -1.0f, 0.0f, 1.0f, 0.0f,
 			 1.0f,  1.0f, 0.0f, 1.0f, 1.0f,
 			-1.0f,  1.0f, 0.0f, 0.0f, 1.0f
 
@@ -261,6 +261,57 @@ namespace Game
 			}
 		}
 	};
+	class Background : public Layer
+	{
+	private:
+		float m_Vertices[5 * 4] =
+		{
+			-0.8f, -0.45f, 0.0f, 0.0f, 0.0f,
+			 0.8f, -0.45f, 0.0f, 1.0f, 0.0f,
+			 0.8f,  0.45f, 0.0f, 1.0f, 1.0f,
+			-0.8f,  0.45f, 0.0f, 0.0f, 1.0f
+		};
+		uint32_t m_Indices[6] =
+		{
+			0, 1, 2, 2, 3, 0
+		};
+		Ref<VertexArray> m_BgVAO;
+		Ref<Shader>		 m_BgShader = nullptr;
+		Ref<Texture>	 m_BgTexture;
+		glm::mat4		 m_BgModelMatrix = glm::mat4(1.0f);
+	public:
+		Background()
+		{
+			std::string solutionDir = __SOLUTION_DIR;
+			m_BgModelMatrix = glm::scale(m_BgModelMatrix, {12.0f, 12.0f , 1.0f });
+			m_BgVAO = std::make_shared<VertexArray>();
+			m_BgShader = ShaderLibrary::LoadShader("2DBackgroundShader", solutionDir + "AnorEngine\\Assets\\Shaders\\2DBackgroundShader.shader");
+			m_BgTexture = std::make_shared<Texture>(solutionDir + "AnorEngine\\Assets\\Textures\\retro.png");
+		}
+		virtual void OnAttach() override
+		{
+			BufferLayout Layout = { {ShaderDataType::vec3, "a_Position", 0} ,  {ShaderDataType::vec2, "a_TexCoords", 1} };
+			m_BgVAO->AddVertexBuffer(std::make_shared<Buffer>(m_Vertices, 5 * 4 * sizeof(float), Layout));
+			m_BgVAO->SetIndexBuffer(std::make_shared<IndexBuffer>(m_Indices, 6));
+
+		}
+		virtual void OnUpdate(float deltaTime) override
+		{
+			Renderer2D::DrawPrimitive(m_BgVAO, m_BgShader, m_BgModelMatrix, {1,1,1, 0.4f}, m_BgTexture);
+		}
+		virtual void OnImGuiRender() override
+		{
+			
+		}
+		virtual void OnEvent(Ref<Input::Event> e) override
+		{
+			//Handle event if it was not handled before by a layer that resides higher in the LayerStack.
+			if (!e->m_Handled)
+			{
+				//Reminder: You can set the m_Handled to true. If you want to block the propogation of this event.
+			}
+		}
+	};
 
 	class SandboxApp2D : public Application
 	{		
@@ -273,6 +324,7 @@ namespace Game
 		Ref<ExampleLayer>				  m_Layer  = std::make_shared<ExampleLayer> ();
 		Ref<ExampleLayer2>				  m_Layer2 = std::make_shared<ExampleLayer2>();
 		Ref<ExampleLayer3>				  m_Layer3 = std::make_shared<ExampleLayer3>();
+		Ref<Background>					  m_Bg = std::make_shared<Background>();
 		glm::vec3						  m_CameraPos = { 0.0f, 0.0f, 0.0f };
 		float							  m_CameraSpeed = 1;
 		float							  lastFrame;
@@ -297,6 +349,7 @@ namespace Game
 			PushLayer(m_Layer3);
 			PushLayer(m_Layer2);
 			PushLayer(m_Layer);
+			PushLayer(m_Bg);
 			LogInfoDebug();
 		}
 	protected:

@@ -28,7 +28,14 @@ namespace AnorEngine
 		{
 			shader->enable();
 			vertexArray->Bind();
-			shader->UploadMat4("u_ViewProjMat", s_OrthoCamera->GetViewProjectionMatrix());
+			if (shader->GetName() == "2DBackgroundShader")
+			{
+				shader->UploadMat4("u_ViewProjMat", s_OrthoCamera->GetBackgroundViewProjectionMatrix());
+			}
+			else
+			{
+				shader->UploadMat4("u_ViewProjMat", s_OrthoCamera->GetViewProjectionMatrix());
+			}
 			shader->UploadMat4("u_ModelMatrix", modelMatrix);
 			shader->UploadFloat4("u_Color", color);
 			if(texture != nullptr)

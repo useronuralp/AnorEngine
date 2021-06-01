@@ -16,7 +16,7 @@
 #include <algorithm> 
 #include <math.h>
 #include <typeinfo>
-#include <time.h>
+#include <chrono>
 
 #include <cmath>
 #include <utils/Logger.h>
