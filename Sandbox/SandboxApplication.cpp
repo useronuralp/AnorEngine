@@ -94,7 +94,7 @@ namespace Game
 		Random(){ srand(time(NULL));}
 		static float GetFloat(){ return static_cast <float> (rand()) / static_cast <float> (RAND_MAX); }
 	};
-
+	//Mal erdem 
 	struct Particle
 	{
 		float m_Vertices[3 * 4] =
@@ -182,7 +182,7 @@ namespace Game
 		{
 			for (int i = 0; i < m_Particles.size(); i++)
 			{
-				if (m_Particles[i]->isDead)
+				if (m_Particles[i]->m_IsDead)
 				{
 					m_Particles.erase(m_Particles.begin() + i);
 					continue;
