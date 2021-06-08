@@ -15,7 +15,7 @@ namespace AnorEngine {
 			const char *m_Title;
 			int m_Width, m_Height;
 			bool m_Closed;
-			double m_Time;
+			double m_Time = 0.0f;
 		public:
 			OpenGLWindow(const char* name, int width, int height);
 			~OpenGLWindow();

@@ -11,7 +11,12 @@
 	#error Engine currently supports only windows!!!
 #endif
 
-#define PROFILE_SCOPE(name) Timer timer##timer__LINE__(name, [&](ProfileResult profileResult) { m_ProfileResults.push_back(profileResult); })
+#define WARN(...) AnorEngine::Logger::getConsole()->warn(__VA_ARGS__)
+#define CRITICAL_ASSERT(...) AnorEngine::Logger::getConsole()->critical(__VA_ARGS__); __debugbreak()
+#define INFO(...) AnorEngine::Logger::getConsole()->info(__VA_ARGS__)
+
+#define PROFILE_SCOPE(name) Timer timer__LINE__(name, [&](ProfileResult profileResult) { m_ProfileResults.push_back(profileResult); })
+
 namespace AnorEngine
 {
 	template<typename T>

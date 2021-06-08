@@ -133,7 +133,7 @@ namespace AnorEngine {
 			glfwSetScrollCallback(m_Window, mouse_scroll_callback);
 			glfwSetWindowSizeCallback(m_Window, window_resize_callback);
 			glfwSetWindowUserPointer(m_Window, this);// need this to access the currently active window. This is very important.
-			glfwSwapInterval(0);// Vsync
+			glfwSwapInterval(1);// Vsync
 
 			std::cout << "OpenGL" << glGetString(GL_VERSION) << std::endl;
 			return true;

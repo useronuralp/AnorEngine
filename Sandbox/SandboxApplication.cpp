@@ -89,6 +89,117 @@ namespace Game
 	};
 #endif
 
+	static struct Random
+	{
+		Random(){ srand(time(NULL));}
+		static float GetFloat(){ return static_cast <float> (rand()) / static_cast <float> (RAND_MAX); }
+	};
+
+	struct Particle
+	{
+		float m_Vertices[3 * 4] =
+		{
+			-0.5f, -0.5f, 0.0f,
+			 0.5f, -0.5f, 0.0f,
+			 0.5f,  0.5f, 0.0f,
+			-0.5f,  0.5f, 0.0f
+		};
+		uint32_t m_Indices[6] =
+		{
+			0, 1, 2, 2, 3, 0
+		};
+		float m_Speed;
+		float m_LifeTime;
+		float m_Size;
+		float m_StartingAlphaValue;
+		float m_InitialSpeed;
+		bool m_IsDead;
+		Ref<VertexArray> m_ParticleVAO;
+		Ref<Shader> m_ParticleShader;
+		glm::mat4 m_Transform;
+		glm::vec3 m_MoveDirection;
+		glm::vec4 m_Color;
+		std::chrono::steady_clock::time_point m_LifeStartTime;
+	public:
+		Particle()
+		{
+			BufferLayout Layout = { {ShaderDataType::vec3, "a_Position", 0} };
+			m_LifeStartTime = std::chrono::high_resolution_clock::now();
+			m_Speed = 20.0f;
+			m_InitialSpeed = m_Speed;
+			m_LifeTime = 5;
+			m_Size = 1.0f;
+			m_MoveDirection = { 0.0f,0.0f,0.0f };
+			m_Color = { 1, 1, 1, 0.5f };
+			m_IsDead = false;
+			m_StartingAlphaValue = m_Color.a;
+			m_Transform = glm::mat4(1.0f);
+			m_ParticleVAO = std::make_shared<VertexArray>();
+			m_ParticleVAO->AddVertexBuffer(std::make_shared<Buffer>(m_Vertices, 12 * sizeof(float), Layout));
+			m_ParticleVAO->SetIndexBuffer(std::make_shared<IndexBuffer>(m_Indices, 6));
+			m_ParticleShader = ShaderLibrary::GetShader("2DShader");
+			//Randomization part----------------------------------------------------------------------------------------
+			m_Speed -= Random::GetFloat();
+			m_Size -= Random::GetFloat();
+			m_Size = std::max(m_Size, 0.05f);
+			m_Transform = glm::scale(m_Transform, { m_Size, m_Size, 0 });
+			m_MoveDirection.x += Random::GetFloat() * 2.0 - 1.0;
+			m_MoveDirection.y += Random::GetFloat() * 2.0 - 1.0;
+			m_Color.y -= Random::GetFloat();
+		}
+	public:
+		void OnUpdate(float deltaTime)
+		{			
+			auto currentTime = std::chrono::high_resolution_clock::now();
+			auto elapsedTime = currentTime - m_LifeStartTime;
+			if (std::chrono::duration_cast<std::chrono::seconds>(elapsedTime).count() >= m_LifeTime)
+				m_IsDead = true;
+			m_Color.a -= (m_StartingAlphaValue / m_LifeTime) * deltaTime;
+			Renderer2D::DrawPrimitive(m_ParticleVAO, m_ParticleShader, m_Transform, m_Color);
+			m_Transform = glm::translate(m_Transform, {m_MoveDirection.x * (m_Speed * deltaTime), m_MoveDirection.y * (m_Speed * deltaTime), 0 });
+			m_Speed -= (std::chrono::duration_cast<std::chrono::seconds>(elapsedTime).count() / m_LifeTime) * m_InitialSpeed * deltaTime;
+			//m_Transform = glm::rotate(m_Transform, 8.0f * deltaTime, { 0,0,0.5f });
+
+		}
+	};
+
+
+	class ParticleSystem
+	{
+		glm::vec3 m_StartPosition = { 15.0f, 15.0f , 0.0f};
+		std::vector<Ref<Particle>> m_Particles;
+	public:
+		void CreateParticles(int count)
+		{
+			for (int i = 0; i < count; i++)
+			{
+				Ref<Particle> particle = std::make_shared<Particle>();
+				particle->m_Transform = glm::translate(particle->m_Transform, m_StartPosition);
+				m_Particles.push_back(particle);
+			}
+		}
+		void OnUpdate(float deltaTime)
+		{
+			for (int i = 0; i < m_Particles.size(); i++)
+			{
+				if (m_Particles[i]->isDead)
+				{
+					m_Particles.erase(m_Particles.begin() + i);
+					continue;
+				}
+				m_Particles[i]->OnUpdate(deltaTime);
+			}
+		}
+		void OnImGui()
+		{
+			float vec2[2] = {0.0f, 0.0f };
+			ImGui::SliderFloat2("ParticleSystem position", &vec2[0], 0.0f, 50.0f);
+			m_StartPosition.x = vec2[0];
+			m_StartPosition.y = vec2[1];
+		}
+	};
+
+
 	class ExampleLayer : public Layer
 	{
 		float m_Vertices[21] =
@@ -110,7 +221,7 @@ namespace Game
 		{		
 			m_TriangleVAO = std::make_shared<VertexArray>();
 			std::string solutionDir= __SOLUTION_DIR;
-			m_TriangleShader = ShaderLibrary::LoadShader("2DShader", solutionDir + "AnorEngine\\Assets\\Shaders\\2DShader.shader");
+			m_TriangleShader = ShaderLibrary::GetShader("2DShader");
 		}
 		virtual void OnAttach() override
 		{
@@ -218,7 +329,7 @@ namespace Game
 		ExampleLayer3()
 		{
 			m_QuadVAO = std::make_shared<VertexArray>();
-			m_QuadShader = ShaderLibrary::LoadShader("TextureShader", solutionDir + "AnorEngine\\Assets\\Shaders\\2DTextureShader.shader");
+			m_QuadShader = ShaderLibrary::GetShader("TextureShader");
 			//m_QuadShader = ShaderLibrary::GetShader("2DShader");
 			m_QuadTexture = std::make_shared<Texture>(solutionDir + "AnorEngine\\Assets\\Textures\\transparent.png");
 			m_QuadShader->UploadInteger("u_Sampler", 0);
@@ -285,7 +396,7 @@ namespace Game
 			std::string solutionDir = __SOLUTION_DIR;
 			m_BgModelMatrix = glm::scale(m_BgModelMatrix, {12.0f, 12.0f , 1.0f });
 			m_BgVAO = std::make_shared<VertexArray>();
-			m_BgShader = ShaderLibrary::LoadShader("2DBackgroundShader", solutionDir + "AnorEngine\\Assets\\Shaders\\2DBackgroundShader.shader");
+			m_BgShader = ShaderLibrary::GetShader("2DBackgroundShader");
 			m_BgTexture = std::make_shared<Texture>(solutionDir + "AnorEngine\\Assets\\Textures\\retro.png");
 		}
 		virtual void OnAttach() override
@@ -299,18 +410,6 @@ namespace Game
 		{
 			Renderer2D::DrawPrimitive(m_BgVAO, m_BgShader, m_BgModelMatrix, {1,1,1, 0.4f}, m_BgTexture);
 		}
-		virtual void OnImGuiRender() override
-		{
-			
-		}
-		virtual void OnEvent(Ref<Input::Event> e) override
-		{
-			//Handle event if it was not handled before by a layer that resides higher in the LayerStack.
-			if (!e->m_Handled)
-			{
-				//Reminder: You can set the m_Handled to true. If you want to block the propogation of this event.
-			}
-		}
 	};
 
 	class SandboxApp2D : public Application
@@ -320,11 +419,12 @@ namespace Game
 		Ref<OrthographicCamera>			  m_OrthoCamera;
 		Ref<OrthographicCameraController> m_OrthoGraphicCameraController;
 		Ref<PerspectiveCamera>			  m_PersCamera;
-		Ref<ImGuiBase>					  m_ImGuiBase = std::make_shared<ImGuiBase>();
-		Ref<ExampleLayer>				  m_Layer  = std::make_shared<ExampleLayer> ();
-		Ref<ExampleLayer2>				  m_Layer2 = std::make_shared<ExampleLayer2>();
-		Ref<ExampleLayer3>				  m_Layer3 = std::make_shared<ExampleLayer3>();
-		Ref<Background>					  m_Bg = std::make_shared<Background>();
+		Ref<ImGuiBase>					  m_ImGuiBase = std::make_shared<ImGuiBase>(); //ImGui initializiton code.
+		Ref<ExampleLayer>				  m_Layer;
+		Ref<ExampleLayer2>				  m_Layer2;
+		Ref<ExampleLayer3>				  m_Layer3;
+		Ref<Background>					  m_Bg;
+		Ref<ParticleSystem>				  m_ParticleSystem;
 		glm::vec3						  m_CameraPos = { 0.0f, 0.0f, 0.0f };
 		float							  m_CameraSpeed = 1;
 		float							  lastFrame;
@@ -345,10 +445,20 @@ namespace Game
 #ifdef RENDER_MY_SCENE
 			pushLayer(scene);
 #endif		
+			//Shader Creation
+			ShaderLibrary::LoadShader("2DShader", solutionDir + "AnorEngine\\Assets\\Shaders\\2DShader.shader");
+			ShaderLibrary::LoadShader("TextureShader", solutionDir + "AnorEngine\\Assets\\Shaders\\2DTextureShader.shader");
+			ShaderLibrary::LoadShader("2DBackgroundShader", solutionDir + "AnorEngine\\Assets\\Shaders\\2DBackgroundShader.shader");
+			//Layer Creation
+			m_Layer = std::make_shared<ExampleLayer>();
+			m_Layer2 = std::make_shared<ExampleLayer2>();
+			m_Layer3 = std::make_shared<ExampleLayer3>();
+			m_Bg = std::make_shared<Background>();
+			m_ParticleSystem = std::make_shared<ParticleSystem>();
 			//Layer insertion
-			PushLayer(m_Layer3);
-			PushLayer(m_Layer2);
-			PushLayer(m_Layer);
+			//PushLayer(m_Layer3);
+			//PushLayer(m_Layer2);
+			//PushLayer(m_Layer);
 			PushLayer(m_Bg);
 			LogInfoDebug();
 		}
@@ -362,6 +472,7 @@ namespace Game
 		{	
 			while (!m_OpenGLWindow->IsClosed())
 			{
+				m_ParticleSystem->CreateParticles(1);
 				float deltaTime = DeltaTime();
 				{
 					PROFILE_SCOPE("BeginScene");
@@ -378,9 +489,11 @@ namespace Game
 						{	
 							layer->OnUpdate(deltaTime);
 						}				
+						m_ParticleSystem->OnUpdate(deltaTime);
 					}
 				}
 				m_ImGuiBase->Begin();
+				m_ParticleSystem->OnImGui();
 				for (Ref<Layer> layer : m_LayerStack)
 				{
 					layer->OnImGuiRender();
@@ -480,11 +593,12 @@ namespace Game
 ;		}
 		void PushLayer(Ref<Layer> Layer)
 		{
-			Layer->OnAttach();
 			m_LayerStack.pushLayer(Layer);
+			Layer->OnAttach();
 		}
 		void PopLayer()
 		{
+			//Add OnDetach();
 			m_LayerStack.popLayer();
 		}
 		void ProcessMovementInput() //TODO:Remove
