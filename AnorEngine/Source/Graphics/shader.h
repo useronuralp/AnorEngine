@@ -1,6 +1,6 @@
 #pragma once
 #include <GL/glew.h>
-#include "../utils/fileutils.h"
+#include "../Utility/fileutils.h"
 #include "../Math/maths.h"
 #include <glm.hpp>
 #include <gtc/type_ptr.hpp>

@@ -45,7 +45,7 @@
     <ClCompile Include="Source\Graphics\renderable3D.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Graphics\shader.cpp">
+    <ClCompile Include="Source\Graphics\Shader.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Source\Graphics\simplerenderer3D.cpp">
@@ -84,7 +84,7 @@
     <ClCompile Include="Source\Renderer\RendererCommand.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Source\utils\Logger.cpp">
+    <ClCompile Include="Source\Utility\Logger.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Vendor\ImGUI\imgui.cpp">
@@ -118,6 +118,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Source\Core\Timer.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Graphics\ParticleSystem.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -158,7 +161,7 @@
     <ClInclude Include="Source\Graphics\renderable3D.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Source\Graphics\shader.h">
+    <ClInclude Include="Source\Graphics\Shader.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Source\Graphics\simplerenderer3D.h">
@@ -200,10 +203,10 @@
     <ClInclude Include="Source\Renderer\RendererCommand.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Source\utils\fileutils.h">
+    <ClInclude Include="Source\Utility\fileutils.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Source\utils\Logger.h">
+    <ClInclude Include="Source\Utility\Logger.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Vendor\ImGUI\imconfig.h">
@@ -264,6 +267,12 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Source\Core\Timer.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Graphics\ParticleSystem.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Utility\Randomizer.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
