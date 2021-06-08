@@ -95,6 +95,7 @@ namespace Game
 		static float GetFloat(){ return static_cast <float> (rand()) / static_cast <float> (RAND_MAX); }
 	};
 	//Mal erdem 
+	//Mal erdem 2
 	struct Particle
 	{
 		float m_Vertices[3 * 4] =
