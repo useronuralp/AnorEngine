@@ -236,7 +236,7 @@ namespace Game
 		float							  lastFrame;
 		bool							  m_Minimized = false;
 		std::vector<ProfileResult>		  m_ProfileResults;
-		//-----------------
+		//--------------------------------------------------------------------
 		std::string solutionDir = __SOLUTION_DIR;
 	public:
 		SandboxApp2D()
@@ -245,16 +245,23 @@ namespace Game
 			Input::EventHandler::SetTargetApplication(this); //Important to set this to the active Application else, you won't get your input processed.		
 			m_ImGuiBase->Init(); // Need to call the initialization code for imgui here.
 			m_OrthoGraphicCameraController = std::make_shared<OrthographicCameraController>(m_OrthoCamera, (1280.0f / 720.0f));	
-			//Shader Creation
+			//Shader Creation-------------------------------------------------------------------------------------------------------------
 			ShaderLibrary::LoadShader("2DShader", solutionDir + "AnorEngine\\Assets\\Shaders\\2DShader.shader");
 			ShaderLibrary::LoadShader("TextureShader", solutionDir + "AnorEngine\\Assets\\Shaders\\2DTextureShader.shader");
 			ShaderLibrary::LoadShader("2DBackgroundShader", solutionDir + "AnorEngine\\Assets\\Shaders\\2DBackgroundShader.shader");
-			//Layer Creation
+			//Layer Creation--------------------------------------------------------------------------------------------
 			m_Layer = std::make_shared<ExampleLayer>();
 			m_Layer2 = std::make_shared<ExampleLayer2>();
 			m_Layer3 = std::make_shared<ExampleLayer3>();
 			m_Bg = std::make_shared<Background>();
-			m_ParticleSystem = std::make_shared<ParticleSystem>();
+			//Partcile Settings----------------------------------------------------------------------------------
+			ParticleProperties particleProperties;
+			particleProperties.Color = { 1, 1, 1, 0.5f };
+			particleProperties.LifeTime = 5.0f;
+			particleProperties.MoveDirection = { 0.0f, 0.0f, 0.0f };
+			particleProperties.Size = 0.3f;
+			particleProperties.Speed = 20.0f;
+			m_ParticleSystem = std::make_shared<ParticleSystem>(particleProperties);
 			//Layer insertion
 			//PushLayer(m_Layer3);
 			//PushLayer(m_Layer2);

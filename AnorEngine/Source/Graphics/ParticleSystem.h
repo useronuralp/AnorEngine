@@ -7,8 +7,17 @@ namespace AnorEngine
 {
 	namespace Graphics
 	{
-		struct ANOR_API Particle
-		{		
+		struct ANOR_API ParticleProperties
+		{
+			float								  Speed;
+			float								  LifeTime;
+			float								  Size;
+			glm::vec3							  MoveDirection;
+			glm::vec4							  Color;
+		};
+		class ANOR_API Particle
+		{	
+			friend class ParticleSystem;
 			float m_Vertices[3 * 4] =
 			{
 				-0.5f, -0.5f, 0.0f,
@@ -34,14 +43,18 @@ namespace AnorEngine
 			std::chrono::steady_clock::time_point m_LifeStartTime;
 		public:
 			Particle();
-		public:
+		private:
+			void RandomizeParticle();
 			void OnUpdate(float deltaTime);
 		};
 
 		class ANOR_API ParticleSystem
 		{
+			ParticleProperties m_Properties;
 			glm::vec3 m_StartPosition = { 0.0f, 0.0f, 0.0f };
 			std::vector<Ref<Particle>> m_Particles;
+		public:
+			ParticleSystem(ParticleProperties properties);
 		public:
 			void CreateParticles(int count);
 			void OnUpdate(float deltaTime);

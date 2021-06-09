@@ -117,7 +117,7 @@
     <ClCompile Include="Source\Renderer\Renderer2D.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Core\Timer.cpp">
+    <ClCompile Include="Source\Utility\Timer.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Source\Graphics\ParticleSystem.cpp">
@@ -266,7 +266,7 @@
     <ClInclude Include="Source\Renderer\Renderer2D.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Source\Core\Timer.h">
+    <ClInclude Include="Source\Utility\Timer.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Source\Graphics\ParticleSystem.h">
