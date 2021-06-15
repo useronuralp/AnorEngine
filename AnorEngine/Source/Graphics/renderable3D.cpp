@@ -3,7 +3,7 @@
 namespace AnorEngine {
 	namespace Graphics {
 
-		Renderable3D::Renderable3D(Ref<Buffer> buffer)
+		Renderable3D::Renderable3D(Ref<VertexBuffer> buffer)
 			:m_ModelMatrix(glm::mat4(1.0f))
 		{	
 			init(buffer);
@@ -28,7 +28,7 @@ namespace AnorEngine {
 		{
 			glBindVertexArray(0);
 		}
-		void Renderable3D::init(Ref<Buffer> buffer)
+		void Renderable3D::init(Ref<VertexBuffer> buffer)
 		{	
 			m_VAO.AddVertexBuffer(buffer);
 		}

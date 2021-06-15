@@ -8,38 +8,11 @@ namespace Game
 	
 	class ExampleLayer : public Layer
 	{
-		float m_Vertices[21] =
-		{
-			-3.0f, -1.6f, 0.0f,  0.33f, 0.9f, 0.7f, 0.25f,
-			 3.0f, -1.6f, 0.0f,  0.18f, 0.2f, 0.7f, 0.25f,
-			 0.0f,  1.6f, 0.0f,  0.69f, 0.01f, 0.7f, 0.25f
-		};
-		uint32_t m_Indices[3] =
-		{
-			0, 1, 2
-		};
-		Ref<VertexArray> m_TriangleVAO;
-		Ref<Shader>		 m_TriangleShader; 
-		glm::mat4		 m_ModelMatrix = glm::mat4(1.0f);
-		glm::vec4		 m_Color = { 0,1,1,1 };
+		glm::vec4 m_Color = { 0,1,1,1 };
 	public:
-		ExampleLayer()
-		{		
-			m_TriangleVAO = std::make_shared<VertexArray>();
-			std::string solutionDir= __SOLUTION_DIR;
-			m_TriangleShader = ShaderLibrary::GetShader("2DShader");
-		}
-		virtual void OnAttach() override
-		{
-
-			BufferLayout Layout = { {ShaderDataType::vec3, "a_Position", 0} ,{ShaderDataType::vec4, "a_Color", 1} };
-			m_TriangleVAO->AddVertexBuffer(std::make_shared<Buffer>(m_Vertices, 21 * sizeof(float), Layout));
-			m_TriangleVAO->SetIndexBuffer(std::make_shared<IndexBuffer>(m_Indices, 3));
-			
-		}
 		virtual void OnUpdate(float deltaTime) override
 		{	
-			Renderer2D::DrawPrimitive(m_TriangleVAO, m_TriangleShader, m_ModelMatrix, m_Color);
+			Renderer2D::Submit({0.0f, 0.0f, 0.0f}, {1.0f, 1.0f}, m_Color );
 		}
 		virtual void OnImGuiRender() override
 		{
@@ -57,39 +30,11 @@ namespace Game
 	class ExampleLayer2 : public Layer
 	{
 	private:
-		float m_Vertices[21] =
-		{
-			-1.0f, -1.0f, 0.0f, 0.11f, 0.9f, 0.05f,  0.5f,
-			 1.0f, -1.0f, 0.0f, 0.3f, 0.2f, 1.0f, 0.5f,
-			 0.0f,  1.0f, 0.0f, 0.92f, 0.23f, 0.3f, 0.5f
-		};
-		uint32_t m_Indices[3] =
-		{
-			0, 1, 2
-		};
-		Ref<VertexArray> m_TriangleVAO;
-		Ref<Shader>		 m_TriangleShader = nullptr;
-		glm::mat4		 m_ModelMatrix = glm::mat4(1.0f);
-		glm::vec4		 m_Color = { 0,1,0,1 };
+		glm::vec4 m_Color = { 0,1,0,1 };
 	public:
-		ExampleLayer2()
-		{			
-			m_ModelMatrix = glm::translate(m_ModelMatrix, { 1,2,0 });
-			m_TriangleVAO = std::make_shared<VertexArray>();
-			m_TriangleShader = ShaderLibrary::GetShader("2DShader");
-			std::string solutionDir = __SOLUTION_DIR;
-			//shader = ShaderLibrary::LoadShader("2DShader", solutionDir + "AnorEngine\\Assets\\Shaders\\2DShader.shader");
-		}
-		virtual void OnAttach() override
-		{
-			BufferLayout Layout = { {ShaderDataType::vec3, "a_Position", 0} ,  {ShaderDataType::vec4, "a_Color", 1} };
-			m_TriangleVAO->AddVertexBuffer(std::make_shared<Buffer>(m_Vertices, 21 * sizeof(float), Layout));
-			m_TriangleVAO->SetIndexBuffer(std::make_shared<IndexBuffer>(m_Indices, 3));
-			
-		}
 		virtual void OnUpdate(float deltaTime) override
 		{	
-			Renderer2D::DrawPrimitive(m_TriangleVAO, m_TriangleShader, m_ModelMatrix, m_Color);
+			Renderer2D::Submit({ 1.0f, 1.0f, 0.0f }, { 1.0f, 1.0f }, m_Color);
 		}
 		virtual void OnImGuiRender() override
 		{
@@ -107,63 +52,23 @@ namespace Game
 	class ExampleLayer3 : public Layer
 	{
 	private:
-		float			 m_Vertices[5 * 4] =
-		{
-			-1.0f, -1.0f, 0.0f, 0.0f, 0.0f,
-			 1.0f, -1.0f, 0.0f, 1.0f, 0.0f,
-			 1.0f,  1.0f, 0.0f, 1.0f, 1.0f,
-			-1.0f,  1.0f, 0.0f, 0.0f, 1.0f
-
-			//-1.0f, -1.0f, 0.0f, 0.5f, 1.0f, 0.1f,  0.1f,
-			// 1.0f, -1.0f, 0.0f, 0.4f, 1.0f, 0.1f,  0.1f,
-			// 1.0f,  1.0f, 0.0f, 0.2f, 1.0f, 0.1f,  0.1f, //example without textures
-			//-1.0f,  1.0f, 0.0f, 0.1f, 1.0f, 0.1f,   0.1f
-		};
-		uint32_t		 m_Indices[6] =
-		{
-			0, 1, 2, 2, 3, 0
-		};
-		Ref<VertexArray> m_QuadVAO;
-		Ref<Shader>		 m_QuadShader;
-		Ref<Texture>	 m_QuadTexture;
-		glm::mat4		 m_QuadModelMatrix = glm::mat4(1.0f);
-		glm::vec3		 m_QuadTranslation = { 0.0f, 0.0f, 0.0f };
 		glm::vec4		 m_QuadColor = { 1,0,0,1 };
+		glm::vec3		 m_QuadPosition = { 2.0f, 3.0f, 0.0f };
 		float			 m_QuadMoveSpeed = 5.0f;
-		std::string solutionDir = __SOLUTION_DIR;
 	public:
-		ExampleLayer3()
-		{
-			m_QuadVAO = std::make_shared<VertexArray>();
-			m_QuadShader = ShaderLibrary::GetShader("TextureShader");
-			//m_QuadShader = ShaderLibrary::GetShader("2DShader");
-			m_QuadTexture = std::make_shared<Texture>(solutionDir + "AnorEngine\\Assets\\Textures\\transparent.png");
-			m_QuadShader->UploadInteger("u_Sampler", 0);
-		}
-		virtual void OnAttach() override
-		{
-			BufferLayout QuadBufferLayout = { {ShaderDataType::vec3, "a_Position", 0}, { ShaderDataType::vec2, "a_Tex", 1 } };
-			m_QuadVAO->AddVertexBuffer(std::make_shared<Buffer>(m_Vertices, 5 * 4 * sizeof(float), QuadBufferLayout));
-			m_QuadVAO->SetIndexBuffer(std::make_shared<IndexBuffer>(m_Indices, 6));
-		}
 		virtual void OnUpdate(float deltaTime) override
 		{
 			//Querying the EventHandler here so that we can move the quad.
 			if (Input::EventHandler::IsKeyDown(ANOR_KEY_I))
-				m_QuadTranslation.y += m_QuadMoveSpeed * deltaTime;
+				m_QuadPosition.y += m_QuadMoveSpeed * deltaTime;
 			else if (Input::EventHandler::IsKeyDown(ANOR_KEY_K))
-				m_QuadTranslation.y -= m_QuadMoveSpeed * deltaTime;
+				m_QuadPosition.y -= m_QuadMoveSpeed * deltaTime;
 			if (Input::EventHandler::IsKeyDown(ANOR_KEY_J))
-				m_QuadTranslation.x -= m_QuadMoveSpeed * deltaTime;
+				m_QuadPosition.x -= m_QuadMoveSpeed * deltaTime;
 			else if (Input::EventHandler::IsKeyDown(ANOR_KEY_L))
-				m_QuadTranslation.x += m_QuadMoveSpeed * deltaTime;
+				m_QuadPosition.x += m_QuadMoveSpeed * deltaTime;
 
-			//Updating quad transform data here
-			m_QuadModelMatrix = glm::translate(m_QuadModelMatrix, m_QuadTranslation);
-			//Rendering here 
-			Renderer2D::DrawPrimitive(m_QuadVAO, m_QuadShader, m_QuadModelMatrix, m_QuadColor, m_QuadTexture);
-			//Reset translation after rendering for further use
-			m_QuadTranslation = { 0,0,0 }; 
+			Renderer2D::Submit(m_QuadPosition, {1.0f, 1.0f}, m_QuadColor);
 		}
 		virtual void OnImGuiRender() override
 		{
@@ -208,7 +113,7 @@ namespace Game
 		virtual void OnAttach() override
 		{
 			BufferLayout Layout = { {ShaderDataType::vec3, "a_Position", 0} ,  {ShaderDataType::vec2, "a_TexCoords", 1} };
-			m_BgVAO->AddVertexBuffer(std::make_shared<Buffer>(m_Vertices, 5 * 4 * sizeof(float), Layout));
+			m_BgVAO->AddVertexBuffer(std::make_shared<VertexBuffer>(m_Vertices, 5 * 4 * sizeof(float), Layout));
 			m_BgVAO->SetIndexBuffer(std::make_shared<IndexBuffer>(m_Indices, 6));
 
 		}
@@ -245,27 +150,23 @@ namespace Game
 			Input::EventHandler::SetTargetApplication(this); //Important to set this to the active Application else, you won't get your input processed.		
 			m_ImGuiBase->Init(); // Need to call the initialization code for imgui here.
 			m_OrthoGraphicCameraController = std::make_shared<OrthographicCameraController>(m_OrthoCamera, (1280.0f / 720.0f));	
-			//Shader Creation-------------------------------------------------------------------------------------------------------------
-			ShaderLibrary::LoadShader("2DShader", solutionDir + "AnorEngine\\Assets\\Shaders\\2DShader.shader");
-			ShaderLibrary::LoadShader("TextureShader", solutionDir + "AnorEngine\\Assets\\Shaders\\2DTextureShader.shader");
-			ShaderLibrary::LoadShader("2DBackgroundShader", solutionDir + "AnorEngine\\Assets\\Shaders\\2DBackgroundShader.shader");
 			//Layer Creation--------------------------------------------------------------------------------------------
 			m_Layer = std::make_shared<ExampleLayer>();
 			m_Layer2 = std::make_shared<ExampleLayer2>();
 			m_Layer3 = std::make_shared<ExampleLayer3>();
 			m_Bg = std::make_shared<Background>();
-			//Partcile Settings----------------------------------------------------------------------------------
+			//Particle Settings----------------------------------------------------------------------------------
 			ParticleProperties particleProperties;
 			particleProperties.Color = { 1, 1, 1, 0.5f };
-			particleProperties.LifeTime = 5.0f;
-			particleProperties.MoveDirection = { 0.0f, 0.0f, 0.0f };
+			particleProperties.LifeTime = 8.0f;
 			particleProperties.Size = 0.3f;
-			particleProperties.Speed = 20.0f;
+			particleProperties.Speed = 10.0f;
+			particleProperties.StartPosition = { -3.0f, 0.0f,0.0f };
 			m_ParticleSystem = std::make_shared<ParticleSystem>(particleProperties);
 			//Layer insertion
-			//PushLayer(m_Layer3);
-			//PushLayer(m_Layer2);
-			//PushLayer(m_Layer);
+			PushLayer(m_Layer3);
+			PushLayer(m_Layer2);
+			PushLayer(m_Layer);
 			PushLayer(m_Bg);
 			LogInfoDebug();
 		}
@@ -281,24 +182,29 @@ namespace Game
 			{
 				m_ParticleSystem->CreateParticles(1);
 				float deltaTime = DeltaTime();
+
+				m_OrthoGraphicCameraController->OnUpdate(deltaTime);			
+				Renderer2D::BeginScene(m_OrthoCamera);
+				Renderer2D::ClearColor(glm::vec4(0.1f, 0.1f, 0.1f, 1));
+				Renderer2D::Clear();
+
 				{
-					PROFILE_SCOPE("BeginScene");
-					m_OrthoGraphicCameraController->OnUpdate(deltaTime);			
-					Renderer2D::BeginScene(m_OrthoCamera);
-					Renderer2D::ClearColor(glm::vec4(0.1f, 0.1f, 0.1f, 1));
-					Renderer2D::Clear();
-				}
-				{
-					PROFILE_SCOPE("OnUpdate");
+					PROFILE_SCOPE("Submitting geometry");
 					if (!m_Minimized) //We don't want to render if the window is minimized.
 					{
 						for (Ref<Layer> layer : m_LayerStack)
 						{	
 							layer->OnUpdate(deltaTime);
-						}				
+						}			
 						m_ParticleSystem->OnUpdate(deltaTime);
+
 					}
 				}
+				{
+					PROFILE_SCOPE("Flushing");
+					Renderer2D::EndScene();
+				}
+					
 				m_ImGuiBase->Begin();
 				for (Ref<Layer> layer : m_LayerStack)
 				{
@@ -308,7 +214,7 @@ namespace Game
 				m_ImGuiBase->End();
 
 				m_OpenGLWindow->Update();
-				Renderer2D::EndScene();
+				
 			}
 		}
 		virtual void OnEvent(Ref<Input::Event> e) override

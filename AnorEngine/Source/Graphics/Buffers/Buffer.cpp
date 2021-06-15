@@ -7,7 +7,15 @@ namespace AnorEngine{
 		//-------------VertexBuffer impl ----------------
 		//----------------------------------------------
 		//-----------------------------------------------
-		Buffer::Buffer(float* vertices, uint32_t sizeByte, BufferLayout& layout)
+		VertexBuffer::VertexBuffer(uint32_t sizeByte, BufferLayout& layout)
+			:m_Layout(layout), m_SizeByte(sizeByte)
+		{
+			glGenBuffers(1, &m_BufferID);
+			glBindBuffer(GL_ARRAY_BUFFER, m_BufferID);
+			glBufferData(GL_ARRAY_BUFFER, m_SizeByte, nullptr, GL_DYNAMIC_DRAW);
+			glBindBuffer(GL_ARRAY_BUFFER, 0);
+		}
+		VertexBuffer::VertexBuffer(float* vertices, uint32_t sizeByte, BufferLayout& layout)
 			:m_Layout(layout), m_SizeByte(sizeByte)
 		{
 			glGenBuffers(1, &m_BufferID);
@@ -15,15 +23,20 @@ namespace AnorEngine{
 			glBufferData(GL_ARRAY_BUFFER,  m_SizeByte, vertices, GL_STATIC_DRAW);
 			glBindBuffer(GL_ARRAY_BUFFER, 0);
 		}
-		Buffer::~Buffer()
+		VertexBuffer::~VertexBuffer()
 		{	
 			glDeleteBuffers(1, &m_BufferID);
 		}
-		void Buffer::Bind() const
+		void VertexBuffer::SetData(const void* data, uint32_t dataSize)
+		{
+			glBindBuffer(GL_ARRAY_BUFFER, m_BufferID);
+			glBufferSubData(GL_ARRAY_BUFFER, 0, dataSize, data);
+		}
+		void VertexBuffer::Bind() const
 		{
 			glBindBuffer(GL_ARRAY_BUFFER, m_BufferID);
 		}
-		void Buffer::Unbind() const
+		void VertexBuffer::Unbind() const
 		{
 			glBindBuffer(GL_ARRAY_BUFFER, 0);
 		}

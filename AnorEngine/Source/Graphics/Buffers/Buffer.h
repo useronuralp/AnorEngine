@@ -114,15 +114,17 @@ namespace AnorEngine {
 			const uint32_t& GetComponentCount() const { return m_TotalComponentCount; }
 		};
 
-		class ANOR_API Buffer
+		class ANOR_API VertexBuffer
 		{
 		private:
 			uint32_t m_SizeByte;
 			uint32_t m_BufferID;
 			BufferLayout m_Layout;
 		public:
-			Buffer(float* vertices, uint32_t sizeByte, BufferLayout& layout); // size = total component count * sizeof(passed variable)
-			~Buffer();
+			VertexBuffer(uint32_t sizeByte, BufferLayout& layout);
+			VertexBuffer(float* vertices, uint32_t sizeByte, BufferLayout& layout); // size = total component count * sizeof(passed variable)
+			~VertexBuffer();
+			void SetData(const void* data, uint32_t dataSize);
 			void Bind() const;
 			void Unbind() const;
 			const inline BufferLayout& GetBufferLayout() const { return m_Layout; }

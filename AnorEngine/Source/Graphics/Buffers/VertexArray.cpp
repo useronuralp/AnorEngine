@@ -11,7 +11,7 @@ namespace AnorEngine {
 		{	
 			glDeleteVertexArrays(1, &m_ArrayID);
 		}
-		void VertexArray::AddVertexBuffer(const Ref<Buffer>& buffer)
+		void VertexArray::AddVertexBuffer(const Ref<VertexBuffer>& buffer)
 		{
 			glBindVertexArray(m_ArrayID);
 			buffer->Bind();

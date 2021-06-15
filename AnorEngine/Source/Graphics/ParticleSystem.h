@@ -12,32 +12,20 @@ namespace AnorEngine
 			float								  Speed;
 			float								  LifeTime;
 			float								  Size;
-			glm::vec3							  MoveDirection;
+			glm::vec3							  StartPosition;
 			glm::vec4							  Color;
 		};
 		class ANOR_API Particle
 		{	
 			friend class ParticleSystem;
-			float m_Vertices[3 * 4] =
-			{
-				-0.5f, -0.5f, 0.0f,
-				 0.5f, -0.5f, 0.0f,
-				 0.5f,  0.5f, 0.0f,
-				-0.5f,  0.5f, 0.0f
-			};
-			uint32_t m_Indices[6] =
-			{
-				0, 1, 2, 2, 3, 0
-			};
 			float								  m_Speed;
 			float								  m_LifeTime;
 			float								  m_Size;
 			float								  m_StartingAlphaValue;
 			float								  m_InitialSpeed;
 			bool								  m_IsDead;
-			Ref<VertexArray>					  m_ParticleVAO;
-			Ref<Shader>							  m_ParticleShader;
-			glm::mat4							  m_Transform;
+			bool								  m_IsFirstRender;
+			glm::vec3							  m_Position;
 			glm::vec3							  m_MoveDirection;
 			glm::vec4							  m_Color;
 			std::chrono::steady_clock::time_point m_LifeStartTime;
@@ -51,7 +39,7 @@ namespace AnorEngine
 		class ANOR_API ParticleSystem
 		{
 			ParticleProperties m_Properties;
-			glm::vec3 m_StartPosition = { 0.0f, 0.0f, 0.0f };
+			glm::vec3 m_StartPosition = {0.0f, 0.0f, 0.0f};
 			std::vector<Ref<Particle>> m_Particles;
 		public:
 			ParticleSystem(ParticleProperties properties);
