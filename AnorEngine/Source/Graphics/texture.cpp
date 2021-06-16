@@ -48,7 +48,7 @@ namespace AnorEngine {
 
 		void Texture::Bind(unsigned int slot) const
 		{
-			//glActiveTexture(GL_TEXTURE0 + slot); //allows you to speicfy a texture slot, usually on pc there are 32 texture slots and theu count up one by one.
+			glActiveTexture(GL_TEXTURE0 + slot); //allows you to speicfy a texture slot, usually on pc there are 32 texture slots and theu count up one by one.
 			glBindTexture(GL_TEXTURE_2D, m_RendererID);
 		}
 

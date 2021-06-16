@@ -13,12 +13,17 @@ namespace AnorEngine {
 			Texture(const std::string& path);
 			~Texture();
 
-			void Bind(unsigned int slot = 0) const;
+			void Bind(unsigned int slot) const;
 			void Unbind() const;
 
 			inline int GetWidth() const { return m_Width; }
 			inline int GetHeight() const { return m_Height; }
-			inline unsigned int getTID() const{ return m_RendererID; }
+			inline unsigned int GetTextureID() const{ return m_RendererID; }
+
+			bool operator == (const Texture& other) const
+			{
+				return m_RendererID == other.m_RendererID;
+			}
 		};
 	}
 }

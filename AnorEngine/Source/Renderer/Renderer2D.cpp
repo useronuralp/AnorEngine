@@ -10,6 +10,7 @@ namespace AnorEngine
 			glm::vec3 Position;
 			glm::vec4 Color;
 			glm::vec2 TexCoord;
+			float TexIndex;
 			//glm::vec3 Normals;
 		};
 		struct Renderer2DData
@@ -17,16 +18,21 @@ namespace AnorEngine
 			const uint32_t MaxQuads = 10000;
 			const uint32_t MaxVertices = MaxQuads * 4;
 			const uint32_t MaxIndices = MaxQuads * 6;
+			static const uint32_t MaxTextureSlots = 32;
 
 			Ref<VertexArray> QuadVertexArray;
 			Ref<VertexBuffer> QuadVertexBuffer;
 			Ref<Shader> QuadShader;
+			Ref<Texture> WhiteTexture;
 			Ref<Texture> QuadTexture;
 
 			uint32_t QuadIndexCount = 0;
 
 			QuadVertex* QuadVertexBufferBase = nullptr;
 			QuadVertex* QuadVertexBufferPtr = nullptr;
+
+			std::array<Ref<Texture>, MaxTextureSlots> TextureSlots;
+			uint32_t TextureSlotIndex = 1; // 0 = white texture;
 		};
 
 
@@ -39,16 +45,22 @@ namespace AnorEngine
 			glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
 			s_Data.QuadVertexArray = std::make_shared<VertexArray>();
-			BufferLayout QuadLayout = { {ShaderDataType::vec3, "a_Position", 0} ,{ShaderDataType::vec4, "a_Color", 1} , {ShaderDataType::vec2, "a_TexCoord", 2} };
+			BufferLayout QuadLayout = { {ShaderDataType::vec3, "a_Position", 0} ,{ShaderDataType::vec4, "a_Color", 1} , {ShaderDataType::vec2, "a_TexCoord", 2} , {ShaderDataType::vec, "a_TexIndex", 3} };
 			s_Data.QuadVertexBuffer = std::make_shared<VertexBuffer>(s_Data.MaxQuads * sizeof(QuadVertex), QuadLayout);
 			s_Data.QuadVertexArray->AddVertexBuffer(s_Data.QuadVertexBuffer);
 			s_Data.QuadVertexBufferBase = new QuadVertex[s_Data.MaxVertices]; // Set the address of the base when initializing the renderer.
 
 			std::string solutionDir = __SOLUTION_DIR;
 			ShaderLibrary::LoadShader("2DShader", solutionDir + "AnorEngine\\Assets\\Shaders\\2DShader.shader");
-			ShaderLibrary::LoadShader("TextureShader", solutionDir + "AnorEngine\\Assets\\Shaders\\2DTextureShader.shader");
 			ShaderLibrary::LoadShader("2DBackgroundShader", solutionDir + "AnorEngine\\Assets\\Shaders\\2DBackgroundShader.shader");
+			ShaderLibrary::LoadShader("TextureShader", solutionDir + "AnorEngine\\Assets\\Shaders\\2DTextureShader.shader");
 			s_Data.QuadShader = ShaderLibrary::GetShader("2DShader");
+			int samplers[s_Data.MaxTextureSlots];
+			for (uint32_t i = 0; i < s_Data.MaxTextureSlots; i++)
+			{
+				samplers[i] = i;
+			}
+			s_Data.QuadShader->UploadIntegerArray("u_Textures", samplers, s_Data.MaxTextureSlots);
 
 			uint32_t* QuadIndices = new uint32_t[s_Data.MaxIndices];
 
@@ -67,6 +79,11 @@ namespace AnorEngine
 			}
 			s_Data.QuadVertexArray->SetIndexBuffer(std::make_shared<IndexBuffer>(QuadIndices, s_Data.MaxIndices));
 			delete[] QuadIndices;
+
+
+			//Create a white texture here for debugging later.
+			s_Data.WhiteTexture = std::make_shared<Texture>(solutionDir + "AnorEngine\\Assets\\Textures\\WhiteTexture.PNG");
+			s_Data.TextureSlots[0] = s_Data.WhiteTexture;
 		}
 
 		void Renderer2D::Shutdown()
@@ -97,33 +114,84 @@ namespace AnorEngine
 			shader->UploadMat4("u_ModelMatrix", modelMatrix);
 			shader->UploadFloat4("u_Color", color);
 			if(texture != nullptr)
-				texture->Bind();
+				texture->Bind(0);
 			glDrawElements(GL_TRIANGLES, vertexArray->GetIndexBuffer()->GetCount(), GL_UNSIGNED_INT, NULL);
 			if(texture != nullptr)
 				texture->Unbind();
 			vertexArray->Unbind();
 			shader->disable();
 		}
-		void Renderer2D::Submit(const glm::vec3& position, const glm::vec2& size, const glm::vec4& color)
+		void Renderer2D::Submit(const glm::vec3& position, const glm::vec2& size, const Ref<Texture> texture, const glm::vec4& color)
 		{
+
+			float textureIndex = 0.0f;
+			//Setting the textureIndex to its proper value
+			for (uint32_t i = 1; i < s_Data.TextureSlotIndex; i++)
+			{
+				if (*s_Data.TextureSlots[i].get() == *texture.get())
+				{
+					textureIndex = (float)i;
+					break;
+				}
+			}
+			//Using the processed textureIndex
+			if (textureIndex == 0.0f)
+			{
+				textureIndex = (float)s_Data.TextureSlotIndex;
+				s_Data.TextureSlots[s_Data.TextureSlotIndex] = texture;
+				s_Data.TextureSlotIndex++;
+			}
+
 			s_Data.QuadVertexBufferPtr->Position = position;
 			s_Data.QuadVertexBufferPtr->Color = color;
 			s_Data.QuadVertexBufferPtr->TexCoord = { 0.0f, 0.0f };
+			s_Data.QuadVertexBufferPtr->TexIndex = textureIndex;
 			s_Data.QuadVertexBufferPtr++;
 
-			s_Data.QuadVertexBufferPtr->Position = { position.x + size.x, position.y, 0.0f};
+			s_Data.QuadVertexBufferPtr->Position = { position.x + size.x, position.y, 0.0f };
 			s_Data.QuadVertexBufferPtr->Color = color;
 			s_Data.QuadVertexBufferPtr->TexCoord = { 1.0f, 0.0f };
+			s_Data.QuadVertexBufferPtr->TexIndex = textureIndex;
 			s_Data.QuadVertexBufferPtr++;
 
 			s_Data.QuadVertexBufferPtr->Position = { position.x + size.x, position.y + size.y, 0.0f };
 			s_Data.QuadVertexBufferPtr->Color = color;
 			s_Data.QuadVertexBufferPtr->TexCoord = { 1.0f, 1.0f };
+			s_Data.QuadVertexBufferPtr->TexIndex = textureIndex;
 			s_Data.QuadVertexBufferPtr++;
 
 			s_Data.QuadVertexBufferPtr->Position = { position.x, position.y + size.y, 0.0f };
 			s_Data.QuadVertexBufferPtr->Color = color;
 			s_Data.QuadVertexBufferPtr->TexCoord = { 0.0f, 1.0f };
+			s_Data.QuadVertexBufferPtr->TexIndex = textureIndex;
+			s_Data.QuadVertexBufferPtr++;
+
+			s_Data.QuadIndexCount += 6;
+		}
+		void Renderer2D::Submit(const glm::vec3& position, const glm::vec2& size, const glm::vec4& color)
+		{
+			s_Data.QuadVertexBufferPtr->Position = position;
+			s_Data.QuadVertexBufferPtr->Color = color;
+			s_Data.QuadVertexBufferPtr->TexCoord = { 0.0f, 0.0f };
+			s_Data.QuadVertexBufferPtr->TexIndex = 0.0f; //White texture
+			s_Data.QuadVertexBufferPtr++;
+
+			s_Data.QuadVertexBufferPtr->Position = { position.x + size.x, position.y, 0.0f};
+			s_Data.QuadVertexBufferPtr->Color = color;
+			s_Data.QuadVertexBufferPtr->TexCoord = { 1.0f, 0.0f };
+			s_Data.QuadVertexBufferPtr->TexIndex = 0.0f;
+			s_Data.QuadVertexBufferPtr++;
+
+			s_Data.QuadVertexBufferPtr->Position = { position.x + size.x, position.y + size.y, 0.0f };
+			s_Data.QuadVertexBufferPtr->Color = color;
+			s_Data.QuadVertexBufferPtr->TexCoord = { 1.0f, 1.0f };
+			s_Data.QuadVertexBufferPtr->TexIndex = 0.0f;
+			s_Data.QuadVertexBufferPtr++;
+
+			s_Data.QuadVertexBufferPtr->Position = { position.x, position.y + size.y, 0.0f };
+			s_Data.QuadVertexBufferPtr->Color = color;
+			s_Data.QuadVertexBufferPtr->TexCoord = { 0.0f, 1.0f };
+			s_Data.QuadVertexBufferPtr->TexIndex = 0.0f;
 			s_Data.QuadVertexBufferPtr++;
 
 			s_Data.QuadIndexCount += 6;
@@ -135,12 +203,16 @@ namespace AnorEngine
 			uint32_t count;
 			count = s_Data.QuadIndexCount ? s_Data.QuadIndexCount : 0;
 
-			s_Data.QuadShader->enable();
+			for (uint32_t i = 0; i < s_Data.TextureSlotIndex; i++)
+			{
+				s_Data.TextureSlots[i]->Bind(i);
+			}
+
 			s_Data.QuadVertexArray->Bind();
+			s_Data.QuadShader->enable();
 			s_Data.QuadShader->UploadMat4("u_ViewProjMat", s_OrthoCamera->GetViewProjectionMatrix());
 			glDrawElements(GL_TRIANGLES, count, GL_UNSIGNED_INT, nullptr);
-			s_Data.QuadVertexArray->Unbind();
-			s_Data.QuadShader->disable();
+
 		}
 
 		void Renderer2D::BeginScene(const Ref<OrthographicCamera> camera)
@@ -148,6 +220,8 @@ namespace AnorEngine
 			s_OrthoCamera = camera;
 			s_Data.QuadIndexCount = 0;
 			s_Data.QuadVertexBufferPtr = s_Data.QuadVertexBufferBase;
+
+			s_Data.TextureSlotIndex = 1;
 		}
 
 		void Renderer2D::EndScene()
@@ -155,6 +229,8 @@ namespace AnorEngine
 			uint32_t dataSize = (uint8_t*)s_Data.QuadVertexBufferPtr - (uint8_t*)s_Data.QuadVertexBufferBase;
 			s_Data.QuadVertexBuffer->SetData(s_Data.QuadVertexBufferBase, dataSize);
 			Flush();
+			s_Data.QuadVertexArray->Unbind();
+			s_Data.QuadShader->disable();
 		}
 	}
 }

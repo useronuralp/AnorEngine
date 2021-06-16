@@ -18,17 +18,17 @@ namespace AnorEngine
 		class ANOR_API Particle
 		{	
 			friend class ParticleSystem;
-			float								  m_Speed;
-			float								  m_LifeTime;
-			float								  m_Size;
-			float								  m_StartingAlphaValue;
-			float								  m_InitialSpeed;
-			bool								  m_IsDead;
-			bool								  m_IsFirstRender;
-			glm::vec3							  m_Position;
-			glm::vec3							  m_MoveDirection;
-			glm::vec4							  m_Color;
-			std::chrono::steady_clock::time_point m_LifeStartTime;
+			float										   m_Speed;
+			float										   m_LifeTime;
+			float										   m_Size;
+			float										   m_StartingAlphaValue;
+			float										   m_InitialSpeed;
+			bool										   m_IsDead;
+			bool										   m_IsFirstRender;
+			glm::vec3									   m_Position;
+			glm::vec3									   m_MoveDirection;
+			glm::vec4									   m_Color;
+			std::chrono::system_clock::time_point	       m_LifeStartTime;
 		public:
 			Particle();
 		private:

@@ -39,7 +39,7 @@ namespace AnorEngine {
 			inline const Math::vec4& getColor() const { return m_Color; }
 			inline const void setPosition(const Math::vec3& position) { m_Position = position; }
 			inline const std::vector<Math::vec2>& getUV() const { return m_UV; }
-			inline const GLuint getTextureID() const { return m_Texture == nullptr ? 0 : m_Texture->getTID(); }
+			inline const GLuint getTextureID() const { return m_Texture == nullptr ? 0 : m_Texture->GetTextureID(); }
 		private:
 			void setUVDefaults()
 			{

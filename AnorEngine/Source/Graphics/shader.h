@@ -32,6 +32,7 @@ namespace AnorEngine {
 			void UploadFloat3(const std::string name, const Math::vec3& vector);
 			void UploadFloat4(const GLchar* name, const glm::vec4& vector);
 			void UploadMat4(const char* name, const glm::mat4& matrix);
+			void UploadIntegerArray(const char* name, int* values, uint32_t count);
 			void enable() const;
 			void disable() const;
 		private:

@@ -55,7 +55,7 @@ namespace AnorEngine {
 				glShaderSource(shader, 1, &source, NULL);
 				glCompileShader(shader);
 
-				GLint result;
+				GLint result = 0;
 				glGetShaderiv(shader, GL_COMPILE_STATUS, &result);
 
 				if (!result) {
@@ -82,15 +82,15 @@ namespace AnorEngine {
 			glGetProgramiv(program, GL_LINK_STATUS, &result);
 			if (!result) {
 				GLint length;
-				glGetShaderiv(program, GL_INFO_LOG_LENGTH, &length);
+				glGetProgramiv(program, GL_INFO_LOG_LENGTH, &length);
 				std::vector<char> error(length);
-				glGetShaderInfoLog(program, length, &length, &error[0]);
+				glGetProgramInfoLog(program, length, &length, &error[0]);
 				for (auto& shaderID : shaderIDs)
 				{
 					glDeleteShader(shaderID);
 				}
 				CRITICAL_ASSERT("Failed to link shaders!, {0}", &error[0]);
-				glDeleteShader(program);
+				glDeleteProgram(program);
 			}
 
 			for (auto& shaderID : shaderIDs)
@@ -208,6 +208,12 @@ namespace AnorEngine {
 		{
 			enable();
 			glUniformMatrix4fv(GetUniformLocation(name), 1, GL_FALSE, glm::value_ptr(matrix));
+		}
+
+		void Shader::UploadIntegerArray(const char* name, int* values, uint32_t count)
+		{
+			enable();
+			glUniform1iv(GetUniformLocation(name), count, values);
 		}
 
 		std::unordered_map<std::string, Ref<Shader>> ShaderLibrary::m_Shaders;

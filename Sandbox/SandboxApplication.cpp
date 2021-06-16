@@ -9,10 +9,12 @@ namespace Game
 	class ExampleLayer : public Layer
 	{
 		glm::vec4 m_Color = { 0,1,1,1 };
+		std::string solutionDir = __SOLUTION_DIR;
+		Ref<Texture> m_Texture = std::make_shared<Texture>(solutionDir + "AnorEngine\\Assets\\Textures\\minecraft-diamond.PNG");;
 	public:
 		virtual void OnUpdate(float deltaTime) override
 		{	
-			Renderer2D::Submit({0.0f, 0.0f, 0.0f}, {1.0f, 1.0f}, m_Color );
+			Renderer2D::Submit({0.0f, 0.0f, 0.0f}, {1.0f, 1.0f}, m_Texture, m_Color);
 		}
 		virtual void OnImGuiRender() override
 		{
@@ -31,10 +33,12 @@ namespace Game
 	{
 	private:
 		glm::vec4 m_Color = { 0,1,0,1 };
+		std::string solutionDir = __SOLUTION_DIR;
+		Ref<Texture> m_Texture = std::make_shared<Texture>(solutionDir + "AnorEngine\\Assets\\Textures\\381f5a63791945.5abc4ccf1297d.PNG");;
 	public:
 		virtual void OnUpdate(float deltaTime) override
 		{	
-			Renderer2D::Submit({ 1.0f, 1.0f, 0.0f }, { 1.0f, 1.0f }, m_Color);
+			Renderer2D::Submit({ 1.0f, 1.0f, 0.0f }, { 1.0f, 1.0f }, m_Texture, m_Color);
 		}
 		virtual void OnImGuiRender() override
 		{
@@ -55,6 +59,8 @@ namespace Game
 		glm::vec4		 m_QuadColor = { 1,0,0,1 };
 		glm::vec3		 m_QuadPosition = { 2.0f, 3.0f, 0.0f };
 		float			 m_QuadMoveSpeed = 5.0f;
+		std::string solutionDir = __SOLUTION_DIR;
+		Ref<Texture> m_Texture = std::make_shared<Texture>(solutionDir + "AnorEngine\\Assets\\Textures\\sample_gigatextures_4096_seamless2.PNG");;
 	public:
 		virtual void OnUpdate(float deltaTime) override
 		{
@@ -68,7 +74,7 @@ namespace Game
 			else if (Input::EventHandler::IsKeyDown(ANOR_KEY_L))
 				m_QuadPosition.x += m_QuadMoveSpeed * deltaTime;
 
-			Renderer2D::Submit(m_QuadPosition, {1.0f, 1.0f}, m_QuadColor);
+			Renderer2D::Submit(m_QuadPosition, {1.0f, 1.0f}, m_Texture, m_QuadColor);
 		}
 		virtual void OnImGuiRender() override
 		{
@@ -138,7 +144,7 @@ namespace Game
 		Ref<ParticleSystem>				  m_ParticleSystem;
 		glm::vec3						  m_CameraPos = { 0.0f, 0.0f, 0.0f };
 		float							  m_CameraSpeed = 1;
-		float							  lastFrame;
+		float							  m_LastFrameRenderTime;
 		bool							  m_Minimized = false;
 		std::vector<ProfileResult>		  m_ProfileResults;
 		//--------------------------------------------------------------------
@@ -158,7 +164,7 @@ namespace Game
 			//Particle Settings----------------------------------------------------------------------------------
 			ParticleProperties particleProperties;
 			particleProperties.Color = { 1, 1, 1, 0.5f };
-			particleProperties.LifeTime = 8.0f;
+			particleProperties.LifeTime = 2.0f;
 			particleProperties.Size = 0.3f;
 			particleProperties.Speed = 10.0f;
 			particleProperties.StartPosition = { -3.0f, 0.0f,0.0f };
@@ -178,28 +184,35 @@ namespace Game
 	public:
 		virtual void Run() override
 		{	
+			bool stop = false;
 			while (!m_OpenGLWindow->IsClosed())
-			{
-				m_ParticleSystem->CreateParticles(1);
+			{	
 				float deltaTime = DeltaTime();
+				m_ParticleSystem->CreateParticles(1);
+				stop = true;
 
 				m_OrthoGraphicCameraController->OnUpdate(deltaTime);			
 				Renderer2D::BeginScene(m_OrthoCamera);
 				Renderer2D::ClearColor(glm::vec4(0.1f, 0.1f, 0.1f, 1));
 				Renderer2D::Clear();
 
+				
+				if (!m_Minimized) //We don't want to render if the window is minimized.
 				{
-					PROFILE_SCOPE("Submitting geometry");
-					if (!m_Minimized) //We don't want to render if the window is minimized.
 					{
+						PROFILE_SCOPE("Layers' draw calls");
 						for (Ref<Layer> layer : m_LayerStack)
 						{	
 							layer->OnUpdate(deltaTime);
 						}			
-						m_ParticleSystem->OnUpdate(deltaTime);
-
 					}
+					{
+						PROFILE_SCOPE("Particle System Batching");
+						m_ParticleSystem->OnUpdate(deltaTime);
+					}
+
 				}
+
 				{
 					PROFILE_SCOPE("Flushing");
 					Renderer2D::EndScene();
@@ -284,10 +297,10 @@ namespace Game
 		}
 		float DeltaTime()
 		{
-			float currentFrame, deltaTime;
-			currentFrame = m_OpenGLWindow->GetRenderTime();
-			deltaTime = currentFrame - lastFrame;
-			lastFrame = currentFrame;
+			float currentFrameRenderTime, deltaTime;
+			currentFrameRenderTime = m_OpenGLWindow->GetRenderTime();
+			deltaTime = currentFrameRenderTime - m_LastFrameRenderTime;
+			m_LastFrameRenderTime = currentFrameRenderTime;
 			return deltaTime;
 		}
 	};

@@ -15,21 +15,24 @@ namespace AnorEngine
 		{
 			if (m_IsFirstRender)
 			{
-				m_LifeStartTime = std::chrono::high_resolution_clock::now();
+				m_LifeStartTime = std::chrono::system_clock::now();
 				m_IsFirstRender = false;
 			}
-			auto currentTime = std::chrono::high_resolution_clock::now();
-			float elapsedTime = std::chrono::duration_cast<std::chrono::seconds>(currentTime - m_LifeStartTime).count();
-
+			auto currentTime = std::chrono::system_clock::now();
+			long float elapsedTime = std::chrono::duration_cast<std::chrono::milliseconds>(currentTime - m_LifeStartTime).count();
+			elapsedTime /= 1000;
 			if (elapsedTime >= m_LifeTime)
+			{
 				m_IsDead = true;
+				return;
+			}
 
-			m_Color.a -= (m_StartingAlphaValue / m_LifeTime) * elapsedTime * deltaTime;
 			Renderer2D::Submit(m_Position, {m_Size , m_Size}, m_Color);
+			m_Color.a -= (elapsedTime / m_LifeTime) * (m_Color.a / m_StartingAlphaValue) * deltaTime;
 			m_Position.x += m_MoveDirection.x * (m_Speed * deltaTime);
 			m_Position.y += m_MoveDirection.y * (m_Speed * deltaTime);
 			m_Position.z = 0.0f;
-			m_Speed -= (elapsedTime / m_LifeTime) * m_InitialSpeed * deltaTime;
+			m_Speed -= (elapsedTime / m_LifeTime) * (m_Speed * m_InitialSpeed) * deltaTime;
 			//m_Transform = glm::rotate(m_Transform, 8.0f * deltaTime, { 0,0,0.5f });
 		}
 		void Particle::RandomizeParticle()
