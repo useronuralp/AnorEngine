@@ -164,7 +164,7 @@ namespace Game
 			//Particle Settings----------------------------------------------------------------------------------
 			ParticleProperties particleProperties;
 			particleProperties.Color = { 1, 1, 1, 0.5f };
-			particleProperties.LifeTime = 2.0f;
+			particleProperties.LifeTime = 8.0f;
 			particleProperties.Size = 0.3f;
 			particleProperties.Speed = 10.0f;
 			particleProperties.StartPosition = { -3.0f, 0.0f,0.0f };
@@ -191,7 +191,8 @@ namespace Game
 				m_ParticleSystem->CreateParticles(1);
 				stop = true;
 
-				m_OrthoGraphicCameraController->OnUpdate(deltaTime);			
+				m_OrthoGraphicCameraController->OnUpdate(deltaTime);	
+		
 				Renderer2D::BeginScene(m_OrthoCamera);
 				Renderer2D::ClearColor(glm::vec4(0.1f, 0.1f, 0.1f, 1));
 				Renderer2D::Clear();

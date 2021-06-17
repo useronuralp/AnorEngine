@@ -19,8 +19,8 @@ namespace AnorEngine
 				m_IsFirstRender = false;
 			}
 			auto currentTime = std::chrono::system_clock::now();
-			long float elapsedTime = std::chrono::duration_cast<std::chrono::milliseconds>(currentTime - m_LifeStartTime).count();
-			elapsedTime /= 1000;
+			long float elapsedTime = (std::chrono::duration_cast<std::chrono::milliseconds>(currentTime - m_LifeStartTime).count()) / 1000;
+
 			if (elapsedTime >= m_LifeTime)
 			{
 				m_IsDead = true;
@@ -28,10 +28,8 @@ namespace AnorEngine
 			}
 
 			Renderer2D::Submit(m_Position, {m_Size , m_Size}, m_Color);
-			m_Color.a -= (elapsedTime / m_LifeTime) * (m_Color.a / m_StartingAlphaValue) * deltaTime;
-			m_Position.x += m_MoveDirection.x * (m_Speed * deltaTime);
-			m_Position.y += m_MoveDirection.y * (m_Speed * deltaTime);
-			m_Position.z = 0.0f;
+			m_Color.a -= (elapsedTime / m_LifeTime) * (m_Color.a / pow(m_StartingAlphaValue, 3)) * deltaTime;
+			m_Position += glm::vec3(m_MoveDirection.x * (m_Speed* deltaTime), m_MoveDirection.y * (m_Speed* deltaTime), 0.0f);
 			m_Speed -= (elapsedTime / m_LifeTime) * (m_Speed * m_InitialSpeed) * deltaTime;
 			//m_Transform = glm::rotate(m_Transform, 8.0f * deltaTime, { 0,0,0.5f });
 		}
