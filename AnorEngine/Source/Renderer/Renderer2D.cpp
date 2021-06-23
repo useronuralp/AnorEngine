@@ -4,7 +4,6 @@ namespace AnorEngine
 {
 	namespace Graphics
 	{
-
 		struct QuadVertex //Attributes of each vertex. If you want to extend the attributes, you have to add it in here and extend the BufferLayout as well.
 		{
 			glm::vec3 Position;
@@ -15,28 +14,28 @@ namespace AnorEngine
 		};
 		struct Renderer2DData //Used to store data in this static class. Defined this struct in the .cpp so that nothing else can include it.
 		{
-			const uint32_t			 MaxQuads = 10000;
-			const uint32_t			 MaxVertices = MaxQuads * 4;
-			const uint32_t			 MaxIndices = MaxQuads * 6;
-			static const uint32_t	 MaxTextureSlots = 32;
-									 
-			Ref<VertexArray>		 QuadVertexArray;
-			Ref<VertexBuffer>		 QuadVertexBuffer;
-			Ref<Shader>				 QuadShader;
-			Ref<Texture>			 WhiteTexture;
-			Ref<Texture>			 QuadTexture;
-									 
-			uint32_t				 QuadIndexCount = 0;
-									 
-			QuadVertex*				 QuadVertexBufferBase = nullptr;
-			QuadVertex*				 QuadVertexBufferPtr = nullptr;
+			static const uint32_t					  MaxQuads = 10000;
+			static const uint32_t					  MaxVertices = MaxQuads * 4;
+			static const uint32_t					  MaxIndices = MaxQuads * 6;
+			static const uint32_t					  MaxTextureSlots = 32;
+													  
+			Ref<VertexArray>						  QuadVertexArray;
+			Ref<VertexBuffer>						  QuadVertexBuffer;
+			Ref<Shader>								  QuadShader;
+			Ref<Texture>							  WhiteTexture;
+			Ref<Texture>							  QuadTexture;
+													  
+			uint32_t								  QuadIndexCount = 0;
+													  
+			QuadVertex*								  QuadVertexBufferBase = nullptr;
+			QuadVertex*								  QuadVertexBufferPtr = nullptr;
 
 			std::array<Ref<Texture>, MaxTextureSlots> TextureSlots;
-			uint32_t				 TextureSlotIndex = 1; // 0 = white texture;
+			uint32_t								  TextureSlotIndex = 1; // 0 = white texture;
 
-			glm::vec4 QuadVertexPositions[4];
+			glm::vec4								  QuadVertexPositions[4];
+			uint32_t								  NumberOfDrawCalls = 0;
 		};
-
 
 		static Renderer2DData s_Data;
 		Ref<OrthographicCamera> Renderer2D::s_OrthoCamera;
@@ -48,9 +47,9 @@ namespace AnorEngine
 
 			BufferLayout QuadBufferLayout = { {ShaderDataType::vec3, "a_Position", 0} ,{ShaderDataType::vec4, "a_Color", 1} , {ShaderDataType::vec2, "a_TexCoord", 2} , {ShaderDataType::vec, "a_TexIndex", 3} };
 			s_Data.QuadVertexArray = std::make_shared<VertexArray>();
-			s_Data.QuadVertexBuffer = std::make_shared<VertexBuffer>(s_Data.MaxQuads * sizeof(QuadVertex), QuadBufferLayout);
+			s_Data.QuadVertexBuffer = std::make_shared<VertexBuffer>(Renderer2DData::MaxQuads * sizeof(QuadVertex), QuadBufferLayout);
 			s_Data.QuadVertexArray->AddVertexBuffer(s_Data.QuadVertexBuffer);
-			s_Data.QuadVertexBufferBase = new QuadVertex[s_Data.MaxVertices]; // Set the address of the base when initializing the renderer.
+			s_Data.QuadVertexBufferBase = new QuadVertex[Renderer2DData::MaxVertices]; // Set the address of the base when initializing the renderer.
 
 			std::string solutionDir = __SOLUTION_DIR;
 			ShaderLibrary::LoadShader("2DShader", solutionDir + "AnorEngine\\Assets\\Shaders\\2DShader.shader");
@@ -65,10 +64,10 @@ namespace AnorEngine
 			}
 			s_Data.QuadShader->UploadIntegerArray("u_Textures", samplers, s_Data.MaxTextureSlots);
 
-			uint32_t* QuadIndices = new uint32_t[s_Data.MaxIndices];
+			uint32_t* QuadIndices = new uint32_t[Renderer2DData::MaxIndices];
 
 			uint32_t offset = 0;
-			for (uint32_t i = 0; i < s_Data.MaxIndices; i += 6)
+			for (uint32_t i = 0; i < Renderer2DData::MaxIndices; i += 6)
 			{
 				QuadIndices[i + 0] = offset + 0;
 				QuadIndices[i + 1] = offset + 1;
@@ -80,7 +79,7 @@ namespace AnorEngine
 
 				offset += 4;
 			}
-			s_Data.QuadVertexArray->SetIndexBuffer(std::make_shared<IndexBuffer>(QuadIndices, s_Data.MaxIndices));
+			s_Data.QuadVertexArray->SetIndexBuffer(std::make_shared<IndexBuffer>(QuadIndices, Renderer2DData::MaxIndices));
 			delete[] QuadIndices;
 
 
@@ -100,6 +99,14 @@ namespace AnorEngine
 		{
 		}
 
+		uint32_t Renderer2D::GetIndexCount()
+		{
+			return s_Data.QuadIndexCount;
+		}
+		uint32_t Renderer2D::GetNumberOfDrawCalls()
+		{
+			return s_Data.NumberOfDrawCalls;
+		}
 		void Renderer2D::ClearColor(const glm::vec4& color)
 		{
 			glClearColor(color.r, color.g, color.b, color.a);
@@ -133,6 +140,16 @@ namespace AnorEngine
 		}
 		void Renderer2D::Submit(const glm::vec3& position, const glm::vec2& size, const Ref<Texture> texture, const glm::vec4& color, float rotationDegree)
 		{
+
+			//Check if the max buffer data size was exceeded. If that was the case then render the current buffer on hand and start a new batch.
+			//TODO: You should make this if check in a more readable way.
+			if ((uint8_t*)s_Data.QuadVertexBufferPtr - (uint8_t*)s_Data.QuadVertexBufferBase == Renderer2DData::MaxQuads * sizeof(QuadVertex))
+			{
+				EndScene();
+				s_Data.QuadIndexCount = 0;
+				s_Data.QuadVertexBufferPtr = s_Data.QuadVertexBufferBase;
+				s_Data.TextureSlotIndex = 1;
+			}
 
 			float textureIndex = 0.0f;
 			//Setting the textureIndex to its proper value before using it. If we can't find a value for it, it should remain 0.0f.
@@ -186,6 +203,13 @@ namespace AnorEngine
 		//This Submit function is for when you don't want to submit a texture and draw using only a color.
 		void Renderer2D::Submit(const glm::vec3& position, const glm::vec2& size, const glm::vec4& color)
 		{
+			if ((uint8_t*)s_Data.QuadVertexBufferPtr - (uint8_t*)s_Data.QuadVertexBufferBase == Renderer2DData::MaxQuads * sizeof(QuadVertex))
+			{
+				EndScene();
+				s_Data.QuadIndexCount = 0;
+				s_Data.QuadVertexBufferPtr = s_Data.QuadVertexBufferBase;
+				s_Data.TextureSlotIndex = 1;			
+			}
 
 			s_Data.QuadVertexBufferPtr->Position = position;
 			s_Data.QuadVertexBufferPtr->Color = color;
@@ -212,7 +236,6 @@ namespace AnorEngine
 			s_Data.QuadVertexBufferPtr++;
 
 			s_Data.QuadIndexCount += 6;
-			
 		}
 
 		void Renderer2D::Flush()
@@ -224,7 +247,7 @@ namespace AnorEngine
 			{
 				s_Data.TextureSlots[i]->Bind(i);
 			}
-
+			s_Data.NumberOfDrawCalls++;
 			s_Data.QuadVertexArray->Bind();
 			s_Data.QuadShader->enable();
 			//Grabbing the camera View Projection matrix from here. This is a must.
@@ -237,6 +260,7 @@ namespace AnorEngine
 		void Renderer2D::BeginScene(const Ref<OrthographicCamera> camera)
 		{
 			s_OrthoCamera = camera;
+			s_Data.NumberOfDrawCalls = 0;
 			s_Data.QuadIndexCount = 0;
 			s_Data.QuadVertexBufferPtr = s_Data.QuadVertexBufferBase;
 			s_Data.TextureSlotIndex = 1;

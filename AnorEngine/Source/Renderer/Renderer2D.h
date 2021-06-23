@@ -9,6 +9,10 @@ namespace AnorEngine
 	{
 		class ANOR_API Renderer2D
 		{
+			struct Statistics
+			{
+				static uint32_t QuadIndicesCount;
+			};
 		public:
 			static void Init();
 			static void ClearColor(const glm::vec4& color);
@@ -20,6 +24,9 @@ namespace AnorEngine
 			static void Flush();
 			static void BeginScene(const Ref<OrthographicCamera> camera);
 			static void EndScene();
+		public:
+			static uint32_t GetIndexCount();
+			static uint32_t GetNumberOfDrawCalls();
 		private:
 			static uint32_t QuadIndexCount;
 			static Ref<OrthographicCamera> s_OrthoCamera;

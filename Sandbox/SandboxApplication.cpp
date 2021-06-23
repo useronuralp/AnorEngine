@@ -188,7 +188,7 @@ namespace Game
 			while (!m_OpenGLWindow->IsClosed())
 			{	
 				float deltaTime = DeltaTime();
-				m_ParticleSystem->CreateParticles(1);
+				m_ParticleSystem->CreateParticles(3);
 				stop = true;
 
 				m_OrthoGraphicCameraController->OnUpdate(deltaTime);	
@@ -273,6 +273,9 @@ namespace Game
 				strcat(buffer, result.Name);
 				ImGui::Text(buffer, result.Time);
 			}
+			ImGui::Text("Quad Indices Count: %d", Renderer2D::GetIndexCount());
+			ImGui::Text("Quad Count: %d", Renderer2D::GetIndexCount() / 6);
+			ImGui::Text("Number of Draw Calls: %d", Renderer2D::GetNumberOfDrawCalls());
 			m_ProfileResults.clear();
 		}
 		void OnImGuiOverlayEvent(Ref<Input::Event>& e)
