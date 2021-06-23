@@ -27,7 +27,7 @@ namespace AnorEngine
 				return;
 			}
 
-			Renderer2D::Submit(m_Position, {m_Size , m_Size}, m_Color);
+			Renderer2D::Submit(m_Position, { m_Size , m_Size }, m_Color);
 			m_Color.a -= (elapsedTime / m_LifeTime) * (m_Color.a / pow(m_StartingAlphaValue, 3)) * deltaTime;
 			m_Position += glm::vec3(m_MoveDirection.x * (m_Speed* deltaTime), m_MoveDirection.y * (m_Speed* deltaTime), 0.0f);
 			m_Speed -= (elapsedTime / m_LifeTime) * (m_Speed * m_InitialSpeed) * deltaTime;

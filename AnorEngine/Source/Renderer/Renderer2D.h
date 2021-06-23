@@ -15,7 +15,7 @@ namespace AnorEngine
 			static void Clear();
 			static void Shutdown();
 			static void DrawPrimitive(const Ref<VertexArray> vertexArray, const Ref<Shader> shader, const glm::mat4& modelMatrix, const glm::vec4& color, const Ref<Texture> texture = nullptr);
-			static void Submit(const glm::vec3& position, const glm::vec2& size, const Ref<Texture> texture, const glm::vec4& color = { 1.0f, 1.0f, 1.0f, 1.0f });
+			static void Submit(const glm::vec3& position, const glm::vec2& size, const Ref<Texture> texture, const glm::vec4& color = { 1.0f, 1.0f, 1.0f, 1.0f }, float rotationDegree = 0.0f);
 			static void Submit(const glm::vec3& position, const glm::vec2& size, const glm::vec4& color);
 			static void Flush();
 			static void BeginScene(const Ref<OrthographicCamera> camera);

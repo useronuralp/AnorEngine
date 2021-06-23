@@ -14,7 +14,7 @@ namespace Game
 	public:
 		virtual void OnUpdate(float deltaTime) override
 		{	
-			Renderer2D::Submit({0.0f, 0.0f, 0.0f}, {1.0f, 1.0f}, m_Texture, m_Color);
+			Renderer2D::Submit({0.0f, 0.0f, 0.0f}, {1.0f, 1.0f}, m_Texture, m_Color, 45.0f);
 		}
 		virtual void OnImGuiRender() override
 		{
