@@ -47,7 +47,7 @@ namespace AnorEngine
 		ParticleSystem::ParticleSystem(ParticleProperties properties)
 			:m_Properties(properties)
 		{
-			m_StartPosition = m_Properties.StartPosition;
+			m_EmissionPoint = m_Properties.EmissionPoint;
 		}
 
 		void ParticleSystem::CreateParticles(int count)
@@ -61,14 +61,14 @@ namespace AnorEngine
 				particle->m_Speed = m_Properties.Speed;
 				particle->m_InitialSpeed = m_Properties.Speed;
 				particle->m_StartingAlphaValue = m_Properties.Color.a;
-				particle->m_Position.x += m_StartPosition.x;
-				particle->m_Position.y += m_StartPosition.y;
+				particle->m_Position.x += m_EmissionPoint.x;
+				particle->m_Position.y += m_EmissionPoint.y;
 				particle->m_Position.z = 0.0f;
 				particle->RandomizeParticle();
 				m_Particles.push_back(particle);
 			}
 		}
-		void ParticleSystem::OnUpdate(float deltaTime)
+		void ParticleSystem::OnUpdate(const float& deltaTime)
 		{
 			for (int i = 0; i < m_Particles.size(); i++)
 			{
@@ -79,6 +79,11 @@ namespace AnorEngine
 				}
 				m_Particles[i]->OnUpdate(deltaTime);
 			}
+		}
+		void ParticleSystem::SetEmissionPoint(const float& x, const float& y)
+		{
+			m_EmissionPoint.x = x;
+			m_EmissionPoint.y = y;
 		}
 	}
 }

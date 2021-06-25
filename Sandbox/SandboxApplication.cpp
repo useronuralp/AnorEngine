@@ -167,7 +167,7 @@ namespace Game
 			particleProperties.LifeTime = 8.0f;
 			particleProperties.Size = 0.3f;
 			particleProperties.Speed = 10.0f;
-			particleProperties.StartPosition = { -3.0f, 0.0f,0.0f };
+			particleProperties.EmissionPoint = { -3.0f, 0.0f,0.0f };
 			m_ParticleSystem = std::make_shared<ParticleSystem>(particleProperties);
 			//Layer insertion
 			PushLayer(m_Layer3);
@@ -250,6 +250,11 @@ namespace Game
 				}
 				//Passing every single event that I get from the OpenGLWindow to this controller. Will change.
 				m_OrthoGraphicCameraController->OnEvent(e);
+			}
+			if (e->GetEventType() == Input::EventType::MouseMoveEvent)
+			{
+				auto ev = std::static_pointer_cast<Input::MouseMoveEvent>(e);
+				m_ParticleSystem->SetEmissionPoint(((ev->GetMouseXPosition()) / 1280.0f - 0.5f) * m_OrthoGraphicCameraController->GetAspectRatio() / 0.45f , -((ev->GetMouseYPosition()) / 720.0f - 0.5f) * m_OrthoGraphicCameraController->GetAspectRatio() / 0.8f);
 			}
 		}
 		virtual void OnWindowResizeEvent(Ref<Input::WindowResizeEvent> e) override

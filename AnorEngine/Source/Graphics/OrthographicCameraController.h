@@ -11,6 +11,7 @@ namespace AnorEngine
 			OrthographicCameraController(Ref<OrthographicCamera> camera, float aspectRatio);
 			void OnUpdate(float deltaTime);
 			void OnEvent(Ref<Input::Event> e);
+			float GetAspectRatio() { return m_AspectRatio * m_ZoomLevel; }
 		private:
 			bool OnResizeEvent(Ref<Input::WindowResizeEvent> e);
 			bool OnMouseScrollEvent(Ref<Input::MouseScrollEvent> e);

@@ -12,7 +12,7 @@ namespace AnorEngine
 			float								  Speed;
 			float								  LifeTime;
 			float								  Size;
-			glm::vec3							  StartPosition;
+			glm::vec3							  EmissionPoint;
 			glm::vec4							  Color;
 		};
 		class ANOR_API Particle
@@ -39,13 +39,14 @@ namespace AnorEngine
 		class ANOR_API ParticleSystem
 		{
 			ParticleProperties m_Properties;
-			glm::vec3 m_StartPosition = {0.0f, 0.0f, 0.0f};
+			glm::vec3 m_EmissionPoint = {0.0f, 0.0f, 0.0f};
 			std::vector<Ref<Particle>> m_Particles;
 		public:
 			ParticleSystem(ParticleProperties properties);
 		public:
 			void CreateParticles(int count);
-			void OnUpdate(float deltaTime);
+			void OnUpdate(const float& deltaTime);
+			void SetEmissionPoint(const float& x, const float& y);
 			//void OnImGui();
 		};
 	}

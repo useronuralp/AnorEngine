@@ -4,7 +4,7 @@ namespace AnorEngine
 {
 	namespace Graphics
 	{
-		struct QuadVertex //Attributes of each vertex. If you want to extend the attributes, you have to add it in here and extend the BufferLayout as well.
+		struct QuadVertex //Attributes of each vertex. If you want to extend the attributes, you have to add it in here and extend the BufferLayout accordingly as well.
 		{
 			glm::vec3 Position;
 			glm::vec4 Color;
@@ -33,7 +33,7 @@ namespace AnorEngine
 			std::array<Ref<Texture>, MaxTextureSlots> TextureSlots;
 			uint32_t								  TextureSlotIndex = 1; // 0 = white texture;
 
-			glm::vec4								  QuadVertexPositions[4];
+			glm::vec4								  QuadVertexPositions[4] = {};
 			uint32_t								  NumberOfDrawCalls = 0;
 		};
 
@@ -142,7 +142,7 @@ namespace AnorEngine
 		{
 
 			//Check if the max buffer data size was exceeded. If that was the case then render the current buffer on hand and start a new batch.
-			//TODO: You should make this if check in a more readable way.
+			//TODO: You should make this if check more readable.
 			if ((uint8_t*)s_Data.QuadVertexBufferPtr - (uint8_t*)s_Data.QuadVertexBufferBase == Renderer2DData::MaxQuads * sizeof(QuadVertex))
 			{
 				EndScene();
@@ -201,6 +201,7 @@ namespace AnorEngine
 			s_Data.QuadIndexCount += 6;
 		}
 		//This Submit function is for when you don't want to submit a texture and draw using only a color.
+		//TODO::Add rotation to this.
 		void Renderer2D::Submit(const glm::vec3& position, const glm::vec2& size, const glm::vec4& color)
 		{
 			if ((uint8_t*)s_Data.QuadVertexBufferPtr - (uint8_t*)s_Data.QuadVertexBufferBase == Renderer2DData::MaxQuads * sizeof(QuadVertex))
