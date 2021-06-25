@@ -200,6 +200,64 @@ namespace AnorEngine
 
 			s_Data.QuadIndexCount += 6;
 		}
+
+		void Renderer2D::Submit(const glm::vec3& position, const glm::vec2& size, const Ref<Texture> texture, const glm::vec2& subTextureOffset, const glm::vec2& spriteDimensions, const glm::vec4& color, float rotationDegree)
+		{
+			//The bottom left corner of the texture atlas is considered to be (0,0). 
+			//And the the subTextureOffset parameter in this function defines how many cells of size cellSize you need to offset in order to grab the texture you want from the atlas.
+			if ((uint8_t*)s_Data.QuadVertexBufferPtr - (uint8_t*)s_Data.QuadVertexBufferBase == Renderer2DData::MaxQuads * sizeof(QuadVertex))
+			{
+				EndScene();
+				s_Data.QuadIndexCount = 0;
+				s_Data.QuadVertexBufferPtr = s_Data.QuadVertexBufferBase;
+				s_Data.TextureSlotIndex = 1;
+			}
+
+			float textureIndex = 0.0f;
+			for (uint32_t i = 1; i < s_Data.TextureSlotIndex; i++)
+			{
+				if (*s_Data.TextureSlots[i].get() == *texture.get())
+				{
+					textureIndex = (float)i;
+					break;
+				}
+			}
+			if (textureIndex == 0.0f)
+			{
+				textureIndex = (float)s_Data.TextureSlotIndex;
+				s_Data.TextureSlots[s_Data.TextureSlotIndex] = texture;
+				s_Data.TextureSlotIndex++;
+			}
+			glm::mat4 transform = glm::mat4(1.0f);
+			transform = glm::translate(glm::mat4(1.0f), position) * glm::rotate(glm::mat4(1.0f), glm::radians(rotationDegree), { 0.0f, 0.0f, 1.0f }) * glm::scale(glm::mat4(1.0f), { size.x, size.y, 1.0f });
+
+			s_Data.QuadVertexBufferPtr->Position = transform * s_Data.QuadVertexPositions[0];
+			s_Data.QuadVertexBufferPtr->Color = color;
+			s_Data.QuadVertexBufferPtr->TexCoord = { subTextureOffset.x * (spriteDimensions.x / texture->GetWidth()), subTextureOffset.y * (spriteDimensions.y / texture->GetHeight()) };
+			s_Data.QuadVertexBufferPtr->TexIndex = textureIndex;
+			s_Data.QuadVertexBufferPtr++;
+
+			s_Data.QuadVertexBufferPtr->Position = transform * s_Data.QuadVertexPositions[1];
+			s_Data.QuadVertexBufferPtr->Color = color;
+			s_Data.QuadVertexBufferPtr->TexCoord = { (subTextureOffset.x + size.x) * (spriteDimensions.x / texture->GetWidth()), subTextureOffset.y * (spriteDimensions.y / texture->GetHeight())};
+			s_Data.QuadVertexBufferPtr->TexIndex = textureIndex;
+			s_Data.QuadVertexBufferPtr++;
+
+			s_Data.QuadVertexBufferPtr->Position = transform * s_Data.QuadVertexPositions[2];
+			s_Data.QuadVertexBufferPtr->Color = color;
+			s_Data.QuadVertexBufferPtr->TexCoord = { (subTextureOffset.x + size.x) * (spriteDimensions.x / texture->GetWidth()), (subTextureOffset.y + size.y ) * (spriteDimensions.y / texture->GetHeight()) };
+			s_Data.QuadVertexBufferPtr->TexIndex = textureIndex;
+			s_Data.QuadVertexBufferPtr++;
+
+			s_Data.QuadVertexBufferPtr->Position = transform * s_Data.QuadVertexPositions[3];
+			s_Data.QuadVertexBufferPtr->Color = color;
+			s_Data.QuadVertexBufferPtr->TexCoord = { subTextureOffset.x * (spriteDimensions.x / texture->GetWidth()), (subTextureOffset.y + size.y) * (spriteDimensions.y / texture->GetHeight()) };
+			s_Data.QuadVertexBufferPtr->TexIndex = textureIndex;
+			s_Data.QuadVertexBufferPtr++;
+
+			s_Data.QuadIndexCount += 6;
+		}
+
 		//This Submit function is for when you don't want to submit a texture and draw using only a color.
 		//TODO::Add rotation to this.
 		void Renderer2D::Submit(const glm::vec3& position, const glm::vec2& size, const glm::vec4& color)

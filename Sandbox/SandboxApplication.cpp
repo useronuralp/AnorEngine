@@ -10,11 +10,11 @@ namespace Game
 	{
 		glm::vec4 m_Color = { 0,1,1,1 };
 		std::string solutionDir = __SOLUTION_DIR;
-		Ref<Texture> m_Texture = std::make_shared<Texture>(solutionDir + "AnorEngine\\Assets\\Textures\\minecraft-diamond.PNG");;
+		Ref<Texture> m_TextureAtlas = std::make_shared<Texture>(solutionDir + "AnorEngine\\Assets\\Textures\\PlatformerTextures\\Tilesheet\\platformPack_tilesheet@2.png");;
 	public:
 		virtual void OnUpdate(float deltaTime) override
 		{	
-			Renderer2D::Submit({0.0f, 0.0f, 0.0f}, {1.0f, 1.0f}, m_Texture, m_Color, 45.0f);
+			Renderer2D::Submit({ 0.0f, 0.0f, 0.0f }, { 2.0f, 1.0f }, m_TextureAtlas, { 9, 3 }, {128.0f, 128.0f});
 		}
 		virtual void OnImGuiRender() override
 		{
@@ -34,11 +34,11 @@ namespace Game
 	private:
 		glm::vec4 m_Color = { 0,1,0,1 };
 		std::string solutionDir = __SOLUTION_DIR;
-		Ref<Texture> m_Texture = std::make_shared<Texture>(solutionDir + "AnorEngine\\Assets\\Textures\\381f5a63791945.5abc4ccf1297d.PNG");;
+		Ref<Texture> m_Texture = std::make_shared<Texture>(solutionDir + "AnorEngine\\Assets\\Textures\\381f5a63791945.5abc4ccf1297d.png");
 	public:
 		virtual void OnUpdate(float deltaTime) override
 		{	
-			Renderer2D::Submit({ 1.0f, 1.0f, 0.0f }, { 1.0f, 1.0f }, m_Texture, m_Color);
+			Renderer2D::Submit({ 1.0f, 1.0f, 0.0f }, { 1.0f, 1.0f }, m_Texture);
 		}
 		virtual void OnImGuiRender() override
 		{
@@ -60,7 +60,7 @@ namespace Game
 		glm::vec3		 m_QuadPosition = { 2.0f, 3.0f, 0.0f };
 		float			 m_QuadMoveSpeed = 5.0f;
 		std::string solutionDir = __SOLUTION_DIR;
-		Ref<Texture> m_Texture = std::make_shared<Texture>(solutionDir + "AnorEngine\\Assets\\Textures\\sample_gigatextures_4096_seamless2.PNG");;
+		Ref<Texture> m_CharacterTextureAtlas = std::make_shared<Texture>(solutionDir + "AnorEngine\\Assets\\Textures\\PlatformerTextures\\Tilesheet\\platformerPack_character@2.png");;
 	public:
 		virtual void OnUpdate(float deltaTime) override
 		{
@@ -74,7 +74,7 @@ namespace Game
 			else if (Input::EventHandler::IsKeyDown(ANOR_KEY_L))
 				m_QuadPosition.x += m_QuadMoveSpeed * deltaTime;
 
-			Renderer2D::Submit(m_QuadPosition, {1.0f, 1.0f}, m_Texture, m_QuadColor);
+			Renderer2D::Submit(m_QuadPosition, { 1.0f, 1.0f }, m_CharacterTextureAtlas, { 0 ,1 }, {192.0f, 175.0f});
 		}
 		virtual void OnImGuiRender() override
 		{
@@ -157,7 +157,7 @@ namespace Game
 			m_ImGuiBase->Init(); // Need to call the initialization code for imgui here.
 			m_OrthoGraphicCameraController = std::make_shared<OrthographicCameraController>(m_OrthoCamera, (1280.0f / 720.0f));	
 			//Layer Creation--------------------------------------------------------------------------------------------
-			m_Layer = std::make_shared<ExampleLayer>();
+			m_Layer = std::make_shared<ExampleLayer>(); //PROBLEM READING THE DATA
 			m_Layer2 = std::make_shared<ExampleLayer2>();
 			m_Layer3 = std::make_shared<ExampleLayer3>();
 			m_Bg = std::make_shared<Background>();
@@ -188,7 +188,7 @@ namespace Game
 			while (!m_OpenGLWindow->IsClosed())
 			{	
 				float deltaTime = DeltaTime();
-				m_ParticleSystem->CreateParticles(3);
+				m_ParticleSystem->CreateParticles(1);
 				stop = true;
 
 				m_OrthoGraphicCameraController->OnUpdate(deltaTime);	

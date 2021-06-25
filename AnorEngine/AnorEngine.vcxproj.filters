@@ -334,6 +334,21 @@
     <Image Include="Assets\Textures\transparent.png">
       <Filter>Resource Files</Filter>
     </Image>
+    <Image Include="Assets\Textures\3840x2160 4K AESTHETIC Wallpaper wallpapers.jpg">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="Assets\Textures\retrowave.jpg">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="Assets\Textures\retro-wave-4k-zx.jpg">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="Assets\Textures\retroSquare.jpg">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="Assets\Textures\retro.png">
+      <Filter>Resource Files</Filter>
+    </Image>
   </ItemGroup>
   <ItemGroup>
     <Text Include="Assets\Models\Backpack\source_attribution.txt" />
