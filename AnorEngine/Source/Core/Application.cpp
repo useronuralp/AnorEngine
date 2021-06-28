@@ -30,7 +30,7 @@ namespace AnorEngine
 	{	
 		WARN("Application Destructor!!!");
 	}
-A	void Application::Close()
+	void Application::Close()
 	{
 		m_OpenGLWindow->Close();
 	}
