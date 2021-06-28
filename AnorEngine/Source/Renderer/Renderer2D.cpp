@@ -131,14 +131,14 @@ namespace AnorEngine
 			shader->UploadMat4("u_ModelMatrix", modelMatrix);
 			shader->UploadFloat4("u_Color", color);
 			if(texture != nullptr)
-				texture->Bind(0);
+				texture->Bind(0); //Binding the white texture.
 			glDrawElements(GL_TRIANGLES, vertexArray->GetIndexBuffer()->GetCount(), GL_UNSIGNED_INT, NULL);
 			if(texture != nullptr)
 				texture->Unbind();
 			vertexArray->Unbind();
 			shader->disable();
 		}
-		void Renderer2D::Submit(const glm::vec3& position, const glm::vec2& size, const Ref<Texture> texture, const glm::vec4& color, float rotationDegree)
+		void Renderer2D::Submit(const glm::vec3& position, const glm::vec2& size, const Ref<Texture> texture, float rotationDegree, const glm::vec4& tintColor)
 		{
 
 			//Check if the max buffer data size was exceeded. If that was the case then render the current buffer on hand and start a new batch.
@@ -175,25 +175,25 @@ namespace AnorEngine
 
 			//If you don't pass a color, the default value is white. We also set the Position value to the transform we get from above.
 			s_Data.QuadVertexBufferPtr->Position = transform * s_Data.QuadVertexPositions[0];
-			s_Data.QuadVertexBufferPtr->Color = color;
+			s_Data.QuadVertexBufferPtr->Color = tintColor;
 			s_Data.QuadVertexBufferPtr->TexCoord = { 0.0f, 0.0f };
 			s_Data.QuadVertexBufferPtr->TexIndex = textureIndex;
 			s_Data.QuadVertexBufferPtr++;
 
 			s_Data.QuadVertexBufferPtr->Position = transform * s_Data.QuadVertexPositions[1];
-			s_Data.QuadVertexBufferPtr->Color = color;
+			s_Data.QuadVertexBufferPtr->Color = tintColor;
 			s_Data.QuadVertexBufferPtr->TexCoord = { 1.0f, 0.0f };
 			s_Data.QuadVertexBufferPtr->TexIndex = textureIndex;
 			s_Data.QuadVertexBufferPtr++;
 
 			s_Data.QuadVertexBufferPtr->Position = transform * s_Data.QuadVertexPositions[2];
-			s_Data.QuadVertexBufferPtr->Color = color;
+			s_Data.QuadVertexBufferPtr->Color = tintColor;
 			s_Data.QuadVertexBufferPtr->TexCoord = { 1.0f, 1.0f };
 			s_Data.QuadVertexBufferPtr->TexIndex = textureIndex;
 			s_Data.QuadVertexBufferPtr++;
 
 			s_Data.QuadVertexBufferPtr->Position = transform * s_Data.QuadVertexPositions[3];
-			s_Data.QuadVertexBufferPtr->Color = color;
+			s_Data.QuadVertexBufferPtr->Color = tintColor;
 			s_Data.QuadVertexBufferPtr->TexCoord = { 0.0f, 1.0f };
 			s_Data.QuadVertexBufferPtr->TexIndex = textureIndex;
 			s_Data.QuadVertexBufferPtr++;
@@ -201,7 +201,7 @@ namespace AnorEngine
 			s_Data.QuadIndexCount += 6;
 		}
 
-		void Renderer2D::Submit(const glm::vec3& position, const glm::vec2& size, const Ref<Texture> texture, const glm::vec2& subTextureOffset, const glm::vec2& spriteDimensions, const glm::vec4& color, float rotationDegree)
+		void Renderer2D::Submit(const glm::vec3& position, const glm::vec2& size, const Ref<Texture> texture, const glm::vec2& subTextureOffset, const glm::vec2& subTextureDimensions, float rotationDegree, const glm::vec4& tintColor)
 		{
 			//The bottom left corner of the texture atlas is considered to be (0,0). 
 			//And the the subTextureOffset parameter in this function defines how many cells of size cellSize you need to offset in order to grab the texture you want from the atlas.
@@ -232,26 +232,26 @@ namespace AnorEngine
 			transform = glm::translate(glm::mat4(1.0f), position) * glm::rotate(glm::mat4(1.0f), glm::radians(rotationDegree), { 0.0f, 0.0f, 1.0f }) * glm::scale(glm::mat4(1.0f), { size.x, size.y, 1.0f });
 
 			s_Data.QuadVertexBufferPtr->Position = transform * s_Data.QuadVertexPositions[0];
-			s_Data.QuadVertexBufferPtr->Color = color;
-			s_Data.QuadVertexBufferPtr->TexCoord = { subTextureOffset.x * (spriteDimensions.x / texture->GetWidth()), subTextureOffset.y * (spriteDimensions.y / texture->GetHeight()) };
+			s_Data.QuadVertexBufferPtr->Color = tintColor;
+			s_Data.QuadVertexBufferPtr->TexCoord = { subTextureOffset.x * (subTextureDimensions.x / texture->GetWidth()), subTextureOffset.y * (subTextureDimensions.y / texture->GetHeight()) };
 			s_Data.QuadVertexBufferPtr->TexIndex = textureIndex;
 			s_Data.QuadVertexBufferPtr++;
 
 			s_Data.QuadVertexBufferPtr->Position = transform * s_Data.QuadVertexPositions[1];
-			s_Data.QuadVertexBufferPtr->Color = color;
-			s_Data.QuadVertexBufferPtr->TexCoord = { (subTextureOffset.x + size.x) * (spriteDimensions.x / texture->GetWidth()), subTextureOffset.y * (spriteDimensions.y / texture->GetHeight())};
+			s_Data.QuadVertexBufferPtr->Color = tintColor;
+			s_Data.QuadVertexBufferPtr->TexCoord = { (subTextureOffset.x + size.x) * (subTextureDimensions.x / texture->GetWidth()), subTextureOffset.y * (subTextureDimensions.y / texture->GetHeight())};
 			s_Data.QuadVertexBufferPtr->TexIndex = textureIndex;
 			s_Data.QuadVertexBufferPtr++;
 
 			s_Data.QuadVertexBufferPtr->Position = transform * s_Data.QuadVertexPositions[2];
-			s_Data.QuadVertexBufferPtr->Color = color;
-			s_Data.QuadVertexBufferPtr->TexCoord = { (subTextureOffset.x + size.x) * (spriteDimensions.x / texture->GetWidth()), (subTextureOffset.y + size.y ) * (spriteDimensions.y / texture->GetHeight()) };
+			s_Data.QuadVertexBufferPtr->Color = tintColor;
+			s_Data.QuadVertexBufferPtr->TexCoord = { (subTextureOffset.x + size.x) * (subTextureDimensions.x / texture->GetWidth()), (subTextureOffset.y + size.y ) * (subTextureDimensions.y / texture->GetHeight()) };
 			s_Data.QuadVertexBufferPtr->TexIndex = textureIndex;
 			s_Data.QuadVertexBufferPtr++;
 
 			s_Data.QuadVertexBufferPtr->Position = transform * s_Data.QuadVertexPositions[3];
-			s_Data.QuadVertexBufferPtr->Color = color;
-			s_Data.QuadVertexBufferPtr->TexCoord = { subTextureOffset.x * (spriteDimensions.x / texture->GetWidth()), (subTextureOffset.y + size.y) * (spriteDimensions.y / texture->GetHeight()) };
+			s_Data.QuadVertexBufferPtr->Color = tintColor;
+			s_Data.QuadVertexBufferPtr->TexCoord = { subTextureOffset.x * (subTextureDimensions.x / texture->GetWidth()), (subTextureOffset.y + size.y) * (subTextureDimensions.y / texture->GetHeight()) };
 			s_Data.QuadVertexBufferPtr->TexIndex = textureIndex;
 			s_Data.QuadVertexBufferPtr++;
 
