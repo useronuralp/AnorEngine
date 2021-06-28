@@ -162,6 +162,11 @@ namespace AnorEngine {
 			//indicating that the window should be closed.
 		}
 
+		void OpenGLWindow::Close()
+		{
+			glfwTerminate();
+		}
+
 		void OpenGLWindow::drawRightAngledTriangle()
 		{	
 			//Legacy OpenGL, this is an old way of drawing stuff on the screen.

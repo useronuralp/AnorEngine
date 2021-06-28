@@ -20,6 +20,7 @@ namespace AnorEngine {
 			OpenGLWindow(const char* name, int width, int height);
 			~OpenGLWindow();
 			void Clear() const;
+			void Close();
 			void Update();
 			bool IsClosed() const;
 			void drawRightAngledTriangle();

@@ -30,6 +30,10 @@ namespace AnorEngine
 	{	
 		WARN("Application Destructor!!!");
 	}
+A	void Application::Close()
+	{
+		m_OpenGLWindow->Close();
+	}
 	void Application::LogInfoDebug()
 	{
 		WARN("APP::{0}", "Application Default Constructor!!");
