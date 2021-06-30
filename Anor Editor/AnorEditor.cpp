@@ -240,9 +240,10 @@ namespace Game
 				ImGui::Text("Number of Draw Calls: %d", Renderer2D::GetNumberOfDrawCalls());
 				ImGui::Text("Viewport Size: %.0lf, %.0lf", m_Framebuffer->GetDimensions().x, m_Framebuffer->GetDimensions().y);
 				ImGui::End();
-
+				//Frames of the game will be rendered to this panel. Every frame will be rendered to a framebuffer and ImGui will read that data in here and render it to the viewport window as a texture. 
 				ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0, 0));
 				ImGui::Begin("Viewport");
+				//Saving the viewport size in these member variables.
 				m_ViewportSize.x = ImGui::GetContentRegionAvail().x;
 				m_ViewportSize.y = ImGui::GetContentRegionAvail().y;
 				uint32_t texture = m_Framebuffer->GetColorAttachmentID();
@@ -251,7 +252,8 @@ namespace Game
 				ImGui::PopStyleVar();
 				m_ImGuiBase->End(); //-----------------------ImGui END -------------------------------
 
-				//Setting up the framebuffer for the next frame.
+				//Resizing the framebuffer if the ImGui panel happens to get resized. (Framebuffer and the panel sizes should be equal.)
+				//Try to resize the framebuffer at the end. Otherwise it causes weird flickering problems.
 				if (m_Framebuffer->GetDimensions().x != m_ViewportSize.x || m_Framebuffer->GetDimensions().y != m_ViewportSize.y)
 				{
 					m_Framebuffer->Resize(m_ViewportSize.x, m_ViewportSize.y);
@@ -385,9 +387,6 @@ namespace Game
 		{
 			//Add OnDetach();
 			m_LayerStack.popLayer();
-		}
-		void ProcessMovementInput() //TODO:Remove
-		{
 		}
 		float DeltaTime()
 		{
