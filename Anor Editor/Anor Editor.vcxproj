@@ -21,9 +21,10 @@
   <PropertyGroup Label="Globals">
     <VCProjectVersion>16.0</VCProjectVersion>
     <Keyword>Win32Proj</Keyword>
-    <ProjectGuid>{8b41e46e-34cd-4f6c-aaa4-dd9ca2c25121}</ProjectGuid>
-    <RootNamespace>Sandbox</RootNamespace>
+    <ProjectGuid>{9f2fcbd7-07eb-4450-a76f-d52e67e3eec6}</ProjectGuid>
+    <RootNamespace>AnorEditor</RootNamespace>
     <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
+    <ProjectName>AnorEditor</ProjectName>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
@@ -79,16 +80,16 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LinkIncremental>true</LinkIncremental>
     <IncludePath>$(SolutionDir)AnorEngine\Source;$(SolutionDir)Dependencies\GLM;$(SolutionDir)Dependencies\FreeImage\include;$(SolutionDir)Dependencies\GLEW\include;$(SolutionDir)Dependencies\GLFW\includex64;$(SolutionDir)Dependencies\Assimp\include;$(SolutionDir)AnorEngine\Vendor\spdlog-1.x\include;$(SolutionDir)AnorEngine\Vendor\imgui;$(IncludePath)</IncludePath>
+    <LibraryPath>$(SolutionDir)Dependencies\FreeImage\lib;$(SolutionDir)Dependencies\GLEW\lib\x64;$(SolutionDir)Dependencies\GLFW\lib-vc2019x64;$(SolutionDir)Dependencies\Assimp\lib;$(LibraryPath)</LibraryPath>
     <OutDir>$(SolutionDir)bin\$(ProjectName)_$(Configuration)_$(Platform)</OutDir>
     <IntDir>$(SolutionDir)IntermediateFiles\$(ProjectName)_$(Configuration)_$(Platform)</IntDir>
-    <LibraryPath>$(SolutionDir)Dependencies\FreeImage\lib;$(SolutionDir)Dependencies\GLEW\lib\x64;$(SolutionDir)Dependencies\GLFW\lib-vc2019x64;$(SolutionDir)Dependencies\Assimp\lib;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LinkIncremental>false</LinkIncremental>
     <IncludePath>$(SolutionDir)AnorEngine\Source;$(SolutionDir)Dependencies\GLM;$(SolutionDir)Dependencies\FreeImage\include;$(SolutionDir)Dependencies\GLEW\include;$(SolutionDir)Dependencies\GLFW\includex64;$(SolutionDir)Dependencies\Assimp\include;$(SolutionDir)AnorEngine\Vendor\spdlog-1.x\include;$(SolutionDir)AnorEngine\Vendor\imgui;$(IncludePath)</IncludePath>
+    <LibraryPath>$(SolutionDir)Dependencies\FreeImage\lib;$(SolutionDir)Dependencies\GLEW\lib\x64;$(SolutionDir)Dependencies\GLFW\lib-vc2019x64;$(SolutionDir)Dependencies\Assimp\lib;$(LibraryPath)</LibraryPath>
     <OutDir>$(SolutionDir)bin\$(ProjectName)_$(Configuration)_$(Platform)</OutDir>
     <IntDir>$(SolutionDir)IntermediateFiles\$(ProjectName)_$(Configuration)_$(Platform)</IntDir>
-    <LibraryPath>$(SolutionDir)Dependencies\FreeImage\lib;$(SolutionDir)Dependencies\GLEW\lib\x64;$(SolutionDir)Dependencies\GLFW\lib-vc2019x64;$(SolutionDir)Dependencies\Assimp\lib;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -149,7 +150,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="SandboxApplication.cpp" />
+    <ClCompile Include="AnorEditor.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\AnorEngine\AnorEngine.vcxproj">

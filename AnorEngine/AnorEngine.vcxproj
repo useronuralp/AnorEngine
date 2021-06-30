@@ -84,13 +84,13 @@
     <LinkIncremental>true</LinkIncremental>
     <IncludePath>$(SolutionDir)AnorEngine\Source;$(SolutionDir)Dependencies\GLM;$(SolutionDir)Dependencies\FreeImage\include;$(SolutionDir)Dependencies\GLEW\include;$(SolutionDir)Dependencies\GLFW\includex64;$(SolutionDir)Dependencies\Assimp\include;$(SolutionDir)AnorEngine\Vendor\spdlog-1.x\include;$(SolutionDir)AnorEngine\Vendor\imgui;$(IncludePath)</IncludePath>
     <LibraryPath>$(SolutionDir)Dependencies\FreeImage\lib;$(SolutionDir)Dependencies\GLEW\lib\x64;$(SolutionDir)Dependencies\GLFW\lib-vc2019x64;$(SolutionDir)Dependencies\Assimp\lib;$(LibraryPath)</LibraryPath>
-    <IntDir>$(SolutionDir)bin-int\$(Configuration)_$(Platform)-$(ProjectName)_int</IntDir>
-    <OutDir>$(SolutionDir)bin\$(Configuration)_$(Platform)-$(ProjectName)</OutDir>
+    <IntDir>$(SolutionDir)IntermediateFiles\$(ProjectName)_$(Configuration)_$(Platform)</IntDir>
+    <OutDir>$(SolutionDir)bin\$(ProjectName)_$(Configuration)_$(Platform)</OutDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LinkIncremental>false</LinkIncremental>
-    <OutDir>$(SolutionDir)bin\$(Configuration)_$(Platform)-$(ProjectName)</OutDir>
-    <IntDir>$(SolutionDir)bin-int\$(Configuration)_$(Platform)-$(ProjectName)_int</IntDir>
+    <OutDir>$(SolutionDir)bin\$(ProjectName)_$(Configuration)_$(Platform)</OutDir>
+    <IntDir>$(SolutionDir)IntermediateFiles\$(ProjectName)_$(Configuration)_$(Platform)</IntDir>
     <IncludePath>$(SolutionDir)AnorEngine\Source;$(SolutionDir)Dependencies\GLM;$(SolutionDir)Dependencies\FreeImage\include;$(SolutionDir)Dependencies\GLEW\include;$(SolutionDir)Dependencies\GLFW\includex64;$(SolutionDir)Dependencies\Assimp\include;$(SolutionDir)AnorEngine\Vendor\spdlog-1.x\include;$(SolutionDir)AnorEngine\Vendor\imgui;$(IncludePath)</IncludePath>
     <LibraryPath>$(SolutionDir)Dependencies\FreeImage\lib;$(SolutionDir)Dependencies\GLEW\lib\x64;$(SolutionDir)Dependencies\GLFW\lib-vc2019x64;$(SolutionDir)Dependencies\Assimp\lib;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
@@ -176,6 +176,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="Source\Core\Application.cpp" />
+    <ClCompile Include="Source\Graphics\Framebuffer.cpp" />
     <ClCompile Include="Source\Utility\Timer.cpp" />
     <ClCompile Include="Source\Graphics\ParticleSystem.cpp" />
     <ClCompile Include="Source\pch.cpp">
@@ -224,6 +225,7 @@
     <ClInclude Include="Source\Core\EngineInitializer.h" />
     <ClInclude Include="Source\Core\EntryPoint.h" />
     <ClInclude Include="Source\Core\MouseButtonCodes.h" />
+    <ClInclude Include="Source\Graphics\Framebuffer.h" />
     <ClInclude Include="Source\Utility\Timer.h" />
     <ClInclude Include="Source\Events\Event.h" />
     <ClInclude Include="Source\Events\EventHandler.h" />

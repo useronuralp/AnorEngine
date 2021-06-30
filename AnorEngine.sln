@@ -10,6 +10,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Sandbox", "Sandbox\Sandbox.
 		{B5BB4A7B-BDA7-4F07-A147-4C8D7333A707} = {B5BB4A7B-BDA7-4F07-A147-4C8D7333A707}
 	EndProjectSection
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Anor Editor", "Anor Editor\Anor Editor.vcxproj", "{9F2FCBD7-07EB-4450-A76F-D52E67E3EEC6}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -34,6 +36,14 @@ Global
 		{8B41E46E-34CD-4F6C-AAA4-DD9CA2C25121}.Release|x64.Build.0 = Release|x64
 		{8B41E46E-34CD-4F6C-AAA4-DD9CA2C25121}.Release|x86.ActiveCfg = Release|Win32
 		{8B41E46E-34CD-4F6C-AAA4-DD9CA2C25121}.Release|x86.Build.0 = Release|Win32
+		{9F2FCBD7-07EB-4450-A76F-D52E67E3EEC6}.Debug|x64.ActiveCfg = Debug|x64
+		{9F2FCBD7-07EB-4450-A76F-D52E67E3EEC6}.Debug|x64.Build.0 = Debug|x64
+		{9F2FCBD7-07EB-4450-A76F-D52E67E3EEC6}.Debug|x86.ActiveCfg = Debug|Win32
+		{9F2FCBD7-07EB-4450-A76F-D52E67E3EEC6}.Debug|x86.Build.0 = Debug|Win32
+		{9F2FCBD7-07EB-4450-A76F-D52E67E3EEC6}.Release|x64.ActiveCfg = Release|x64
+		{9F2FCBD7-07EB-4450-A76F-D52E67E3EEC6}.Release|x64.Build.0 = Release|x64
+		{9F2FCBD7-07EB-4450-A76F-D52E67E3EEC6}.Release|x86.ActiveCfg = Release|Win32
+		{9F2FCBD7-07EB-4450-A76F-D52E67E3EEC6}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
