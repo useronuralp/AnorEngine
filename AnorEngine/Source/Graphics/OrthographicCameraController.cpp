@@ -4,11 +4,12 @@ namespace AnorEngine {
 	namespace Graphics
 	{
 		OrthographicCameraController::OrthographicCameraController(Ref<OrthographicCamera> camera, float aspectRatio)
-			:m_Camera(camera), m_AspectRatio(aspectRatio)
+			:m_Camera(camera), m_AspectRatio(aspectRatio), m_Bounds({ -aspectRatio * m_ZoomLevel, aspectRatio * m_ZoomLevel, -m_ZoomLevel, m_ZoomLevel })
 		{
 		}
 		void OrthographicCameraController::OnUpdate(float deltaTime)
 		{
+
 			m_CameraTranslationSpeed = m_ZoomLevel; //liner curve to smooth out the translation a little bit
 			if (Input::EventHandler::IsKeyDown(ANOR_KEY_W))
 			{
@@ -26,7 +27,6 @@ namespace AnorEngine {
 			{
 				m_CameraPos.x += m_CameraTranslationSpeed * deltaTime;
 			}
-
 			m_Camera->SetPosition(m_CameraPos);
 		}
 		void OrthographicCameraController::OnEvent(Ref<Input::Event> e)
@@ -43,14 +43,16 @@ namespace AnorEngine {
 		bool OrthographicCameraController::OnResizeEvent(Ref<Input::WindowResizeEvent> e)
 		{	
 			m_AspectRatio = (float)e->GetWidth() / (float)e->GetHeight();
-			m_Camera->SetProjectionMatrix(-m_AspectRatio * m_ZoomLevel, m_AspectRatio * m_ZoomLevel, -m_ZoomLevel, m_ZoomLevel);
+			m_Bounds = { -m_AspectRatio * m_ZoomLevel, m_AspectRatio * m_ZoomLevel, -m_ZoomLevel, m_ZoomLevel };
+			m_Camera->SetProjectionMatrix(m_Bounds.Left, m_Bounds.Right, m_Bounds.Bottom, m_Bounds.Top);
 			return false;
 		}
 		bool OrthographicCameraController::OnMouseScrollEvent(Ref<Input::MouseScrollEvent> e)
 		{
 			m_ZoomLevel -= e->GetYOffset() * 0.15f;
 			m_ZoomLevel = std::max(m_ZoomLevel, 0.25f);
-			m_Camera->SetProjectionMatrix(-m_AspectRatio * m_ZoomLevel, m_AspectRatio * m_ZoomLevel, -m_ZoomLevel, m_ZoomLevel);
+			m_Bounds = { -m_AspectRatio * m_ZoomLevel, m_AspectRatio * m_ZoomLevel, -m_ZoomLevel, m_ZoomLevel };
+			m_Camera->SetProjectionMatrix(m_Bounds.Left, m_Bounds.Right, m_Bounds.Bottom, m_Bounds.Top);
 			return false;
 		}
 	}

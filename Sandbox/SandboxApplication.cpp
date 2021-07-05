@@ -177,7 +177,6 @@ namespace Game
 			PushLayer(m_Layer2);
 			PushLayer(m_Layer);
 			PushLayer(m_Bg);
-			LogInfoDebug();
 		}
 	protected:
 		virtual ~SandboxApp2D()
@@ -239,8 +238,7 @@ namespace Game
 				m_ImGuiBase->End(); //-----------------------ImGui END -------------------------------
 
 				m_ProfileResults.clear();
-				m_OpenGLWindow->Update();
-				
+				m_OpenGLWindow->Update();			
 			}
 		}
 		virtual void OnEvent(Ref<Input::Event> e) override
@@ -258,7 +256,11 @@ namespace Game
 			{
 				if (e->GetEventType() == Input::EventType::WindowResizeEvent)
 				{
-					OnWindowResizeEvent(std::static_pointer_cast<Input::WindowResizeEvent>(e));
+					auto castEvent = std::static_pointer_cast<Input::WindowResizeEvent>(e);
+					if (castEvent->GetHeight() == 0 || castEvent->GetWidth() == 0)
+						m_Minimized = true;
+					else if (castEvent->GetHeight() > 0 || castEvent->GetWidth() > 0)
+						m_Minimized = false;
 				}
 				//Passing every single event that I get from the OpenGLWindow to this controller. Will change.
 				m_OrthoGraphicCameraController->OnEvent(e);
@@ -266,19 +268,14 @@ namespace Game
 			if (e->GetEventType() == Input::EventType::MouseMoveEvent)
 			{
 				auto ev = std::static_pointer_cast<Input::MouseMoveEvent>(e);
-				m_ParticleSystem->SetEmissionPoint(((ev->GetMouseXPosition()) / 1280.0f - 0.5f) * m_OrthoGraphicCameraController->GetAspectRatio() / 0.45f , -((ev->GetMouseYPosition()) / 720.0f - 0.5f) * m_OrthoGraphicCameraController->GetAspectRatio() / 0.8f);
+				float x = ev->GetMouseXPosition();
+				float y = ev->GetMouseYPosition();
+				auto bounds = m_OrthoGraphicCameraController->GetBounds();
+				int width, height;
+				m_OpenGLWindow->GetWindowSize(&width, &height);
+				float aspectRatio = m_OrthoGraphicCameraController->GetAspectRatio();
+				m_ParticleSystem->SetEmissionPoint((x) / width * bounds.GetWidth() - bounds.GetWidth() * 0.5f, bounds.GetHeight() * 0.5f - (y) / height* bounds.GetHeight());
 			}
-		}
-		virtual void OnWindowResizeEvent(Ref<Input::WindowResizeEvent> e) override
-		{
-			if (e->GetHeight() == 0 || e->GetWidth() == 0)
-				m_Minimized = true;
-			else if (e->GetHeight() > 0 || e->GetWidth() > 0)
-				m_Minimized = false;
-		}
-		virtual void LogInfoDebug() override
-		{	
-			WARN("APP::{0}", "Custom sandbox application has been created!!");
 		}
 		void OnImGuiOverlayEvent(Ref<Input::Event>& e)
 		{
@@ -297,9 +294,6 @@ namespace Game
 		{
 			//Add OnDetach();
 			m_LayerStack.popLayer();
-		}
-		void ProcessMovementInput() //TODO:Remove
-		{	
 		}
 		float DeltaTime()
 		{

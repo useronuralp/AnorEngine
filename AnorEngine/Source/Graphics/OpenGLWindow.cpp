@@ -99,6 +99,11 @@ namespace AnorEngine {
 			glfwTerminate();
 		}
 
+		void OpenGLWindow::GetWindowSize(int* width, int* height)
+		{
+			glfwGetWindowSize(m_Window, width, height);
+		}
+
 		bool OpenGLWindow::init()
 		{		
 			if (!glfwInit()) //calling glfwInit() inside this if statement.

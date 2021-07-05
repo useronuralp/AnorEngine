@@ -30,6 +30,7 @@ namespace AnorEngine {
 			inline double  GetRenderTime() { return m_Time; }
 			inline void SetInputMode(int Mode, int Value) { glfwSetInputMode(m_Window, Mode, Value); }
 			inline int GetInputMode(int Mode) { return glfwGetInputMode(m_Window, Mode); }
+			void GetWindowSize(int* width, int* height);
 		private:
 			bool init();
 		private:

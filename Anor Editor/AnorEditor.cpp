@@ -149,8 +149,10 @@ namespace Game
 		float							  m_CameraSpeed = 1;
 		float							  m_LastFrameRenderTime;
 		bool							  m_Minimized = false;
+		bool							  m_ViewportHovered = false;
+		bool							  m_ViewportFocused = false;
+		bool							  m_BlockEvents = false;
 		std::vector<ProfileResult>		  m_ProfileResults;
-		//--------------------------------------------------------------------
 		std::string solutionDir = __SOLUTION_DIR;
 	public:
 		AnorEditor(const char* appName)
@@ -195,8 +197,10 @@ namespace Game
 			while (!m_OpenGLWindow->IsClosed())
 			{
 				float deltaTime = DeltaTime();
-				m_ParticleSystem->CreateParticles(1);
-				m_OrthoGraphicCameraController->OnUpdate(deltaTime);
+				m_ParticleSystem->CreateParticles(3);
+
+				if(m_ViewportFocused)
+					m_OrthoGraphicCameraController->OnUpdate(deltaTime);
 
 				m_Framebuffer->Bind();
 				Renderer2D::BeginScene(m_OrthoCamera);
@@ -223,6 +227,7 @@ namespace Game
 				}
 				m_ImGuiBase->Begin(); //-----------------------ImGui Beginning-------------------------
 				OnImGuiOverlayRender();
+
 				ImGui::Begin("Settings");
 				for (Ref<Layer> layer : m_LayerStack)
 				{
@@ -240,10 +245,14 @@ namespace Game
 				ImGui::Text("Number of Draw Calls: %d", Renderer2D::GetNumberOfDrawCalls());
 				ImGui::Text("Viewport Size: %.0lf, %.0lf", m_Framebuffer->GetDimensions().x, m_Framebuffer->GetDimensions().y);
 				ImGui::End();
-				//Frames of the game will be rendered to this panel. Every frame will be rendered to a framebuffer and ImGui will read that data in here and render it to the viewport window as a texture. 
+
+				//Frames of the scene will be rendered to this panel. Every frame will be rendered to a framebuffer and ImGui will read that data in here and render it to one of its viewport window objects as a texture. 
 				ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0, 0));
 				ImGui::Begin("Viewport");
-				//Saving the viewport size in these member variables.
+				m_ViewportFocused = ImGui::IsWindowFocused();
+				m_ViewportHovered = ImGui::IsWindowHovered();
+				m_BlockEvents = !m_ViewportFocused || !m_ViewportHovered;
+				//Saving the viewport size in m_ViewportSize.
 				m_ViewportSize.x = ImGui::GetContentRegionAvail().x;
 				m_ViewportSize.y = ImGui::GetContentRegionAvail().y;
 				uint32_t texture = m_Framebuffer->GetColorAttachmentID();
@@ -265,6 +274,8 @@ namespace Game
 		virtual void OnEvent(Ref<Input::Event> e) override
 		{
 			e->Log();
+			if (m_BlockEvents)
+				e->m_Handled = true;
 			//Propogating the recieved event to layers.
 			//One of the layers can set the 'm_Handled' value of an event to true so that further propogation is prevented.
 			if (!e->m_Handled)
@@ -286,7 +297,15 @@ namespace Game
 				if (e->GetEventType() == Input::EventType::MouseMoveEvent)
 				{
 					auto ev = std::static_pointer_cast<Input::MouseMoveEvent>(e);
-					m_ParticleSystem->SetEmissionPoint(((ev->GetMouseXPosition()) / 1280.0f - 0.5f) * m_OrthoGraphicCameraController->GetAspectRatio() / 0.45f, -((ev->GetMouseYPosition()) / 720.0f - 0.5f) * m_OrthoGraphicCameraController->GetAspectRatio() / 0.8f);
+					float x = ev->GetMouseXPosition();
+					float y = ev->GetMouseYPosition();
+					auto bounds = m_OrthoGraphicCameraController->GetBounds();
+					int width, height;
+					m_OpenGLWindow->GetWindowSize(&width, &height);
+					float xoffset = width - m_ViewportSize.x;
+					float yoffset = height - m_ViewportSize.y;
+					float aspectRatio = m_OrthoGraphicCameraController->GetAspectRatio();
+					m_ParticleSystem->SetEmissionPoint((x - xoffset) / m_ViewportSize.x * bounds.GetWidth() - bounds.GetWidth() * 0.5f, bounds.GetHeight() * 0.5f - (y - yoffset) / m_ViewportSize.y * bounds.GetHeight());
 				}
 			}
 		}
