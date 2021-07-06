@@ -30,10 +30,10 @@ namespace AnorEngine
 			glm::vec4									   m_Color;
 			std::chrono::system_clock::time_point	       m_LifeStartTime;
 		public:
-			Particle();
+			Particle();													
 		private:
-			void RandomizeParticle();
-			void OnUpdate(float deltaTime);
+			   void RandomizeParticle();
+			   void OnUpdate(float deltaTime);
 		};
 
 		class ANOR_API ParticleSystem

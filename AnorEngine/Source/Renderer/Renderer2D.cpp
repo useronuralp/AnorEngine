@@ -140,7 +140,6 @@ namespace AnorEngine
 		}
 		void Renderer2D::Submit(const glm::vec3& position, const glm::vec2& size, const Ref<Texture> texture, float rotationDegree, const glm::vec4& tintColor)
 		{
-
 			//Check if the max buffer data size was exceeded. If that was the case then render the current buffer on hand and start a new batch.
 			//TODO: You should make this if check more readable.
 			if ((uint8_t*)s_Data.QuadVertexBufferPtr - (uint8_t*)s_Data.QuadVertexBufferBase == Renderer2DData::MaxQuads * sizeof(QuadVertex))
@@ -292,6 +291,154 @@ namespace AnorEngine
 			s_Data.QuadVertexBufferPtr->Color = color;
 			s_Data.QuadVertexBufferPtr->TexCoord = { 0.0f, 1.0f };
 			s_Data.QuadVertexBufferPtr->TexIndex = 0.0f;
+			s_Data.QuadVertexBufferPtr++;
+
+			s_Data.QuadIndexCount += 6;
+		}
+
+		void Renderer2D::Submit(const glm::mat4& transform, glm::vec4& color)
+		{
+			if ((uint8_t*)s_Data.QuadVertexBufferPtr - (uint8_t*)s_Data.QuadVertexBufferBase == Renderer2DData::MaxQuads * sizeof(QuadVertex))
+			{
+				EndScene();
+				s_Data.QuadIndexCount = 0;
+				s_Data.QuadVertexBufferPtr = s_Data.QuadVertexBufferBase;
+				s_Data.TextureSlotIndex = 1;
+			}
+
+			s_Data.QuadVertexBufferPtr->Position = transform * s_Data.QuadVertexPositions[0];
+			s_Data.QuadVertexBufferPtr->Color = color;
+			s_Data.QuadVertexBufferPtr->TexCoord = { 0.0f, 0.0f };
+			s_Data.QuadVertexBufferPtr->TexIndex = 0.0f;
+			s_Data.QuadVertexBufferPtr++;
+
+			s_Data.QuadVertexBufferPtr->Position = transform * s_Data.QuadVertexPositions[1];
+			s_Data.QuadVertexBufferPtr->Color = color;
+			s_Data.QuadVertexBufferPtr->TexCoord = { 1.0f, 0.0f };
+			s_Data.QuadVertexBufferPtr->TexIndex = 0.0f;
+			s_Data.QuadVertexBufferPtr++;
+
+			s_Data.QuadVertexBufferPtr->Position = transform * s_Data.QuadVertexPositions[2];
+			s_Data.QuadVertexBufferPtr->Color = color;
+			s_Data.QuadVertexBufferPtr->TexCoord = { 1.0f, 1.0f };
+			s_Data.QuadVertexBufferPtr->TexIndex = 0.0f;
+			s_Data.QuadVertexBufferPtr++;
+
+			s_Data.QuadVertexBufferPtr->Position = transform * s_Data.QuadVertexPositions[3];
+			s_Data.QuadVertexBufferPtr->Color = color;
+			s_Data.QuadVertexBufferPtr->TexCoord = { 0.0f, 1.0f };
+			s_Data.QuadVertexBufferPtr->TexIndex = 0.0f;
+			s_Data.QuadVertexBufferPtr++;
+
+			s_Data.QuadIndexCount += 6;
+		}
+
+		void Renderer2D::Submit(const glm::mat4& transform, const Ref<Texture> texture, float rotationDegree, const glm::vec4& tintColor)
+		{
+			if ((uint8_t*)s_Data.QuadVertexBufferPtr - (uint8_t*)s_Data.QuadVertexBufferBase == Renderer2DData::MaxQuads * sizeof(QuadVertex))
+			{
+				EndScene();
+				s_Data.QuadIndexCount = 0;
+				s_Data.QuadVertexBufferPtr = s_Data.QuadVertexBufferBase;
+				s_Data.TextureSlotIndex = 1;
+			}
+
+			float textureIndex = 0.0f;
+			//Setting the textureIndex to its proper value before using it. If we can't find a value for it, it should remain 0.0f.
+			for (uint32_t i = 1; i < s_Data.TextureSlotIndex; i++)
+			{
+				if (*s_Data.TextureSlots[i].get() == *texture.get())
+				{
+					textureIndex = (float)i;
+					break;
+				}
+			}
+			//Using the processed textureIndex
+			if (textureIndex == 0.0f)
+			{
+				textureIndex = (float)s_Data.TextureSlotIndex;
+				s_Data.TextureSlots[s_Data.TextureSlotIndex] = texture;
+				s_Data.TextureSlotIndex++;
+			}
+			glm::mat4 transformEdited = glm::rotate(transform, glm::radians(rotationDegree), { 0.0f, 0.0f, 1.0f });
+			//If you don't pass a color, the default value is white. We also set the Position value to the transform we get from above.
+			s_Data.QuadVertexBufferPtr->Position = transformEdited * s_Data.QuadVertexPositions[0];
+			s_Data.QuadVertexBufferPtr->Color = tintColor;
+			s_Data.QuadVertexBufferPtr->TexCoord = { 0.0f, 0.0f };
+			s_Data.QuadVertexBufferPtr->TexIndex = textureIndex;
+			s_Data.QuadVertexBufferPtr++;
+
+			s_Data.QuadVertexBufferPtr->Position = transformEdited * s_Data.QuadVertexPositions[1];
+			s_Data.QuadVertexBufferPtr->Color = tintColor;
+			s_Data.QuadVertexBufferPtr->TexCoord = { 1.0f, 0.0f };
+			s_Data.QuadVertexBufferPtr->TexIndex = textureIndex;
+			s_Data.QuadVertexBufferPtr++;
+
+			s_Data.QuadVertexBufferPtr->Position = transformEdited * s_Data.QuadVertexPositions[2];
+			s_Data.QuadVertexBufferPtr->Color = tintColor;
+			s_Data.QuadVertexBufferPtr->TexCoord = { 1.0f, 1.0f };
+			s_Data.QuadVertexBufferPtr->TexIndex = textureIndex;
+			s_Data.QuadVertexBufferPtr++;
+
+			s_Data.QuadVertexBufferPtr->Position = transformEdited * s_Data.QuadVertexPositions[3];
+			s_Data.QuadVertexBufferPtr->Color = tintColor;
+			s_Data.QuadVertexBufferPtr->TexCoord = { 0.0f, 1.0f };
+			s_Data.QuadVertexBufferPtr->TexIndex = textureIndex;
+			s_Data.QuadVertexBufferPtr++;
+
+			s_Data.QuadIndexCount += 6;
+		}
+
+		void Renderer2D::Submit(const glm::mat4& transform, const glm::vec2& size, const Ref<Texture> texture, const glm::vec2& subTextureOffset, const glm::vec2& subTextureDimensions, float rotationDegree, const glm::vec4& tintColor)
+		{
+			if ((uint8_t*)s_Data.QuadVertexBufferPtr - (uint8_t*)s_Data.QuadVertexBufferBase == Renderer2DData::MaxQuads * sizeof(QuadVertex))
+			{
+				EndScene();
+				s_Data.QuadIndexCount = 0;
+				s_Data.QuadVertexBufferPtr = s_Data.QuadVertexBufferBase;
+				s_Data.TextureSlotIndex = 1;
+			}
+
+			float textureIndex = 0.0f;
+			for (uint32_t i = 1; i < s_Data.TextureSlotIndex; i++)
+			{
+				if (*s_Data.TextureSlots[i].get() == *texture.get())
+				{
+					textureIndex = (float)i;
+					break;
+				}
+			}
+			if (textureIndex == 0.0f)
+			{
+				textureIndex = (float)s_Data.TextureSlotIndex;
+				s_Data.TextureSlots[s_Data.TextureSlotIndex] = texture;
+				s_Data.TextureSlotIndex++;
+			}
+
+			glm::mat4 transformEdited =  glm::rotate(transform, glm::radians(rotationDegree), { 0.0f, 0.0f, 1.0f }) * glm::scale(transform, { size.x, size.y, 1.0f });
+
+			s_Data.QuadVertexBufferPtr->Position = transformEdited * s_Data.QuadVertexPositions[0];
+			s_Data.QuadVertexBufferPtr->Color = tintColor;
+			s_Data.QuadVertexBufferPtr->TexCoord = { subTextureOffset.x * (subTextureDimensions.x / texture->GetWidth()), subTextureOffset.y * (subTextureDimensions.y / texture->GetHeight()) };
+			s_Data.QuadVertexBufferPtr->TexIndex = textureIndex;
+			s_Data.QuadVertexBufferPtr++;
+
+			s_Data.QuadVertexBufferPtr->Position = transformEdited * s_Data.QuadVertexPositions[1];
+			s_Data.QuadVertexBufferPtr->Color = tintColor;
+			s_Data.QuadVertexBufferPtr->TexCoord = { (subTextureOffset.x + size.x) * (subTextureDimensions.x / texture->GetWidth()), subTextureOffset.y * (subTextureDimensions.y / texture->GetHeight()) };
+			s_Data.QuadVertexBufferPtr->TexIndex = textureIndex;
+			s_Data.QuadVertexBufferPtr++;
+
+			s_Data.QuadVertexBufferPtr->Position = transformEdited * s_Data.QuadVertexPositions[2];
+			s_Data.QuadVertexBufferPtr->Color = tintColor;
+			s_Data.QuadVertexBufferPtr->TexCoord = { (subTextureOffset.x + size.x) * (subTextureDimensions.x / texture->GetWidth()), (subTextureOffset.y + size.y) * (subTextureDimensions.y / texture->GetHeight()) };
+			s_Data.QuadVertexBufferPtr->TexIndex = textureIndex;
+			s_Data.QuadVertexBufferPtr++;
+
+			s_Data.QuadVertexBufferPtr->Position = transformEdited * s_Data.QuadVertexPositions[3];
+			s_Data.QuadVertexBufferPtr->Color = tintColor;
+			s_Data.QuadVertexBufferPtr->TexCoord = { subTextureOffset.x * (subTextureDimensions.x / texture->GetWidth()), (subTextureOffset.y + size.y) * (subTextureDimensions.y / texture->GetHeight()) };
+			s_Data.QuadVertexBufferPtr->TexIndex = textureIndex;
 			s_Data.QuadVertexBufferPtr++;
 
 			s_Data.QuadIndexCount += 6;

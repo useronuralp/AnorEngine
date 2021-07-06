@@ -22,6 +22,9 @@ namespace AnorEngine
 			static void Submit(const glm::vec3& position, const glm::vec2& size, const Ref<Texture> texture, float rotationDegree = 0.0f, const glm::vec4& tintColor = { 1.0f, 1.0f, 1.0f, 1.0f } );
 			static void Submit(const glm::vec3& position, const glm::vec2& size, const Ref<Texture> texture, const glm::vec2& subTextureOffset, const glm::vec2& subTextureDimensions, float rotationDegree = 0.0f, const glm::vec4& tintColor = { 1.0f, 1.0f, 1.0f, 1.0f });
 			static void Submit(const glm::vec3& position, const glm::vec2& size, const glm::vec4& color);
+			static void Submit(const glm::mat4& transform, glm::vec4& color);
+			static void Submit(const glm::mat4& transform, const Ref<Texture> texture, float rotationDegree = 0.0f, const glm::vec4& tintColor = { 1.0f, 1.0f, 1.0f, 1.0f });
+			static void Submit(const glm::mat4& transform, const glm::vec2& size, const Ref<Texture> texture, const glm::vec2& subTextureOffset, const glm::vec2& subTextureDimensions, float rotationDegree = 0.0f, const glm::vec4& tintColor = { 1.0f, 1.0f, 1.0f, 1.0f });
 			static void Flush();
 			static void BeginScene(const Ref<OrthographicCamera> camera);
 			static void EndScene();
