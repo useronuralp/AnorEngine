@@ -1,5 +1,6 @@
 #include "pch.h"
 #include "Scene.h"
+#include "Entity.h"
 namespace AnorEngine
 {
 	Scene::Scene()
@@ -17,9 +18,13 @@ namespace AnorEngine
 			Graphics::Renderer2D::Submit(transform, sprite.Size, sprite.Texture, sprite.SubTextureOffset, sprite.SubTextureDimensions, 0.0f, sprite.Color);
 		}
 	}
-	entt::entity Scene::CreateEntity()
+	Entity Scene::CreateEntity(const std::string& name)
 	{
-		return m_Registry.create();
+		Entity entity = { m_Registry.create(), this };
+		entity.AddComponent<TransformComponent>();
+		auto& tag = entity.AddComponent<TagComponent>();
+		tag.Tag = name.empty() ? "Unnamed Entity" : name;
+		return entity;
 	}
 }
 

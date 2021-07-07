@@ -4,16 +4,16 @@
 #include <Scene/Components.h>
 namespace AnorEngine
 {
+	class Entity;
 	class ANOR_API Scene
 	{
-	public:
-		entt::registry& GetReg() { return m_Registry; }
 	public:
 		Scene();
 		~Scene();
 		void OnRender(float deltaTime);
-		entt::entity CreateEntity();
+		Entity CreateEntity(const std::string& name = std::string());
 	private:
 		entt::registry m_Registry;
+		friend class Entity;
 	};
 }

@@ -3,9 +3,9 @@
 #include "Graphics/texture.h"
 namespace AnorEngine
 {
-	struct TransformComponent
+	struct ANOR_API TransformComponent
 	{
-		glm::mat4 Transform{ 1.0f };
+		glm::mat4 Transform { 1.0f };
 
 		TransformComponent() = default;
 		TransformComponent(const TransformComponent&) = default;
@@ -18,7 +18,7 @@ namespace AnorEngine
 		operator glm::mat4& () { return Transform; }
 		operator const glm::mat4& () const { return Transform; }
 	};
-	struct SpriteRendererComponent
+	struct ANOR_API SpriteRendererComponent
 	{
 		glm::vec4 Color { 1.0f, 1.0f, 1.0f, 1.0f };
 		Ref<Graphics::Texture> Texture;
@@ -34,5 +34,15 @@ namespace AnorEngine
 			:Color(color), Texture(texture) {}
 		SpriteRendererComponent(const glm::vec4& color, Ref<Graphics::Texture> texture, glm::vec2 size, glm::vec2 subTextureOffset, glm::vec2 subTextureDimensions)
 			:Color(color), Texture(texture), Size(size),SubTextureOffset(subTextureOffset), SubTextureDimensions(subTextureDimensions) {}
+	};
+	struct ANOR_API TagComponent
+	{
+		std::string Tag;
+
+		TagComponent() = default;
+		TagComponent(const TagComponent&) = default;
+		TagComponent(const std::string& name)
+			: Tag(name) {}
+
 	};
 }

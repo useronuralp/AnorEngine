@@ -180,6 +180,7 @@
   <ItemGroup>
     <ClCompile Include="Source\Core\Application.cpp" />
     <ClCompile Include="Source\Graphics\Framebuffer.cpp" />
+    <ClCompile Include="Source\Scene\Entity.cpp" />
     <ClCompile Include="Source\Scene\Scene.cpp" />
     <ClCompile Include="Source\Utility\Timer.cpp" />
     <ClCompile Include="Source\Graphics\ParticleSystem.cpp" />
@@ -231,6 +232,7 @@
     <ClInclude Include="Source\Core\MouseButtonCodes.h" />
     <ClInclude Include="Source\Graphics\Framebuffer.h" />
     <ClInclude Include="Source\Scene\Components.h" />
+    <ClInclude Include="Source\Scene\Entity.h" />
     <ClInclude Include="Source\Scene\Scene.h" />
     <ClInclude Include="Source\Utility\Timer.h" />
     <ClInclude Include="Source\Events\Event.h" />

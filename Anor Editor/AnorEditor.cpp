@@ -11,16 +11,15 @@ namespace Game
 		glm::vec4    m_Color = { 1,1,1,1 };
 		std::string  solutionDir = __SOLUTION_DIR;
 		Ref<Texture> m_TextureAtlas = std::make_shared<Texture>(solutionDir + "AnorEngine\\Assets\\Textures\\PlatformerTextures\\Tilesheet\\platformPack_tilesheet@2.png");
-		Ref<Scene>   m_Scene;
-		entt::entity m_Entity;
+		Ref<Scene>   m_Scene = std::make_shared<Scene>();
+		Ref<Entity>  m_Entity = std::make_shared<Entity>(m_Scene->CreateEntity("Diamonds"));
 	public:
 		virtual void OnAttach() override
 		{
-			//this is literally a uint32_t
-			m_Scene = std::make_shared<Scene>();
-			m_Entity = m_Scene->CreateEntity();
-			m_Scene->GetReg().emplace<TransformComponent>(m_Entity);
-			m_Scene->GetReg().emplace<SpriteRendererComponent>(m_Entity, m_Color, m_TextureAtlas, glm::vec2{ 2.0f, 1.0f }, glm::vec2{ 9, 3 }, glm::vec2{ 128.0f, 128.0f });
+			if (m_Entity)
+			{
+				m_Entity->AddComponent<SpriteRendererComponent>(m_Color, m_TextureAtlas, glm::vec2{ 2.0f, 1.0f }, glm::vec2{ 9, 3 }, glm::vec2{ 128.0f, 128.0f });
+			}
 		}
 		virtual void OnUpdate(float deltaTime) override
 		{
@@ -29,7 +28,7 @@ namespace Game
 		}
 		virtual void OnImGuiRender() override
 		{
-			ImGui::ColorEdit4("Layer 1", glm::value_ptr(m_Scene->GetReg().get<SpriteRendererComponent>(m_Entity).Color));
+			ImGui::ColorEdit4(&m_Entity->GetComponent<TagComponent>().Tag[0], glm::value_ptr(m_Entity->GetComponent<SpriteRendererComponent>().Color));
 		}
 		virtual void OnEvent(Ref<Input::Event> e) override
 		{
@@ -46,17 +45,16 @@ namespace Game
 		glm::vec4    m_Color = { 1,1,1,1 };
 		std::string  solutionDir = __SOLUTION_DIR;
 		Ref<Texture> m_Texture = std::make_shared<Texture>(solutionDir + "AnorEngine\\Assets\\Textures\\381f5a63791945.5abc4ccf1297d.png");
-		Ref<Scene>   m_Scene;
-		entt::entity m_Entity;
+		Ref<Scene>   m_Scene = std::make_shared<Scene>();
+		Ref<Entity> m_Entity = std::make_shared<Entity>(m_Scene->CreateEntity("Block"));
 	public:
 		virtual void OnAttach() override
 		{
-			//this is literally a uint32_t
-			m_Scene = std::make_shared<Scene>();
-			m_Entity = m_Scene->CreateEntity();
-			m_Scene->GetReg().emplace<TransformComponent>(m_Entity);
-			m_Scene->GetReg().get<TransformComponent>(m_Entity).Translate(2.0f, 1.0f, 0.0f);
-			m_Scene->GetReg().emplace<SpriteRendererComponent>(m_Entity, m_Color, m_Texture);
+			if (m_Entity)
+			{
+				m_Entity->GetComponent<TransformComponent>().Translate(2.0f, 1.0f, 0.0f);
+				m_Entity->AddComponent<SpriteRendererComponent>(m_Color, m_Texture);
+			}
 		}
 		virtual void OnUpdate(float deltaTime) override
 		{
@@ -65,7 +63,7 @@ namespace Game
 		}
 		virtual void OnImGuiRender() override
 		{
-			ImGui::ColorEdit4("Layer 2", glm::value_ptr(m_Scene->GetReg().get<SpriteRendererComponent>(m_Entity).Color));
+			ImGui::ColorEdit4(&m_Entity->GetComponent<TagComponent>().Tag[0], glm::value_ptr(m_Entity->GetComponent<SpriteRendererComponent>().Color));
 		}
 		virtual void OnEvent(Ref<Input::Event> e) override
 		{
@@ -84,17 +82,16 @@ namespace Game
 		float		 m_QuadMoveSpeed = 5.0f;
 		std::string  solutionDir = __SOLUTION_DIR;
 		Ref<Texture> m_CharacterTextureAtlas = std::make_shared<Texture>(solutionDir + "AnorEngine\\Assets\\Textures\\PlatformerTextures\\Tilesheet\\platformerPack_character@2.png");
-		Ref<Scene>	 m_Scene;
-		entt::entity m_Entity;
+		Ref<Scene>	 m_Scene = std::make_shared<Scene>();
+		Ref<Entity>  m_Entity = std::make_shared<Entity>(m_Scene->CreateEntity("Cute Guy"));
 	public:
 		virtual void OnAttach() override
 		{
-			//this is literally a uint32_t
-			m_Scene = std::make_shared<Scene>();
-			entt::entity m_Entity = m_Scene->CreateEntity();
-			m_Scene->GetReg().emplace<TransformComponent>(m_Entity);
-			m_Scene->GetReg().get<TransformComponent>(m_Entity).Translate(1.0f, 1.0f, 0.0f);
-			m_Scene->GetReg().emplace<SpriteRendererComponent>(m_Entity, m_QuadColor, m_CharacterTextureAtlas, glm::vec2{ 1.0f, 1.0f }, glm::vec2{ 0 ,1 }, glm::vec2{ 192.0f, 175.0f });
+			if (m_Entity)
+			{
+				m_Entity->GetComponent<TransformComponent>().Translate(1.0f, 1.0f, 0.0f);
+				m_Entity->AddComponent<SpriteRendererComponent>(m_QuadColor, m_CharacterTextureAtlas, glm::vec2{ 1.0f, 1.0f }, glm::vec2{ 0 ,1 }, glm::vec2{ 192.0f, 175.0f });
+			}
 		}
 		virtual void OnUpdate(float deltaTime) override
 		{
@@ -108,14 +105,14 @@ namespace Game
 			else if (Input::EventHandler::IsKeyDown(ANOR_KEY_L))
 				m_QuadPosition.x += m_QuadMoveSpeed * deltaTime;
 
-			m_Scene->GetReg().get<TransformComponent>(m_Entity).Translate(m_QuadPosition.x, m_QuadPosition.y, m_QuadPosition.z);
+			m_Entity->GetComponent<TransformComponent>().Translate(m_QuadPosition.x, m_QuadPosition.y, m_QuadPosition.z);
 			m_QuadPosition = { 0.0f, 0.0f, 0.0f };
 			m_Scene->OnRender(deltaTime);
 			//Renderer2D::Submit(m_QuadPosition, { 1.0f, 1.0f }, m_CharacterTextureAtlas, { 0 ,1 }, { 192.0f, 175.0f });
 		}
 		virtual void OnImGuiRender() override
 		{
-			ImGui::ColorEdit4("Layer 3", glm::value_ptr(m_Scene->GetReg().get<SpriteRendererComponent>(m_Entity).Color));
+			ImGui::ColorEdit4(&m_Entity->GetComponent<TagComponent>().Tag[0], glm::value_ptr(m_Entity->GetComponent<SpriteRendererComponent>().Color));
 		}
 		virtual void OnEvent(Ref<Input::Event> e) override
 		{
