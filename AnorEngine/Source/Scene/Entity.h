@@ -9,21 +9,10 @@ namespace AnorEngine
 	{
 	public:
 		Entity() = default;
-		Entity(entt::entity handle, Scene* scene);
+		Entity(entt::entity handle, Scene* scene)
+			:m_EntityHandle(handle), m_Scene(scene) {}
 		Entity(const Entity& other) = default;
 	public:
-		template<typename T, typename... Args>
-		T& AddComponent(Args&&... args)
-		{
-			if (HasComponent<T>()){	CRITICAL_ASSERT("Components you tried to add does already exist!");}
-			return m_Scene->m_Registry.emplace<T>(m_EntityHandle, std::forward<Args>(args)...);
-		}
-		template<typename T>
-		T& GetComponent()
-		{
-			if (!HasComponent<T>()){CRITICAL_ASSERT("Components you tried to get does not exist!");}
-			return m_Scene->m_Registry.get<T>(m_EntityHandle);
-		}
 		template<typename T> 
 		bool HasComponent()
 		{
@@ -31,6 +20,18 @@ namespace AnorEngine
 				return false;
 			else
 				return true;
+		}
+		template<typename T, typename... Args>
+		T& AddComponent(Args&&... args)
+		{
+			if (HasComponent<T>()){	CRITICAL_ASSERT("Component you tried to add does already exist!");}
+			return m_Scene->m_Registry.emplace<T>(m_EntityHandle, std::forward<Args>(args)...);
+		}
+		template<typename T>
+		T& GetComponent()
+		{
+			if (!HasComponent<T>()){CRITICAL_ASSERT("Component you tried to get does not exist!");}
+			return m_Scene->m_Registry.get<T>(m_EntityHandle);
 		}
 		template<typename T>
 		void RemoveComponent()

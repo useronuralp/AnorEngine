@@ -8,119 +8,117 @@ namespace Game
 
 	class ExampleLayer : public Layer
 	{
-		glm::vec4    m_Color = { 1,1,1,1 };
-		std::string  solutionDir = __SOLUTION_DIR;
-		Ref<Texture> m_TextureAtlas = std::make_shared<Texture>(solutionDir + "AnorEngine\\Assets\\Textures\\PlatformerTextures\\Tilesheet\\platformPack_tilesheet@2.png");
-		Ref<Scene>   m_Scene = std::make_shared<Scene>();
-		Ref<Entity>  m_Entity = std::make_shared<Entity>(m_Scene->CreateEntity("Diamonds"));
+		glm::vec4			m_Color = { 1,1,1,1 };
+		std::string			solutionDir = __SOLUTION_DIR;
+		Ref<Scene>			m_Scene = std::make_shared<Scene>();
+		//Entity1----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+		Ref<Entity>			m_Entity1 = std::make_shared<Entity>(m_Scene->CreateEntity("Diamonds"));
+		Ref<Texture>		m_Entity1TextureAtlas = std::make_shared<Texture>(solutionDir + "AnorEngine\\Assets\\Textures\\PlatformerTextures\\Tilesheet\\platformPack_tilesheet@2.png");
+		//Entity2----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+		Ref<Texture>		m_Entity2_Texture = std::make_shared<Texture>(solutionDir + "AnorEngine\\Assets\\Textures\\381f5a63791945.5abc4ccf1297d.png");
+		Ref<Entity>			m_Entity2 = std::make_shared<Entity>(m_Scene->CreateEntity("Block"));
+		//Entity3----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+		Ref<Texture>		m_Entity3TextureAtlas = std::make_shared<Texture>(solutionDir + "AnorEngine\\Assets\\Textures\\PlatformerTextures\\Tilesheet\\platformerPack_character@2.png");
+		glm::vec3			m_Entity3Position = { 0.0f,0.0f,0.0f };
+		Ref<Entity>			m_Entity3 = std::make_shared<Entity>(m_Scene->CreateEntity("Cute Guy"));
+		float				m_Entity3MoveSpeed = 5.0f;
+		//-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+		Ref<Entity>			m_CameraEntity = std::make_shared<Entity>(m_Scene->CreateEntity("Camera"));
+		glm::vec3			m_CameraPos = { 0.0f ,0.0f ,0.0f };
+		float			    m_CameraTranslationSpeed = 10.0f;
 	public:
+		ExampleLayer()
+		{
+		}
 		virtual void OnAttach() override
 		{
-			if (m_Entity)
+			if (m_CameraEntity)
 			{
-				m_Entity->AddComponent<SpriteRendererComponent>(m_Color, m_TextureAtlas, glm::vec2{ 2.0f, 1.0f }, glm::vec2{ 9, 3 }, glm::vec2{ 128.0f, 128.0f });
+				m_CameraEntity->AddComponent<CameraComponent>();
+			}
+			if (m_Entity1)
+			{
+				m_Entity1->AddComponent<SpriteRendererComponent>(m_Color, m_Entity1TextureAtlas, glm::vec2{ 2.0f, 1.0f }, glm::vec2{ 9, 3 }, glm::vec2{ 128.0f, 128.0f });
+			}
+			if (m_Entity2)
+			{
+				m_Entity2->GetComponent<TransformComponent>().Translate(2.0f, 1.0f, 0.0f);
+				m_Entity2->AddComponent<SpriteRendererComponent>(m_Color, m_Entity2_Texture);
+			}
+			if (m_Entity3)
+			{
+				m_Entity3->GetComponent<TransformComponent>().Translate(1.0f, 1.0f, 0.0f);
+				m_Entity3->AddComponent<SpriteRendererComponent>(m_Color, m_Entity3TextureAtlas, glm::vec2{ 1.0f, 1.0f }, glm::vec2{ 0 ,1 }, glm::vec2{ 192.0f, 175.0f });
 			}
 		}
 		virtual void OnUpdate(float deltaTime) override
 		{
-			m_Scene->OnRender(deltaTime);
-			//Renderer2D::Submit({ 0.0f, 0.0f, 0.0f }, { 2.0f, 1.0f }, m_TextureAtlas, { 9, 3 }, { 128.0f, 128.0f });
-		}
-		virtual void OnImGuiRender() override
-		{
-			ImGui::ColorEdit4(&m_Entity->GetComponent<TagComponent>().Tag[0], glm::value_ptr(m_Entity->GetComponent<SpriteRendererComponent>().Color));
-		}
-		virtual void OnEvent(Ref<Input::Event> e) override
-		{
-			//Handle event if it was not handled before by a layer that resides higher in the LayerStack.
-			if (!e->m_Handled)
+			if (Input::EventHandler::IsKeyDown(ANOR_KEY_W))
 			{
-				//Reminder: You can set the m_Handled to true. If you want to block the propogation of this event.
+				m_CameraPos.y += m_CameraTranslationSpeed * deltaTime;
 			}
-		}
-	};
-	class ExampleLayer2 : public Layer
-	{
-	private:
-		glm::vec4    m_Color = { 1,1,1,1 };
-		std::string  solutionDir = __SOLUTION_DIR;
-		Ref<Texture> m_Texture = std::make_shared<Texture>(solutionDir + "AnorEngine\\Assets\\Textures\\381f5a63791945.5abc4ccf1297d.png");
-		Ref<Scene>   m_Scene = std::make_shared<Scene>();
-		Ref<Entity> m_Entity = std::make_shared<Entity>(m_Scene->CreateEntity("Block"));
-	public:
-		virtual void OnAttach() override
-		{
-			if (m_Entity)
+			else if (Input::EventHandler::IsKeyDown(ANOR_KEY_S))
 			{
-				m_Entity->GetComponent<TransformComponent>().Translate(2.0f, 1.0f, 0.0f);
-				m_Entity->AddComponent<SpriteRendererComponent>(m_Color, m_Texture);
+				m_CameraPos.y -= m_CameraTranslationSpeed * deltaTime;
 			}
-		}
-		virtual void OnUpdate(float deltaTime) override
-		{
-			m_Scene->OnRender(deltaTime);
-			//Renderer2D::Submit({ 1.0f, 1.0f, 0.0f }, { 1.0f, 1.0f }, m_Texture);
-		}
-		virtual void OnImGuiRender() override
-		{
-			ImGui::ColorEdit4(&m_Entity->GetComponent<TagComponent>().Tag[0], glm::value_ptr(m_Entity->GetComponent<SpriteRendererComponent>().Color));
-		}
-		virtual void OnEvent(Ref<Input::Event> e) override
-		{
-			//Handle event if it was not handled before by a layer that resides higher in the LayerStack.
-			if (!e->m_Handled)
+			if (Input::EventHandler::IsKeyDown(ANOR_KEY_A))
 			{
-				//Reminder: You can set the m_Handled to true. If you want to block the propogation of this event.
+				m_CameraPos.x -= m_CameraTranslationSpeed * deltaTime;
 			}
-		}
-	};
-	class ExampleLayer3 : public Layer
-	{
-	private:
-		glm::vec4	 m_QuadColor = { 1,1,1,1 };
-		glm::vec3	 m_QuadPosition = { 0.0f,0.0f,0.0f };
-		float		 m_QuadMoveSpeed = 5.0f;
-		std::string  solutionDir = __SOLUTION_DIR;
-		Ref<Texture> m_CharacterTextureAtlas = std::make_shared<Texture>(solutionDir + "AnorEngine\\Assets\\Textures\\PlatformerTextures\\Tilesheet\\platformerPack_character@2.png");
-		Ref<Scene>	 m_Scene = std::make_shared<Scene>();
-		Ref<Entity>  m_Entity = std::make_shared<Entity>(m_Scene->CreateEntity("Cute Guy"));
-	public:
-		virtual void OnAttach() override
-		{
-			if (m_Entity)
+			else if (Input::EventHandler::IsKeyDown(ANOR_KEY_D))
 			{
-				m_Entity->GetComponent<TransformComponent>().Translate(1.0f, 1.0f, 0.0f);
-				m_Entity->AddComponent<SpriteRendererComponent>(m_QuadColor, m_CharacterTextureAtlas, glm::vec2{ 1.0f, 1.0f }, glm::vec2{ 0 ,1 }, glm::vec2{ 192.0f, 175.0f });
+				m_CameraPos.x += m_CameraTranslationSpeed * deltaTime;
 			}
-		}
-		virtual void OnUpdate(float deltaTime) override
-		{
 			//Querying the EventHandler here so that we can move the quad.
 			if (Input::EventHandler::IsKeyDown(ANOR_KEY_I))
-				m_QuadPosition.y += m_QuadMoveSpeed * deltaTime;
+				m_Entity3Position.y += m_Entity3MoveSpeed * deltaTime;
 			else if (Input::EventHandler::IsKeyDown(ANOR_KEY_K))
-				m_QuadPosition.y -= m_QuadMoveSpeed * deltaTime;
+				m_Entity3Position.y -= m_Entity3MoveSpeed * deltaTime;
 			if (Input::EventHandler::IsKeyDown(ANOR_KEY_J))
-				m_QuadPosition.x -= m_QuadMoveSpeed * deltaTime;
+				m_Entity3Position.x -= m_Entity3MoveSpeed * deltaTime;
 			else if (Input::EventHandler::IsKeyDown(ANOR_KEY_L))
-				m_QuadPosition.x += m_QuadMoveSpeed * deltaTime;
+				m_Entity3Position.x += m_Entity3MoveSpeed * deltaTime;
 
-			m_Entity->GetComponent<TransformComponent>().Translate(m_QuadPosition.x, m_QuadPosition.y, m_QuadPosition.z);
-			m_QuadPosition = { 0.0f, 0.0f, 0.0f };
+			m_CameraEntity->GetComponent<TransformComponent>().Translate(m_CameraPos.x, m_CameraPos.y, m_CameraPos.z);
+			m_Entity3->GetComponent<TransformComponent>().Translate(m_Entity3Position.x, m_Entity3Position.y, m_Entity3Position.z);
+			m_Entity3Position = { 0.0f, 0.0f, 0.0f };
 			m_Scene->OnRender(deltaTime);
-			//Renderer2D::Submit(m_QuadPosition, { 1.0f, 1.0f }, m_CharacterTextureAtlas, { 0 ,1 }, { 192.0f, 175.0f });
+			m_CameraPos = { 0,0,0 };
 		}
 		virtual void OnImGuiRender() override
 		{
-			ImGui::ColorEdit4(&m_Entity->GetComponent<TagComponent>().Tag[0], glm::value_ptr(m_Entity->GetComponent<SpriteRendererComponent>().Color));
+			ImGui::ColorEdit4(&m_Entity1->GetComponent<TagComponent>().Tag[0], glm::value_ptr(m_Entity1->GetComponent<SpriteRendererComponent>().Color));
+			ImGui::ColorEdit4(&m_Entity2->GetComponent<TagComponent>().Tag[0], glm::value_ptr(m_Entity2->GetComponent<SpriteRendererComponent>().Color));
+			ImGui::ColorEdit4(&m_Entity3->GetComponent<TagComponent>().Tag[0], glm::value_ptr(m_Entity3->GetComponent<SpriteRendererComponent>().Color));
 		}
 		virtual void OnEvent(Ref<Input::Event> e) override
 		{
-			//Handle the event if it was not handled before by a layer that resides higher in the LayerStack.
 			if (!e->m_Handled)
 			{
-				//Reminder: You can set the m_Handled to true. If you want to block the propogation of this event.
+				if (e->GetEventType() == Input::EventType::WindowResizeEvent)
+				{
+					WARN("Resizing window!!!!");
+					auto castEvent = std::static_pointer_cast<Input::WindowResizeEvent>(e);
+					OnResizeViewport(castEvent->GetWidth(), castEvent->GetHeight());
+					e->m_Handled = true;
+				}
+				if (e->GetEventType() == Input::EventType::MouseScrollEvent)
+				{
+					WARN("Scrolling!!!!");
+					auto castEvent = std::static_pointer_cast<Input::MouseScrollEvent>(e);
+					OnMouseScroll(castEvent->GetXOffset(), castEvent->GetYOffset());
+					e->m_Handled = true;
+				}
 			}
+		}
+	public:
+		virtual void OnResizeViewport(uint32_t width, uint32_t height) override
+		{
+			m_Scene->OnResizeViewport(width, height);
+		}
+		virtual void OnMouseScroll(float xoffset, float yoffset) override
+		{
+			m_Scene->OnMouseScroll(xoffset, yoffset);
 		}
 	};
 	class Background : public Layer
@@ -141,9 +139,11 @@ namespace Game
 		Ref<Shader>		 m_BgShader = nullptr;
 		Ref<Texture>	 m_BgTexture;
 		glm::mat4		 m_BgModelMatrix = glm::mat4(1.0f);
+		Ref<OrthographicCamera>	     m_MainCamera;
 	public:
-		Background()
+		Background(Ref<OrthographicCamera> mainCamera)
 		{
+			m_MainCamera = mainCamera;
 			std::string solutionDir = __SOLUTION_DIR;
 			m_BgModelMatrix = glm::scale(m_BgModelMatrix, { 12.0f, 12.0f , 1.0f });
 			m_BgVAO = std::make_shared<VertexArray>();
@@ -159,43 +159,36 @@ namespace Game
 		}
 		virtual void OnUpdate(float deltaTime) override
 		{
+			Renderer2D::BeginScene(m_MainCamera);
 			Renderer2D::DrawPrimitive(m_BgVAO, m_BgShader, m_BgModelMatrix, { 1,1,1, 0.4f }, m_BgTexture);
+			Renderer2D::EndScene();
 		}
 	};
-
 	class AnorEditor : public Application
 	{
 	private:
 		LayerStack						  m_LayerStack;
 		Ref<OrthographicCamera>			  m_OrthoCamera;
-		Ref<OrthographicCameraController> m_OrthoGraphicCameraController;
 		Ref<PerspectiveCamera>			  m_PersCamera;
-		Ref<ImGuiBase>					  m_ImGuiBase = std::make_shared<ImGuiBase>(); //ImGui initializiton code.
+		Ref<ImGuiBase>					  m_ImGuiBase;
 		Ref<ExampleLayer>				  m_Layer;
-		Ref<ExampleLayer2>				  m_Layer2;
-		Ref<ExampleLayer3>				  m_Layer3;
 		Ref<Background>					  m_Bg;
 		Ref<ParticleSystem>				  m_ParticleSystem;
-		Ref<Texture>					  m_CheckerboardTexture;
 		Ref<Framebuffer>				  m_Framebuffer;
 		glm::vec2						  m_ViewportSize;
-		glm::vec3						  m_CameraPos = { 0.0f, 0.0f, 0.0f };
-		float							  m_CameraSpeed = 1;
 		float							  m_LastFrameRenderTime;
 		bool							  m_Minimized = false;
 		bool							  m_ViewportHovered = false;
 		bool							  m_ViewportFocused = false;
 		bool							  m_BlockEvents = false;
 		std::vector<ProfileResult>		  m_ProfileResults;
-		std::string solutionDir = __SOLUTION_DIR;
+		std::string					      solutionDir = __SOLUTION_DIR;
 	public:
 		AnorEditor(const char* appName)
 			:Application(appName), m_OrthoCamera(std::make_shared<OrthographicCamera>(-1280.0f / 720.0f * (5), 1280.0f / 720.0f * (5), -1 * (5), 1 * (5))), m_PersCamera(std::make_shared<PerspectiveCamera>(1280, 720))
 		{
-			m_CheckerboardTexture = std::make_shared<Texture>(solutionDir + "AnorEngine\\Assets\\Textures\\checkerboard.jpg");
 			Input::EventHandler::SetTargetApplication(this); //Important to set this to the active Application else, you won't get your input processed.		
 			m_ImGuiBase->Init(); // Need to call the initialization code for imgui here.
-			m_OrthoGraphicCameraController = std::make_shared<OrthographicCameraController>(m_OrthoCamera, (1280.0f / 720.0f));
 			//Framebuffer Settings --------------------------------------------------------------------------------------------
 			FramebufferSpecifications FramebufferSpecs;
 			FramebufferSpecs.Width = 1280;
@@ -203,9 +196,7 @@ namespace Game
 			m_Framebuffer = std::make_shared<Framebuffer>(FramebufferSpecs);
 			//Layer Creation--------------------------------------------------------------------------------------------
 			m_Layer = std::make_shared<ExampleLayer>();
-			m_Layer2 = std::make_shared<ExampleLayer2>();
-			m_Layer3 = std::make_shared<ExampleLayer3>();
-			m_Bg = std::make_shared<Background>();
+			m_Bg = std::make_shared<Background>(m_OrthoCamera);
 			//Particle Settings----------------------------------------------------------------------------------
 			ParticleProperties particleProperties;
 			particleProperties.Color = { 1, 1, 1, 0.5f };
@@ -215,8 +206,6 @@ namespace Game
 			particleProperties.EmissionPoint = { -3.0f, 0.0f,0.0f };
 			m_ParticleSystem = std::make_shared<ParticleSystem>(particleProperties);
 			//Layer insertion----------------------------------------------------------------------------------------
-			PushLayer(m_Layer3);
-			PushLayer(m_Layer2);
 			PushLayer(m_Layer);
 			PushLayer(m_Bg);
 		}
@@ -232,33 +221,20 @@ namespace Game
 			{
 				float deltaTime = DeltaTime();
 				m_ParticleSystem->CreateParticles(3);
-
-				if(m_ViewportFocused)
-					m_OrthoGraphicCameraController->OnUpdate(deltaTime);
-
 				m_Framebuffer->Bind();
-				Renderer2D::BeginScene(m_OrthoCamera);
 				Renderer2D::ClearColor(glm::vec4(0.1f, 0.1f, 0.1f, 1));
 				Renderer2D::Clear();
 				if (!m_Minimized) //We don't want to render if the window is minimized.
 				{
+					for (Ref<Layer> layer : m_LayerStack)
 					{
-						PROFILE_SCOPE("Layers' draw calls");
-						for (Ref<Layer> layer : m_LayerStack)
-						{
-							layer->OnUpdate(deltaTime);
-						}
+						layer->OnUpdate(deltaTime);
 					}
-					{
-						PROFILE_SCOPE("Particle System Batching");
-						m_ParticleSystem->OnUpdate(deltaTime);
-					}
-				}
-				{
-					PROFILE_SCOPE("Flushing");
+					Renderer2D::BeginScene(m_OrthoCamera);
+					m_ParticleSystem->OnUpdate(deltaTime);
 					Renderer2D::EndScene();
-					m_Framebuffer->Unbind();
 				}
+				m_Framebuffer->Unbind();
 				m_ImGuiBase->Begin(); //-----------------------ImGui Beginning-------------------------
 				OnImGuiOverlayRender();
 
@@ -300,6 +276,10 @@ namespace Game
 				if (m_Framebuffer->GetDimensions().x != m_ViewportSize.x || m_Framebuffer->GetDimensions().y != m_ViewportSize.y)
 				{
 					m_Framebuffer->Resize(m_ViewportSize.x, m_ViewportSize.y);
+					for (auto layerIterator = m_LayerStack.rbegin(); layerIterator != m_LayerStack.rend(); layerIterator++)
+					{
+						layerIterator->get()->OnResizeViewport(m_ViewportSize.x, m_ViewportSize.y);
+					}
 				}
 				m_ProfileResults.clear();
 				m_OpenGLWindow->Update();
@@ -308,37 +288,39 @@ namespace Game
 		virtual void OnEvent(Ref<Input::Event> e) override
 		{
 			e->Log();
-			if (m_BlockEvents)
-				e->m_Handled = true;
 			//Propogating the recieved event to layers.
 			//One of the layers can set the 'm_Handled' value of an event to true so that further propogation is prevented.
-			if (!e->m_Handled)
+			if (e->GetEventType() == Input::EventType::WindowResizeEvent)
 			{
 				for (auto layerIterator = m_LayerStack.rbegin(); layerIterator != m_LayerStack.rend(); layerIterator++)
 				{
 					//Sending the events in reverse order here
 					layerIterator->get()->OnEvent(e);
 				}
-				if (e->GetEventType() == Input::EventType::WindowResizeEvent)
+				auto castEvent = std::static_pointer_cast<Input::WindowResizeEvent>(e);
+				if (castEvent->GetHeight() == 0 || castEvent->GetWidth() == 0)
+					m_Minimized = true;
+				else if (castEvent->GetHeight() > 0 || castEvent->GetWidth() > 0)
+					m_Minimized = false;
+			}
+			if (!m_BlockEvents)
+			{
+				for (auto layerIterator = m_LayerStack.rbegin(); layerIterator != m_LayerStack.rend(); layerIterator++)
 				{
-					auto castEvent = std::static_pointer_cast<Input::WindowResizeEvent>(e);
-					if (castEvent->GetHeight() == 0 || castEvent->GetWidth() == 0)
-						m_Minimized = true;
-					else if (castEvent->GetHeight() > 0 || castEvent->GetWidth() > 0)
-						m_Minimized = false;
+					//Sending the events in reverse order here
+					layerIterator->get()->OnEvent(e);
 				}
-				m_OrthoGraphicCameraController->OnEvent(e);
 				if (e->GetEventType() == Input::EventType::MouseMoveEvent)
 				{
 					auto ev = std::static_pointer_cast<Input::MouseMoveEvent>(e);
 					float x = ev->GetMouseXPosition();
 					float y = ev->GetMouseYPosition();
-					auto bounds = m_OrthoGraphicCameraController->GetBounds();
 					int width, height;
 					m_OpenGLWindow->GetWindowSize(&width, &height);
 					float xoffset = width - m_ViewportSize.x;
 					float yoffset = height - m_ViewportSize.y;
-					float aspectRatio = m_OrthoGraphicCameraController->GetAspectRatio();
+					float aspectRatio = (float)width / (float)height;
+					OrthographicCameraBounds bounds = {-aspectRatio * 5, aspectRatio* 5, -5, 5 };
 					m_ParticleSystem->SetEmissionPoint((x - xoffset) / m_ViewportSize.x * bounds.GetWidth() - bounds.GetWidth() * 0.5f, bounds.GetHeight() * 0.5f - (y - yoffset) / m_ViewportSize.y * bounds.GetHeight());
 				}
 			}

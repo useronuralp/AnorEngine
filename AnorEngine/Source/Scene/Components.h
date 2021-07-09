@@ -1,6 +1,7 @@
 #pragma once
 #include <glm.hpp>
 #include "Graphics/texture.h"
+#include "SceneCamera.h"
 namespace AnorEngine
 {
 	struct ANOR_API TransformComponent
@@ -44,5 +45,14 @@ namespace AnorEngine
 		TagComponent(const std::string& name)
 			: Tag(name) {}
 
+	};
+	struct ANOR_API CameraComponent
+	{
+		SceneCamera Camera;
+		bool Primary = true;
+		bool FixedAspectRatio = false;
+
+		CameraComponent() = default;
+		CameraComponent(const CameraComponent&) = default;
 	};
 }

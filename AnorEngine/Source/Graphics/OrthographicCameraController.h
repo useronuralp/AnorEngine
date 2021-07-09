@@ -32,7 +32,7 @@ namespace AnorEngine
 			float m_ZoomLevel = 5; //This value is determined by the multiplier in the sandbox.
 			OrthographicCameraBounds m_Bounds;
 			glm::vec3 m_CameraPos = {0.0f, 0.0f, 0.0f};
-			Ref<OrthographicCamera> m_Camera;
+			Ref<OrthographicCamera> m_OrthographicCamera;
 		};
 	}
 }

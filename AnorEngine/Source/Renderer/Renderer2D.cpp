@@ -456,8 +456,6 @@ namespace AnorEngine
 			s_Data.NumberOfDrawCalls++;
 			s_Data.QuadVertexArray->Bind();
 			s_Data.QuadShader->enable();
-			//Grabbing the camera View Projection matrix from here. This is a must.
-			s_Data.QuadShader->UploadMat4("u_ViewProjMat", s_OrthoCamera->GetViewProjectionMatrix());
 			glDrawElements(GL_TRIANGLES, count, GL_UNSIGNED_INT, nullptr);
 			s_Data.QuadVertexArray->Unbind();
 			s_Data.QuadShader->disable();
@@ -466,6 +464,20 @@ namespace AnorEngine
 		void Renderer2D::BeginScene(const Ref<OrthographicCamera> camera)
 		{
 			s_OrthoCamera = camera;
+			s_Data.QuadShader->enable();
+			s_Data.QuadShader->UploadMat4("u_ViewProjMat", s_OrthoCamera->GetViewProjectionMatrix());
+			s_Data.QuadShader->disable();
+			s_Data.NumberOfDrawCalls = 0;
+			s_Data.QuadIndexCount = 0;
+			s_Data.QuadVertexBufferPtr = s_Data.QuadVertexBufferBase;
+			s_Data.TextureSlotIndex = 1;
+		}
+		void Renderer2D::BeginScene(Camera* camera, const glm::mat4& transform)
+		{
+			glm::mat4 viewProjMatrix = camera->GetProjectionMatrix() * glm::inverse(transform);
+			s_Data.QuadShader->enable();
+			s_Data.QuadShader->UploadMat4("u_ViewProjMat", viewProjMatrix);
+			s_Data.QuadShader->disable();
 			s_Data.NumberOfDrawCalls = 0;
 			s_Data.QuadIndexCount = 0;
 			s_Data.QuadVertexBufferPtr = s_Data.QuadVertexBufferBase;

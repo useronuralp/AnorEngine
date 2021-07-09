@@ -7,6 +7,22 @@ namespace AnorEngine
 {
 	namespace Graphics
 	{
+		class ANOR_API Camera
+		{
+		public:
+			Camera() = default;
+			Camera(const glm::mat4& projection)
+				:m_ProjectionMatrix(projection) {}
+			Camera(const Camera* camera)
+				:m_ProjectionMatrix(camera->m_ProjectionMatrix) {}
+			virtual ~Camera() = default;
+		public:
+			void SetProjectionMatrix(float left, float right, float bottom, float top);
+			glm::mat4& GetProjectionMatrix() { return m_ProjectionMatrix; }
+		protected:
+			glm::mat4 m_ProjectionMatrix = glm::mat4(1.0f);
+		};
+
 		class ANOR_API PerspectiveCamera
 		{
 		public:
@@ -38,8 +54,8 @@ namespace AnorEngine
 			const glm::vec3& GetPosition() const { return m_Position; }
 			const float& GetRotation() const { return m_Rotation; }
 			void SetProjectionMatrix(float left, float right, float bottom, float top);
-			void SetPosition(glm::vec3 position) { m_Position = position; RecalculateViewMatrix(); }
-			void SetRotation(float rotation) { m_Rotation = rotation; RecalculateViewMatrix(); }
+			void SetPosition(glm::vec3 position) { m_Position = position; RecalculateViewProjectionMatrix(); }
+			void SetRotation(float rotation) { m_Rotation = rotation; RecalculateViewProjectionMatrix(); }
 
 
 			const glm::mat4& GetBackgroundViewProjectionMatrix() { return m_BackgroundViewProjMatrix; }
@@ -49,7 +65,7 @@ namespace AnorEngine
 
 			double GetRenderTime() { return glfwGetTime(); }
 		private:
-			void RecalculateViewMatrix();
+			void RecalculateViewProjectionMatrix();
 		private:
 			glm::mat4 m_ProjectionMatrix;
 			glm::mat4 m_ViewMatrix;

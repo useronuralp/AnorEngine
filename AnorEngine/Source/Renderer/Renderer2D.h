@@ -27,6 +27,7 @@ namespace AnorEngine
 			static void Submit(const glm::mat4& transform, const glm::vec2& size, const Ref<Texture> texture, const glm::vec2& subTextureOffset, const glm::vec2& subTextureDimensions, float rotationDegree = 0.0f, const glm::vec4& tintColor = { 1.0f, 1.0f, 1.0f, 1.0f });
 			static void Flush();
 			static void BeginScene(const Ref<OrthographicCamera> camera);
+			static void BeginScene(Camera* camera, const glm::mat4& transform);
 			static void EndScene();
 		public:
 			static uint32_t GetIndexCount();

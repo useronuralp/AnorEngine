@@ -24,7 +24,10 @@ namespace AnorEngine
 		{
 			glm::lookAt(cameraPos, cameraPos + cameraFront, cameraUp);
 		}
-
+		void Camera::SetProjectionMatrix(float left, float right, float bottom, float top)
+		{
+			m_ProjectionMatrix = glm::ortho(left, right, bottom, top, -1.0f, 1.0f);
+		}
 		OrthographicCamera::OrthographicCamera(float left, float right, float bottom, float top)
 			:m_ProjectionMatrix(glm::ortho(left, right, bottom, top, -1.0f, 1.0f)), m_ViewMatrix(glm::mat4(1.0f))
 		{
@@ -36,7 +39,7 @@ namespace AnorEngine
 			m_ProjectionMatrix = glm::ortho(left, right, bottom, top, -1.0f, 1.0f);
 			m_ViewProjectionMatrix = m_ProjectionMatrix * m_ViewMatrix;
 		}
-		void OrthographicCamera::RecalculateViewMatrix()
+		void OrthographicCamera::RecalculateViewProjectionMatrix()
 		{
 			glm::mat4 transform = glm::translate(glm::mat4(1.0f), m_Position) * glm::rotate(glm::mat4(1.0f), glm::radians(m_Rotation), glm::vec3(0.0f, 0.0f, 1.0f));
 			m_ViewMatrix = glm::inverse(transform);
