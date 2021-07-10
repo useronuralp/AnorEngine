@@ -1,6 +1,7 @@
 #include "pch.h"
 #include "Scene.h"
 #include "Entity.h"
+#include "Components.h"
 namespace AnorEngine
 {
 	Scene::Scene()
@@ -11,6 +12,25 @@ namespace AnorEngine
 	}
 	void Scene::OnRender(float deltaTime)
 	{
+		//Exaplanation: In this OnRender function, the user can retrieve whatever component they want and do operations on them.
+
+		//Update scripts.
+		//This part requires some deep knowledge of C++ to really wrap your head around it. It just calls the bound functions of the scriptComponent though. 
+		//Function binding part is what really makes the whole thing complicated.
+		{
+			m_Registry.view<NativeScriptComponent>().each([=](auto entity, auto& nativeScriptComponent)
+			{
+				if (!nativeScriptComponent.Instance)
+				{
+					nativeScriptComponent.InstantiateFunction();
+					nativeScriptComponent.Instance->m_Entity = Entity{ entity, this };
+					nativeScriptComponent.OnCreateFunction(nativeScriptComponent.Instance);
+				}
+				nativeScriptComponent.OnUpdateFunction(nativeScriptComponent.Instance, deltaTime);
+			});
+		}
+
+		//Retrieving the camera component of each entity in the scene. What you do after you retrieve them is up to you / to user.
 		Graphics::Camera* mainCamera = nullptr;
 		glm::mat4* mainCameraTransform = nullptr; 
 		auto view = m_Registry.view<TransformComponent, CameraComponent>();
@@ -24,6 +44,8 @@ namespace AnorEngine
 				break;
 			}
 		}
+
+		//Retrieving sprite renderer component here so that we can send the corresponding data to the renderer2D.
 		if (mainCamera)
 		{
 			Graphics::Renderer2D::BeginScene(mainCamera, *mainCameraTransform);
@@ -36,6 +58,7 @@ namespace AnorEngine
 			Graphics::Renderer2D::EndScene();
 		}
 	}
+
 	void Scene::OnResizeViewport(uint32_t width, uint32_t height)
 	{
 		m_ViewportWidth = width;
@@ -45,11 +68,8 @@ namespace AnorEngine
 		for (auto& entity : view)
 		{
 			auto& cameraComponent = view.get<CameraComponent>(entity);
-			if (!cameraComponent.FixedAspectRatio)
-			{
-				
+			if (!cameraComponent.FixedAspectRatio)	
 				cameraComponent.Camera.SetViewportSize(width, height);
-			}
 		}
 
 	}
@@ -60,9 +80,7 @@ namespace AnorEngine
 		{
 			auto& cameraComponent = view.get<CameraComponent>(entity);
 			if (!cameraComponent.FixedAspectRatio)
-			{
 				cameraComponent.Camera.SetOrthographic(cameraComponent.Camera.GetOrhographicSize() - yoffset, -1.0f, 1.0f);
-			}
 		}
 	}
 	Entity Scene::CreateEntity(const std::string& name)

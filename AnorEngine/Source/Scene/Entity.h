@@ -2,7 +2,6 @@
 #include "Scene.h"
 #include "entt.h"
 #include <glm.hpp>
-#include "Components.h"
 namespace AnorEngine
 {
 	class ANOR_API Entity

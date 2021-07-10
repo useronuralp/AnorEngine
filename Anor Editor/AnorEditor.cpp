@@ -15,26 +15,45 @@ namespace Game
 		Ref<Entity>			m_Entity1 = std::make_shared<Entity>(m_Scene->CreateEntity("Diamonds"));
 		Ref<Texture>		m_Entity1TextureAtlas = std::make_shared<Texture>(solutionDir + "AnorEngine\\Assets\\Textures\\PlatformerTextures\\Tilesheet\\platformPack_tilesheet@2.png");
 		//Entity2----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-		Ref<Texture>		m_Entity2_Texture = std::make_shared<Texture>(solutionDir + "AnorEngine\\Assets\\Textures\\381f5a63791945.5abc4ccf1297d.png");
 		Ref<Entity>			m_Entity2 = std::make_shared<Entity>(m_Scene->CreateEntity("Block"));
+		Ref<Texture>		m_Entity2_Texture = std::make_shared<Texture>(solutionDir + "AnorEngine\\Assets\\Textures\\381f5a63791945.5abc4ccf1297d.png");
 		//Entity3----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+		Ref<Entity>			m_Entity3 = std::make_shared<Entity>(m_Scene->CreateEntity("Cute Guy"));
 		Ref<Texture>		m_Entity3TextureAtlas = std::make_shared<Texture>(solutionDir + "AnorEngine\\Assets\\Textures\\PlatformerTextures\\Tilesheet\\platformerPack_character@2.png");
 		glm::vec3			m_Entity3Position = { 0.0f,0.0f,0.0f };
-		Ref<Entity>			m_Entity3 = std::make_shared<Entity>(m_Scene->CreateEntity("Cute Guy"));
 		float				m_Entity3MoveSpeed = 5.0f;
 		//-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 		Ref<Entity>			m_CameraEntity = std::make_shared<Entity>(m_Scene->CreateEntity("Camera"));
-		glm::vec3			m_CameraPos = { 0.0f ,0.0f ,0.0f };
-		float			    m_CameraTranslationSpeed = 10.0f;
 	public:
 		ExampleLayer()
 		{
 		}
 		virtual void OnAttach() override
 		{
+			struct CameraController : public ScriptableEntity
+			{
+				void OnCreate()
+				{
+				}
+				void OnDestroy()
+				{
+				}
+				void OnUpdate(float deltaTime)
+				{
+					if (Input::EventHandler::IsKeyDown(ANOR_KEY_W))
+						GetComponent<TransformComponent>().Translate(0, 10.0f * deltaTime, 0);
+					else if (Input::EventHandler::IsKeyDown(ANOR_KEY_S))
+						GetComponent<TransformComponent>().Translate(0, -10.0f * deltaTime, 0);
+					if (Input::EventHandler::IsKeyDown(ANOR_KEY_A))
+						GetComponent<TransformComponent>().Translate(10.0f * deltaTime, 0, 0);
+					else if (Input::EventHandler::IsKeyDown(ANOR_KEY_D))
+						GetComponent<TransformComponent>().Translate(-10.0f * deltaTime, 0, 0);
+				}
+			};
 			if (m_CameraEntity)
 			{
 				m_CameraEntity->AddComponent<CameraComponent>();
+				m_CameraEntity->AddComponent<NativeScriptComponent>().Bind<CameraController>();
 			}
 			if (m_Entity1)
 			{
@@ -53,22 +72,7 @@ namespace Game
 		}
 		virtual void OnUpdate(float deltaTime) override
 		{
-			if (Input::EventHandler::IsKeyDown(ANOR_KEY_W))
-			{
-				m_CameraPos.y += m_CameraTranslationSpeed * deltaTime;
-			}
-			else if (Input::EventHandler::IsKeyDown(ANOR_KEY_S))
-			{
-				m_CameraPos.y -= m_CameraTranslationSpeed * deltaTime;
-			}
-			if (Input::EventHandler::IsKeyDown(ANOR_KEY_A))
-			{
-				m_CameraPos.x -= m_CameraTranslationSpeed * deltaTime;
-			}
-			else if (Input::EventHandler::IsKeyDown(ANOR_KEY_D))
-			{
-				m_CameraPos.x += m_CameraTranslationSpeed * deltaTime;
-			}
+			
 			//Querying the EventHandler here so that we can move the quad.
 			if (Input::EventHandler::IsKeyDown(ANOR_KEY_I))
 				m_Entity3Position.y += m_Entity3MoveSpeed * deltaTime;
@@ -79,11 +83,9 @@ namespace Game
 			else if (Input::EventHandler::IsKeyDown(ANOR_KEY_L))
 				m_Entity3Position.x += m_Entity3MoveSpeed * deltaTime;
 
-			m_CameraEntity->GetComponent<TransformComponent>().Translate(m_CameraPos.x, m_CameraPos.y, m_CameraPos.z);
 			m_Entity3->GetComponent<TransformComponent>().Translate(m_Entity3Position.x, m_Entity3Position.y, m_Entity3Position.z);
 			m_Entity3Position = { 0.0f, 0.0f, 0.0f };
 			m_Scene->OnRender(deltaTime);
-			m_CameraPos = { 0,0,0 };
 		}
 		virtual void OnImGuiRender() override
 		{
@@ -201,8 +203,8 @@ namespace Game
 			ParticleProperties particleProperties;
 			particleProperties.Color = { 1, 1, 1, 0.5f };
 			particleProperties.LifeTime = 8.0f;
-			particleProperties.Size = 0.3f;
-			particleProperties.Speed = 10.0f;
+			particleProperties.Size = 0.1f;
+			particleProperties.Speed = 3.5f;
 			particleProperties.EmissionPoint = { -3.0f, 0.0f,0.0f };
 			m_ParticleSystem = std::make_shared<ParticleSystem>(particleProperties);
 			//Layer insertion----------------------------------------------------------------------------------------

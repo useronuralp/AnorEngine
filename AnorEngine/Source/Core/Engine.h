@@ -18,6 +18,7 @@
 #include "Utility/Timer.h"
 #include "Graphics/Framebuffer.h"
 #include "Scene/Entity.h"
+#include "Scene/ScriptableEntity.h"
 #include "Scene/Scene.h"
 #include "Scene/Components.h"
 #include "entt.h"

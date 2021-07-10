@@ -1,7 +1,6 @@
 #pragma once
 #include "entt.h"
 #include "Renderer/Renderer2D.h"
-#include "Scene/Components.h"
 #include "Graphics/Camera.h"
 
 namespace AnorEngine

@@ -235,6 +235,7 @@
     <ClInclude Include="Source\Scene\Entity.h" />
     <ClInclude Include="Source\Scene\SceneCamera.h" />
     <ClInclude Include="Source\Scene\Scene.h" />
+    <ClInclude Include="Source\Scene\ScriptableEntity.h" />
     <ClInclude Include="Source\Utility\Timer.h" />
     <ClInclude Include="Source\Events\Event.h" />
     <ClInclude Include="Source\Events\EventHandler.h" />
