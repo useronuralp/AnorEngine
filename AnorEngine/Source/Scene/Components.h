@@ -62,22 +62,14 @@ namespace AnorEngine
 		ScriptableEntity* Instance = nullptr;
 
 		//These std::function's will bind to the functions of whatever T class you pass here. This way you'll be able to call those functions in a script.
-		std::function<void()> InstantiateFunction;
-		std::function<void()> DestroyInstanceFunction;
-
-		std::function<void(ScriptableEntity*)> OnCreateFunction;
-		std::function<void(ScriptableEntity*, float)> OnUpdateFunction;
-		std::function<void(ScriptableEntity*)> OnDestroyFunction;
+		ScriptableEntity* (*InstantiateScript)();
+		void (*DestroyScript)(NativeScriptComponent*);
 
 		template<typename T>
 		void Bind()
 		{
-			InstantiateFunction = [&]() {Instance = new T(); };
-			DestroyInstanceFunction = [&]() { delete (T*)Instance; };
-
-			OnCreateFunction = [](ScriptableEntity* instance) {((T*)instance)->OnCreate(); };
-			OnDestroyFunction = [](ScriptableEntity* instance) {((T*)instance)->OnDestroy(); };
-			OnUpdateFunction = [](ScriptableEntity* instance, float deltaTime) {((T*)instance)->OnUpdate(deltaTime); };
+			InstantiateScript = []() {return static_cast<ScriptableEntity*>(new T()); };
+			DestroyScript = [](NativeScriptComponent* nsc) { delete nsc->Instance; nsc->Instance = nullptr; };
 		}
 	};
 }

@@ -18,15 +18,15 @@ namespace AnorEngine
 		//This part requires some deep knowledge of C++ to really wrap your head around it. It just calls the bound functions of the scriptComponent though. 
 		//Function binding part is what really makes the whole thing complicated.
 		{
-			m_Registry.view<NativeScriptComponent>().each([=](auto entity, auto& nativeScriptComponent)
+			m_Registry.view<NativeScriptComponent>().each([=](auto entity, auto& nsc)
 			{
-				if (!nativeScriptComponent.Instance)
+				if (!nsc.Instance)
 				{
-					nativeScriptComponent.InstantiateFunction();
-					nativeScriptComponent.Instance->m_Entity = Entity{ entity, this };
-					nativeScriptComponent.OnCreateFunction(nativeScriptComponent.Instance);
+					nsc.Instance = nsc.InstantiateScript();
+					nsc.Instance->m_Entity = Entity { entity, this };
+					nsc.Instance->OnCreate();
 				}
-				nativeScriptComponent.OnUpdateFunction(nativeScriptComponent.Instance, deltaTime);
+				nsc.Instance->OnUpdate(deltaTime);
 			});
 		}
 

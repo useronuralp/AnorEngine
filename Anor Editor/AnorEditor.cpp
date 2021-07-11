@@ -20,14 +20,9 @@ namespace Game
 		//Entity3----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 		Ref<Entity>			m_Entity3 = std::make_shared<Entity>(m_Scene->CreateEntity("Cute Guy"));
 		Ref<Texture>		m_Entity3TextureAtlas = std::make_shared<Texture>(solutionDir + "AnorEngine\\Assets\\Textures\\PlatformerTextures\\Tilesheet\\platformerPack_character@2.png");
-		glm::vec3			m_Entity3Position = { 0.0f,0.0f,0.0f };
-		float				m_Entity3MoveSpeed = 5.0f;
 		//-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 		Ref<Entity>			m_CameraEntity = std::make_shared<Entity>(m_Scene->CreateEntity("Camera"));
 	public:
-		ExampleLayer()
-		{
-		}
 		virtual void OnAttach() override
 		{
 			struct CameraController : public ScriptableEntity
@@ -45,9 +40,29 @@ namespace Game
 					else if (Input::EventHandler::IsKeyDown(ANOR_KEY_S))
 						GetComponent<TransformComponent>().Translate(0, -10.0f * deltaTime, 0);
 					if (Input::EventHandler::IsKeyDown(ANOR_KEY_A))
-						GetComponent<TransformComponent>().Translate(10.0f * deltaTime, 0, 0);
-					else if (Input::EventHandler::IsKeyDown(ANOR_KEY_D))
 						GetComponent<TransformComponent>().Translate(-10.0f * deltaTime, 0, 0);
+					else if (Input::EventHandler::IsKeyDown(ANOR_KEY_D))
+						GetComponent<TransformComponent>().Translate(10.0f * deltaTime, 0, 0);
+				}
+			};
+			struct CharacterController : public ScriptableEntity
+			{
+				void OnCreate()
+				{
+				}
+				void OnDestroy()
+				{
+				}
+				void OnUpdate(float deltaTime)
+				{
+					if (Input::EventHandler::IsKeyDown(ANOR_KEY_I))
+						GetComponent<TransformComponent>().Translate(0, 5.0f * deltaTime, 0);
+					else if (Input::EventHandler::IsKeyDown(ANOR_KEY_K))
+						GetComponent<TransformComponent>().Translate(0, -5.0f * deltaTime, 0);
+					if (Input::EventHandler::IsKeyDown(ANOR_KEY_J))
+						GetComponent<TransformComponent>().Translate(-5.0f * deltaTime, 0, 0);
+					else if (Input::EventHandler::IsKeyDown(ANOR_KEY_L))
+						GetComponent<TransformComponent>().Translate(5.0f * deltaTime, 0, 0);
 				}
 			};
 			if (m_CameraEntity)
@@ -68,30 +83,20 @@ namespace Game
 			{
 				m_Entity3->GetComponent<TransformComponent>().Translate(1.0f, 1.0f, 0.0f);
 				m_Entity3->AddComponent<SpriteRendererComponent>(m_Color, m_Entity3TextureAtlas, glm::vec2{ 1.0f, 1.0f }, glm::vec2{ 0 ,1 }, glm::vec2{ 192.0f, 175.0f });
+				m_Entity3->AddComponent<NativeScriptComponent>().Bind<CharacterController>();
 			}
 		}
 		virtual void OnUpdate(float deltaTime) override
 		{
-			
-			//Querying the EventHandler here so that we can move the quad.
-			if (Input::EventHandler::IsKeyDown(ANOR_KEY_I))
-				m_Entity3Position.y += m_Entity3MoveSpeed * deltaTime;
-			else if (Input::EventHandler::IsKeyDown(ANOR_KEY_K))
-				m_Entity3Position.y -= m_Entity3MoveSpeed * deltaTime;
-			if (Input::EventHandler::IsKeyDown(ANOR_KEY_J))
-				m_Entity3Position.x -= m_Entity3MoveSpeed * deltaTime;
-			else if (Input::EventHandler::IsKeyDown(ANOR_KEY_L))
-				m_Entity3Position.x += m_Entity3MoveSpeed * deltaTime;
-
-			m_Entity3->GetComponent<TransformComponent>().Translate(m_Entity3Position.x, m_Entity3Position.y, m_Entity3Position.z);
-			m_Entity3Position = { 0.0f, 0.0f, 0.0f };
 			m_Scene->OnRender(deltaTime);
 		}
 		virtual void OnImGuiRender() override
 		{
+			ImGui::Separator();
 			ImGui::ColorEdit4(&m_Entity1->GetComponent<TagComponent>().Tag[0], glm::value_ptr(m_Entity1->GetComponent<SpriteRendererComponent>().Color));
 			ImGui::ColorEdit4(&m_Entity2->GetComponent<TagComponent>().Tag[0], glm::value_ptr(m_Entity2->GetComponent<SpriteRendererComponent>().Color));
 			ImGui::ColorEdit4(&m_Entity3->GetComponent<TagComponent>().Tag[0], glm::value_ptr(m_Entity3->GetComponent<SpriteRendererComponent>().Color));
+			ImGui::Separator();
 		}
 		virtual void OnEvent(Ref<Input::Event> e) override
 		{
@@ -99,21 +104,18 @@ namespace Game
 			{
 				if (e->GetEventType() == Input::EventType::WindowResizeEvent)
 				{
-					WARN("Resizing window!!!!");
 					auto castEvent = std::static_pointer_cast<Input::WindowResizeEvent>(e);
 					OnResizeViewport(castEvent->GetWidth(), castEvent->GetHeight());
 					e->m_Handled = true;
 				}
 				if (e->GetEventType() == Input::EventType::MouseScrollEvent)
 				{
-					WARN("Scrolling!!!!");
 					auto castEvent = std::static_pointer_cast<Input::MouseScrollEvent>(e);
 					OnMouseScroll(castEvent->GetXOffset(), castEvent->GetYOffset());
 					e->m_Handled = true;
 				}
 			}
 		}
-	public:
 		virtual void OnResizeViewport(uint32_t width, uint32_t height) override
 		{
 			m_Scene->OnResizeViewport(width, height);
@@ -203,7 +205,7 @@ namespace Game
 			ParticleProperties particleProperties;
 			particleProperties.Color = { 1, 1, 1, 0.5f };
 			particleProperties.LifeTime = 8.0f;
-			particleProperties.Size = 0.1f;
+			particleProperties.Size = 0.25f;
 			particleProperties.Speed = 3.5f;
 			particleProperties.EmissionPoint = { -3.0f, 0.0f,0.0f };
 			m_ParticleSystem = std::make_shared<ParticleSystem>(particleProperties);
