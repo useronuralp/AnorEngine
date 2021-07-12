@@ -17,7 +17,7 @@ namespace AnorEngine {
 			virtual void OnResizeViewport(uint32_t width, uint32_t height) {};
 			virtual void OnMouseScroll(float xoffset, float yoffset) {};
 			virtual void OnImGuiRender() {};
-			inline const char* getName() { return m_LayerName; }
+			inline const char* GetName() { return m_LayerName; }
 			void logInfoDebug();
 		protected:
 			const char* m_LayerName;

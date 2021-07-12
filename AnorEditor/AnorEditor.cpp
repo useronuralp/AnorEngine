@@ -1,5 +1,6 @@
 #include <Core/Engine.h>
 #include <Core/EntryPoint.h>
+#include <Panels/SceneHierarchyPanel.h>
 namespace Game
 {
 	using namespace AnorEngine;
@@ -8,6 +9,7 @@ namespace Game
 
 	class ExampleLayer : public Layer
 	{
+		SceneHierarchyPanel m_SceneHierarchyPanel;
 		glm::vec4			m_Color = { 1,1,1,1 };
 		std::string			solutionDir = __SOLUTION_DIR;
 		Ref<Scene>			m_Scene = std::make_shared<Scene>();
@@ -79,12 +81,16 @@ namespace Game
 				m_Entity2->GetComponent<TransformComponent>().Translate(2.0f, 1.0f, 0.0f);
 				m_Entity2->AddComponent<SpriteRendererComponent>(m_Color, m_Entity2_Texture);
 			}
+			//TODO : Make this line of code work. This Paritlce System class should be derived from entity or scriptable entity ?.
+			//m_ParticleSystem->AddComponent<SpriteRendererComponent>(m_Texture);
 			if (m_Entity3)
 			{
 				m_Entity3->GetComponent<TransformComponent>().Translate(1.0f, 1.0f, 0.0f);
 				m_Entity3->AddComponent<SpriteRendererComponent>(m_Color, m_Entity3TextureAtlas, glm::vec2{ 1.0f, 1.0f }, glm::vec2{ 0 ,1 }, glm::vec2{ 192.0f, 175.0f });
 				m_Entity3->AddComponent<NativeScriptComponent>().Bind<CharacterController>();
 			}
+
+			m_SceneHierarchyPanel.SetContext(m_Scene);
 		}
 		virtual void OnUpdate(float deltaTime) override
 		{
@@ -97,6 +103,8 @@ namespace Game
 			ImGui::ColorEdit4(&m_Entity2->GetComponent<TagComponent>().Tag[0], glm::value_ptr(m_Entity2->GetComponent<SpriteRendererComponent>().Color));
 			ImGui::ColorEdit4(&m_Entity3->GetComponent<TagComponent>().Tag[0], glm::value_ptr(m_Entity3->GetComponent<SpriteRendererComponent>().Color));
 			ImGui::Separator();
+
+			m_SceneHierarchyPanel.OnImGuiRender();
 		}
 		virtual void OnEvent(Ref<Input::Event> e) override
 		{
@@ -191,7 +199,7 @@ namespace Game
 		AnorEditor(const char* appName)
 			:Application(appName), m_OrthoCamera(std::make_shared<OrthographicCamera>(-1280.0f / 720.0f * (5), 1280.0f / 720.0f * (5), -1 * (5), 1 * (5))), m_PersCamera(std::make_shared<PerspectiveCamera>(1280, 720))
 		{
-			Input::EventHandler::SetTargetApplication(this); //Important to set this to the active Application else, you won't get your input processed.		
+			Input::EventHandler::SetTargetApplication(this); //Important to set this to the active Application else, you won't get your input processed.	
 			m_ImGuiBase->Init(); // Need to call the initialization code for imgui here.
 			//Framebuffer Settings --------------------------------------------------------------------------------------------
 			FramebufferSpecifications FramebufferSpecs;
@@ -204,9 +212,9 @@ namespace Game
 			//Particle Settings----------------------------------------------------------------------------------
 			ParticleProperties particleProperties;
 			particleProperties.Color = { 1, 1, 1, 0.5f };
-			particleProperties.LifeTime = 8.0f;
+			particleProperties.LifeTime = 4.0f;
 			particleProperties.Size = 0.25f;
-			particleProperties.Speed = 3.5f;
+			particleProperties.Speed = 2.0f;
 			particleProperties.EmissionPoint = { -3.0f, 0.0f,0.0f };
 			m_ParticleSystem = std::make_shared<ParticleSystem>(particleProperties);
 			//Layer insertion----------------------------------------------------------------------------------------
@@ -316,16 +324,16 @@ namespace Game
 				}
 				if (e->GetEventType() == Input::EventType::MouseMoveEvent)
 				{
-					auto ev = std::static_pointer_cast<Input::MouseMoveEvent>(e);
-					float x = ev->GetMouseXPosition();
-					float y = ev->GetMouseYPosition();
-					int width, height;
-					m_OpenGLWindow->GetWindowSize(&width, &height);
-					float xoffset = width - m_ViewportSize.x;
-					float yoffset = height - m_ViewportSize.y;
-					float aspectRatio = (float)width / (float)height;
-					OrthographicCameraBounds bounds = {-aspectRatio * 5, aspectRatio* 5, -5, 5 };
-					m_ParticleSystem->SetEmissionPoint((x - xoffset) / m_ViewportSize.x * bounds.GetWidth() - bounds.GetWidth() * 0.5f, bounds.GetHeight() * 0.5f - (y - yoffset) / m_ViewportSize.y * bounds.GetHeight());
+					//auto ev = std::static_pointer_cast<Input::MouseMoveEvent>(e);
+					//float x = ev->GetMouseXPosition();
+					//float y = ev->GetMouseYPosition();
+					//int width, height;
+					//m_OpenGLWindow->GetWindowSize(&width, &height);
+					//float xoffset = width - m_ViewportSize.x;
+					//float yoffset = height - m_ViewportSize.y;
+					//float aspectRatio = (float)width / (float)height;
+					//OrthographicCameraBounds bounds = {-aspectRatio * 5, aspectRatio* 5, -5, 5 };
+					//m_ParticleSystem->SetEmissionPoint((x - xoffset) / m_ViewportSize.x * bounds.GetWidth() - bounds.GetWidth() * 0.5f, bounds.GetHeight() * 0.5f - (y - yoffset) / m_ViewportSize.y * bounds.GetHeight());
 				}
 			}
 		}

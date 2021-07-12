@@ -39,6 +39,15 @@ namespace AnorEngine
 			m_Scene->m_Registry.remove<T>(m_EntityHandle);
 		}
 		operator bool() { return m_EntityHandle != entt::null; }
+		operator uint32_t() { return (uint32_t)m_EntityHandle; }
+		bool const operator == (const Entity& other)
+		{
+			return this->m_EntityHandle == other.m_EntityHandle && this->m_Scene == other.m_Scene;
+		}
+		bool operator != (Entity& other)
+		{
+			return !(*this == other);
+		}
 	private:
 		entt::entity m_EntityHandle = entt::null;
 		Scene* m_Scene = nullptr;

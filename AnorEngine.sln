@@ -10,7 +10,7 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Sandbox", "Sandbox\Sandbox.
 		{B5BB4A7B-BDA7-4F07-A147-4C8D7333A707} = {B5BB4A7B-BDA7-4F07-A147-4C8D7333A707}
 	EndProjectSection
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Anor Editor", "Anor Editor\Anor Editor.vcxproj", "{9F2FCBD7-07EB-4450-A76F-D52E67E3EEC6}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "AnorEditor", "AnorEditor\AnorEditor.vcxproj", "{9F2FCBD7-07EB-4450-A76F-D52E67E3EEC6}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

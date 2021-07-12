@@ -16,7 +16,7 @@ namespace AnorEngine
 			glm::vec4							  Color;
 		};
 		class ANOR_API Particle
-		{	
+		{
 			friend class ParticleSystem;
 			float										   m_Speed;
 			float										   m_LifeTime;
@@ -30,16 +30,16 @@ namespace AnorEngine
 			glm::vec4									   m_Color;
 			std::chrono::system_clock::time_point	       m_LifeStartTime;
 		public:
-			Particle();													
+			Particle();
 		private:
-			   void RandomizeParticle();
-			   void OnUpdate(float deltaTime);
+			void RandomizeParticle();
+			void OnUpdate(float deltaTime);
 		};
 
 		class ANOR_API ParticleSystem
 		{
 			ParticleProperties m_Properties;
-			glm::vec3 m_EmissionPoint = {0.0f, 0.0f, 0.0f};
+			glm::vec3 m_EmissionPoint = { 0.0f, 0.0f, 0.0f };
 			std::vector<Ref<Particle>> m_Particles;
 		public:
 			ParticleSystem(ParticleProperties properties);

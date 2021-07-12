@@ -56,6 +56,8 @@ namespace AnorEngine
 				Graphics::Renderer2D::Submit(transform, sprite.Size, sprite.Texture, sprite.SubTextureOffset, sprite.SubTextureDimensions, 0.0f, sprite.Color);
 			}
 			Graphics::Renderer2D::EndScene();
+
+
 		}
 	}
 
