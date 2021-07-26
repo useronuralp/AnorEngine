@@ -11,8 +11,9 @@ namespace AnorEngine
 	Application::Application(const char* appName)
 	{	
 		s_Instance = this; //static setup of instance of this singleton class.
+		m_OpenGLWindow = std::make_shared<Graphics::OpenGLWindow>(appName, 1280, 720); //window creation
 		EngineInitializer::init();
-		m_OpenGLWindow = std::make_shared<Graphics::OpenGLWindow>(appName, 1280, 720);  //window creation
+		ImGuiBase::Init(); // Need to call the initialization code for imgui here. 
 		if (!m_OpenGLWindow)
 		{
 			CRITICAL_ASSERT("APP::{0}", "Application failed to initialize the OpenGLWindow");

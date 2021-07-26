@@ -5,18 +5,15 @@
 #include <ImGuiExampleBuilds/imgui_impl_opengl3.h>
 namespace AnorEngine
 {
-	namespace Graphics
-	{	
-		class ANOR_API ImGuiBase
-		{
-		public:
-			ImGuiBase() {};
-		public:
-			void Begin();
-			void End();
-			bool Init();
-		private:
-			float m_Time = 0.0f;
-		};
-	}
+	class ANOR_API ImGuiBase
+	{
+	public:
+		ImGuiBase() {};
+	public:
+		static void Begin();
+		static void End();
+		static bool Init();
+	private:
+		static float m_Time;
+	};
 }

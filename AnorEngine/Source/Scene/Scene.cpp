@@ -53,11 +53,9 @@ namespace AnorEngine
 			for (auto& entity : group)
 			{
 				auto [transform, sprite] = group.get<TransformComponent, SpriteRendererComponent>(entity);
-				Graphics::Renderer2D::Submit(transform, sprite.Size, sprite.Texture, sprite.SubTextureOffset, sprite.SubTextureDimensions, 0.0f, sprite.Color);
+				Graphics::Renderer2D::Submit(transform, sprite.TextureSize, sprite.Texture, sprite.SubTextureOffset, sprite.SubTextureDimensions, 0.0f, sprite.Color);
 			}
 			Graphics::Renderer2D::EndScene();
-
-
 		}
 	}
 

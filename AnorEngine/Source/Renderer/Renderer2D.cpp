@@ -44,6 +44,7 @@ namespace AnorEngine
 		{
 			glEnable(GL_BLEND);
 			glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+			//glEnable(GL_DEPTH_TEST);
 
 			BufferLayout QuadBufferLayout = { {ShaderDataType::vec3, "a_Position", 0} ,{ShaderDataType::vec4, "a_Color", 1} , {ShaderDataType::vec2, "a_TexCoord", 2} , {ShaderDataType::vec, "a_TexIndex", 3} };
 			s_Data.QuadVertexArray = std::make_shared<VertexArray>();

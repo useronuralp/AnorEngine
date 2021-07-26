@@ -37,7 +37,7 @@ namespace AnorEngine
 			{		
 				auto& transform = entity.GetComponent<TransformComponent>().Transform;
 				//You can modify the transform translation values (x,y) with an ImGui DragFloat3 like this.
-				if (ImGui::DragFloat3("Position", glm::value_ptr(transform[3]), 0.1f))
+				if (ImGui::DragFloat3("Position", glm::value_ptr(transform[3]), 0.01f))
 				{
 					;
 				}
@@ -45,9 +45,42 @@ namespace AnorEngine
 			}
 
 		}
-		if (entity.HasComponent<TagComponent>())
+		if (entity.HasComponent<CameraComponent>())
 		{
+			auto& camera = entity.GetComponent<CameraComponent>().Camera;
 
+			if (camera.GetProjectionType() == ProjectionType::Perspective)
+			{
+				float FOV = camera.GetPerspectiveFOV();
+				if (ImGui::DragFloat("FOV", &FOV))
+					camera.SetPerspectiveFOV(FOV);
+				float perspectiveNear = camera.GetNearClipPerspective();
+				if (ImGui::DragFloat("Near", &perspectiveNear))
+					camera.SetNearClipPerspective(perspectiveNear);
+				float perspectiveFar = camera.GetFarClipPerspective();
+				if (ImGui::DragFloat("Far", &perspectiveFar))
+					camera.SetFarClipPerspective(perspectiveFar);
+			}
+			else
+			{
+				float orthoSize = camera.GetOrhographicSize();
+				if (ImGui::DragFloat("Size", &orthoSize))
+					camera.SetOrthoGraphicSize(orthoSize);
+				float orthoNear = camera.GetNearClipOrthographic();
+				if (ImGui::DragFloat("Near", &orthoNear))
+					camera.SetNearClipOrthographic(orthoNear);
+				float orthoFar = camera.GetFarClipOrthographic();
+				if (ImGui::DragFloat("Far", &orthoFar))
+					camera.SetFarClipOrthographic(orthoFar);
+			}
+		}
+		if (entity.HasComponent<SpriteRendererComponent>())
+		{
+			auto& spriteRenderer = entity.GetComponent<SpriteRendererComponent>();
+			ImGui::Separator();
+			ImGui::ColorEdit4("Color", glm::value_ptr(spriteRenderer.Color));
+			ImGui::DragFloat2("Repeat Textures",  glm::value_ptr(spriteRenderer.TextureSize));
+			ImGui::Separator();
 		}
 	}
 	void SceneHierarchyPanel::OnImGuiRender()

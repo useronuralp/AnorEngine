@@ -29,20 +29,20 @@ namespace AnorEngine
 		glm::vec4 Color { 1.0f, 1.0f, 1.0f, 1.0f };
 		std::string solutionDir = __SOLUTION_DIR;
 		Ref<Graphics::Texture> Texture = std::make_shared<Graphics::Texture>(solutionDir + "AnorEngine\\Assets\\Textures\\WhiteTexture.PNG");
-		glm::vec2 Size = {1.0f, 1.0f};
+		glm::vec2 TextureSize = {1.0f, 1.0f};
 		glm::vec2 SubTextureOffset = { 1.0f, 1.0f };
-		glm::vec2 SubTextureDimensions = { Texture->GetHeight(), Texture->GetWidth() };
+		glm::vec2 SubTextureDimensions = { Texture->GetHeight(), Texture->GetWidth() }; //default
 
 		SpriteRendererComponent() = default;
 		SpriteRendererComponent(const SpriteRendererComponent&) = default;
-		SpriteRendererComponent(const glm::vec2& size, const glm::vec4& color)
-			:Size(size), Color(color){}
+		SpriteRendererComponent(const glm::vec2& textureSize, const glm::vec4& color)
+			:TextureSize(textureSize), Color(color){}
 		SpriteRendererComponent(const glm::vec4& color)
 			:Color(color) {}
 		SpriteRendererComponent(const glm::vec4& color, Ref<Graphics::Texture> texture)
 			:Color(color), Texture(texture) {}
-		SpriteRendererComponent(const glm::vec4& color, Ref<Graphics::Texture> texture, const glm::vec2& size, const glm::vec2& subTextureOffset, const glm::vec2& subTextureDimensions)
-			:Color(color), Texture(texture), Size(size),SubTextureOffset(subTextureOffset), SubTextureDimensions(subTextureDimensions) {}
+		SpriteRendererComponent(const glm::vec4& color, Ref<Graphics::Texture> texture, const glm::vec2& textureSize, const glm::vec2& subTextureOffset, const glm::vec2& subTextureDimensions)
+			:Color(color), Texture(texture), TextureSize(textureSize),SubTextureOffset(subTextureOffset), SubTextureDimensions(subTextureDimensions) {}
 	};
 	struct ANOR_API TagComponent
 	{

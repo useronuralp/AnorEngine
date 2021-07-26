@@ -9,7 +9,7 @@ namespace AnorEngine
 			uint32_t FramebufferID = 0;
 			uint32_t DepthAttachment = 0;
 			uint32_t ColorAttachment = 0;
-			uint32_t Width = 0, Height = 0;
+			uint32_t Width = 1280, Height = 720;
 		};
 
 		class ANOR_API Framebuffer

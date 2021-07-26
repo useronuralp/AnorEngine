@@ -98,12 +98,6 @@ namespace Game
 		}
 		virtual void OnImGuiRender() override
 		{
-			ImGui::Separator();
-			ImGui::ColorEdit4(&m_Entity1->GetComponent<TagComponent>().Tag[0], glm::value_ptr(m_Entity1->GetComponent<SpriteRendererComponent>().Color));
-			ImGui::ColorEdit4(&m_Entity2->GetComponent<TagComponent>().Tag[0], glm::value_ptr(m_Entity2->GetComponent<SpriteRendererComponent>().Color));
-			ImGui::ColorEdit4(&m_Entity3->GetComponent<TagComponent>().Tag[0], glm::value_ptr(m_Entity3->GetComponent<SpriteRendererComponent>().Color));
-			ImGui::Separator();
-
 			m_SceneHierarchyPanel.OnImGuiRender();
 		}
 		virtual void OnEvent(Ref<Input::Event> e) override
@@ -182,7 +176,6 @@ namespace Game
 		LayerStack						  m_LayerStack;
 		Ref<OrthographicCamera>			  m_OrthoCamera;
 		Ref<PerspectiveCamera>			  m_PersCamera;
-		Ref<ImGuiBase>					  m_ImGuiBase;
 		Ref<ExampleLayer>				  m_Layer;
 		Ref<Background>					  m_Bg;
 		Ref<ParticleSystem>				  m_ParticleSystem;
@@ -200,12 +193,8 @@ namespace Game
 			:Application(appName), m_OrthoCamera(std::make_shared<OrthographicCamera>(-1280.0f / 720.0f * (5), 1280.0f / 720.0f * (5), -1 * (5), 1 * (5))), m_PersCamera(std::make_shared<PerspectiveCamera>(1280, 720))
 		{
 			Input::EventHandler::SetTargetApplication(this); //Important to set this to the active Application else, you won't get your input processed.	
-			m_ImGuiBase->Init(); // Need to call the initialization code for imgui here.
 			//Framebuffer Settings --------------------------------------------------------------------------------------------
-			FramebufferSpecifications FramebufferSpecs;
-			FramebufferSpecs.Width = 1280;
-			FramebufferSpecs.Height = 720;
-			m_Framebuffer = std::make_shared<Framebuffer>(FramebufferSpecs);
+			m_Framebuffer = std::make_shared<Framebuffer>(FramebufferSpecifications());
 			//Layer Creation--------------------------------------------------------------------------------------------
 			m_Layer = std::make_shared<ExampleLayer>();
 			m_Bg = std::make_shared<Background>(m_OrthoCamera);
@@ -247,7 +236,7 @@ namespace Game
 					Renderer2D::EndScene();
 				}
 				m_Framebuffer->Unbind();
-				m_ImGuiBase->Begin(); //-----------------------ImGui Beginning-------------------------
+				ImGuiBase::Begin(); //-----------------------ImGui Beginning-------------------------
 				OnImGuiOverlayRender();
 
 				ImGui::Begin("Settings");
@@ -281,7 +270,7 @@ namespace Game
 				ImGui::Image((void*)texture, { m_Framebuffer->GetDimensions().x, m_Framebuffer->GetDimensions().y }, { 0,1 }, { 1,0 });
 				ImGui::End();
 				ImGui::PopStyleVar();
-				m_ImGuiBase->End(); //-----------------------ImGui END -------------------------------
+				ImGuiBase::End(); //-----------------------ImGui END -------------------------------
 
 				//Resizing the framebuffer if the ImGui panel happens to get resized. (Framebuffer and the panel sizes should be equal.)
 				//Try to resize the framebuffer at the end. Otherwise it causes weird flickering problems.
