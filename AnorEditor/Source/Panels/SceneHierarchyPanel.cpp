@@ -15,8 +15,9 @@ namespace AnorEngine
 	}
 	void SceneHierarchyPanel::DrawComponents(Entity entity)
 	{
-		if (entity.HasComponent<TagComponent>())
+		DrawComponent<TagComponent>("Tag", entity, [&entity]()
 		{
+
 			//Grabbing the tag component of an entity by reference here.
 			auto& tag = entity.GetComponent<TagComponent>().Tag;
 			//Create a local buffer and set its content to 0 so it is clear.
@@ -30,22 +31,20 @@ namespace AnorEngine
 				//If the buffer was modified we change the tag component of the entity with the newly typed in tag.
 				tag = std::string(buffer);
 			}
-		}
-		if (entity.HasComponent<TransformComponent>())
-		{
-			if (ImGui::TreeNodeEx((void*)typeid(TransformComponent).hash_code(), ImGuiTreeNodeFlags_DefaultOpen, "Transform"))
-			{		
-				auto& transform = entity.GetComponent<TransformComponent>().Transform;
-				//You can modify the transform translation values (x,y) with an ImGui DragFloat3 like this.
-				if (ImGui::DragFloat3("Position", glm::value_ptr(transform[3]), 0.01f))
-				{
-					;
-				}
-				ImGui::TreePop();
-			}
 
-		}
-		if (entity.HasComponent<CameraComponent>())
+		});
+
+		DrawComponent<TransformComponent>("Transform", entity, [&entity]()
+		{
+			auto& transform = entity.GetComponent<TransformComponent>().Transform;
+			//You can modify the transform translation values (x,y) with an ImGui DragFloat3 like this.
+			if (ImGui::DragFloat3("Position", glm::value_ptr(transform[3]), 0.01f))
+			{
+				;
+			}
+		});
+
+		DrawComponent<CameraComponent>("Camera", entity, [&entity]()
 		{
 			auto& camera = entity.GetComponent<CameraComponent>().Camera;
 
@@ -73,15 +72,20 @@ namespace AnorEngine
 				if (ImGui::DragFloat("Far", &orthoFar))
 					camera.SetFarClipOrthographic(orthoFar);
 			}
-		}
-		if (entity.HasComponent<SpriteRendererComponent>())
+		});
+
+		DrawComponent<SpriteRendererComponent>("Sprite Renderer", entity, [&entity]()
 		{
-			auto& spriteRenderer = entity.GetComponent<SpriteRendererComponent>();
-			ImGui::Separator();
-			ImGui::ColorEdit4("Color", glm::value_ptr(spriteRenderer.Color));
-			ImGui::DragFloat2("Repeat Textures",  glm::value_ptr(spriteRenderer.TextureSize));
-			ImGui::Separator();
-		}
+			if (entity.HasComponent<SpriteRendererComponent>())
+			{
+				auto& spriteRenderer = entity.GetComponent<SpriteRendererComponent>();
+				ImGui::Separator();
+				ImGui::ColorEdit4("Color", glm::value_ptr(spriteRenderer.Color));
+				ImGui::DragFloat2("Repeat Textures", glm::value_ptr(spriteRenderer.TextureSize));
+				ImGui::Separator();
+			}
+		});
+
 	}
 	void SceneHierarchyPanel::OnImGuiRender()
 	{
