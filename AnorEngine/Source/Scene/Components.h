@@ -7,22 +7,27 @@ namespace AnorEngine
 {
 	struct ANOR_API TransformComponent
 	{
-		glm::mat4 Transform { 1.0f };
+		glm::vec3 Translation { 0.0f, 0.0f, 0.0f };
+		glm::vec3 Scale       { 1.0f, 1.0f, 1.0f };
+		glm::vec3 Rotation    { 0.0f, 0.0f, 0.0f };
 
 		TransformComponent() = default;
 		TransformComponent(const TransformComponent&) = default;
-		TransformComponent(const glm::mat4& transform)
-			:Transform(transform) {}
-		void Translate(float x, float y, float z)
+
+		glm::mat4 GetTransform()
 		{
-			Transform = glm::translate(Transform, glm::vec3{ x,y,z });
+			glm::mat4 transform(1.0f);
+			transform = glm::translate(transform, Translation) * (glm::rotate(transform, Rotation.x, { 1.0f, 0.0f, 0.0f }) *
+				glm::rotate(transform, Rotation.y, { 0.0f, 1.0f, 0.0f }) * glm::rotate(transform, Rotation.z, { 0.0f, 0.0f, 1.0f })) * glm::scale(transform, { Scale.x, Scale.y, Scale.z });
+			return transform;
 		}
-		void Scale(float magnitude)
+		const glm::mat4 GetTransform() const
 		{
-			Transform = glm::scale(Transform, glm::vec3{ magnitude,magnitude,magnitude });
+			glm::mat4 transform(1.0f);
+			transform = glm::translate(transform, Translation) * (glm::rotate(transform, Rotation.x, { 1.0f, 0.0f, 0.0f }) * 
+				glm::rotate(transform, Rotation.y, { 0.0f, 1.0f, 0.0f }) * glm::rotate(transform, Rotation.z, { 0.0f, 0.0f, 1.0f })) * glm::scale(transform, { Scale.x, Scale.y, Scale.z });
+			return transform;
 		}
-		operator glm::mat4& () { return Transform; }
-		operator const glm::mat4& () const { return Transform; }
 	};
 	struct ANOR_API SpriteRendererComponent
 	{

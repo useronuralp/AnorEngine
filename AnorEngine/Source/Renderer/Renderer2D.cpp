@@ -1,5 +1,6 @@
 #include "pch.h"
 #include "Renderer2D.h"
+#include "Scene/Components.h"
 namespace AnorEngine
 {
 	namespace Graphics
@@ -390,7 +391,7 @@ namespace AnorEngine
 			s_Data.QuadIndexCount += 6;
 		}
 
-		void Renderer2D::Submit(const glm::mat4& transform, const glm::vec2& size, const Ref<Texture> texture, const glm::vec2& subTextureOffset, const glm::vec2& subTextureDimensions, float rotationDegree, const glm::vec4& tintColor)
+		void Renderer2D::Submit(const glm::mat4& transform, const glm::vec2& size, const Ref<Texture> texture, const glm::vec2& subTextureOffset, const glm::vec2& subTextureDimensions,const glm::vec4& tintColor)
 		{
 			if ((uint8_t*)s_Data.QuadVertexBufferPtr - (uint8_t*)s_Data.QuadVertexBufferBase == Renderer2DData::MaxQuads * sizeof(QuadVertex))
 			{
@@ -416,7 +417,8 @@ namespace AnorEngine
 				s_Data.TextureSlotIndex++;
 			}
 
-			glm::mat4 transformEdited =  glm::rotate(transform, glm::radians(rotationDegree), { 0.0f, 0.0f, 1.0f }) * glm::scale(transform, { size.x, size.y, 1.0f });
+			//This scaling is neccessary to match the sizes of the textures and required quads to draw them.
+			glm::mat4 transformEdited =  glm::scale(transform, { size.x, size.y, 1.0f });
 
 			s_Data.QuadVertexBufferPtr->Position = transformEdited * s_Data.QuadVertexPositions[0];
 			s_Data.QuadVertexBufferPtr->Color = tintColor;
@@ -444,6 +446,63 @@ namespace AnorEngine
 
 			s_Data.QuadIndexCount += 6;
 		}
+
+		void Renderer2D::Submit(const TransformComponent& tc, const SpriteRendererComponent& sc)
+		{
+			if ((uint8_t*)s_Data.QuadVertexBufferPtr - (uint8_t*)s_Data.QuadVertexBufferBase == Renderer2DData::MaxQuads * sizeof(QuadVertex))
+			{
+				EndScene();
+				s_Data.QuadIndexCount = 0;
+				s_Data.QuadVertexBufferPtr = s_Data.QuadVertexBufferBase;
+				s_Data.TextureSlotIndex = 1;
+			}
+
+			float textureIndex = 0.0f;
+			for (uint32_t i = 1; i < s_Data.TextureSlotIndex; i++)
+			{
+				if (*s_Data.TextureSlots[i].get() == *sc.Texture.get())
+				{
+					textureIndex = (float)i;
+					break;
+				}
+			}
+			if (textureIndex == 0.0f)
+			{
+				textureIndex = (float)s_Data.TextureSlotIndex;
+				s_Data.TextureSlots[s_Data.TextureSlotIndex] = sc.Texture;
+				s_Data.TextureSlotIndex++;
+			}
+
+			//This scaling is neccessary to match the sizes of the textures and required quads to draw them.
+			glm::mat4 transformEdited = glm::scale(tc.GetTransform(), { sc.TextureSize.x, sc.TextureSize.y, 1.0f });
+
+			s_Data.QuadVertexBufferPtr->Position = transformEdited * s_Data.QuadVertexPositions[0];
+			s_Data.QuadVertexBufferPtr->Color = sc.Color;
+			s_Data.QuadVertexBufferPtr->TexCoord = { sc.SubTextureOffset.x * (sc.SubTextureDimensions.x / sc.Texture->GetWidth()), sc.SubTextureOffset.y * (sc.SubTextureDimensions.y / sc.Texture->GetHeight()) };
+			s_Data.QuadVertexBufferPtr->TexIndex = textureIndex;
+			s_Data.QuadVertexBufferPtr++;
+
+			s_Data.QuadVertexBufferPtr->Position = transformEdited * s_Data.QuadVertexPositions[1];
+			s_Data.QuadVertexBufferPtr->Color = sc.Color;
+			s_Data.QuadVertexBufferPtr->TexCoord = { (sc.SubTextureOffset.x + sc.TextureSize.x) * (sc.SubTextureDimensions.x / sc.Texture->GetWidth()), sc.SubTextureOffset.y * (sc.SubTextureDimensions.y / sc.Texture->GetHeight()) };
+			s_Data.QuadVertexBufferPtr->TexIndex = textureIndex;
+			s_Data.QuadVertexBufferPtr++;
+
+			s_Data.QuadVertexBufferPtr->Position = transformEdited * s_Data.QuadVertexPositions[2];
+			s_Data.QuadVertexBufferPtr->Color = sc.Color;
+			s_Data.QuadVertexBufferPtr->TexCoord = { (sc.SubTextureOffset.x + sc.TextureSize.x) * (sc.SubTextureDimensions.x / sc.Texture->GetWidth()), (sc.SubTextureOffset.y + sc.TextureSize.y) * (sc.SubTextureDimensions.y / sc.Texture->GetHeight()) };
+			s_Data.QuadVertexBufferPtr->TexIndex = textureIndex;
+			s_Data.QuadVertexBufferPtr++;
+
+			s_Data.QuadVertexBufferPtr->Position = transformEdited * s_Data.QuadVertexPositions[3];
+			s_Data.QuadVertexBufferPtr->Color = sc.Color;
+			s_Data.QuadVertexBufferPtr->TexCoord = { sc.SubTextureOffset.x * (sc.SubTextureDimensions.x / sc.Texture->GetWidth()), (sc.SubTextureOffset.y + sc.TextureSize.y) * (sc.SubTextureDimensions.y / sc.Texture->GetHeight()) };
+			s_Data.QuadVertexBufferPtr->TexIndex = textureIndex;
+			s_Data.QuadVertexBufferPtr++;
+
+			s_Data.QuadIndexCount += 6;
+		}
+
 
 		void Renderer2D::Flush()
 		{
@@ -484,7 +543,6 @@ namespace AnorEngine
 			s_Data.QuadVertexBufferPtr = s_Data.QuadVertexBufferBase;
 			s_Data.TextureSlotIndex = 1;
 		}
-
 		void Renderer2D::EndScene()
 		{
 			uint32_t dataSize = (uint8_t*)s_Data.QuadVertexBufferPtr - (uint8_t*)s_Data.QuadVertexBufferBase;

@@ -38,13 +38,13 @@ namespace Game
 				void OnUpdate(float deltaTime)
 				{
 					if (Input::EventHandler::IsKeyDown(ANOR_KEY_W))
-						GetComponent<TransformComponent>().Translate(0, 10.0f * deltaTime, 0);
+						GetComponent<TransformComponent>().Translation.y += 10.0f * deltaTime;
 					else if (Input::EventHandler::IsKeyDown(ANOR_KEY_S))
-						GetComponent<TransformComponent>().Translate(0, -10.0f * deltaTime, 0);
+						GetComponent<TransformComponent>().Translation.y -= 10.0f * deltaTime;
 					if (Input::EventHandler::IsKeyDown(ANOR_KEY_A))
-						GetComponent<TransformComponent>().Translate(-10.0f * deltaTime, 0, 0);
+						GetComponent<TransformComponent>().Translation.x -= 10.0f * deltaTime;
 					else if (Input::EventHandler::IsKeyDown(ANOR_KEY_D))
-						GetComponent<TransformComponent>().Translate(10.0f * deltaTime, 0, 0);
+						GetComponent<TransformComponent>().Translation.x += 10.0f * deltaTime;
 				}
 			};
 			struct CharacterController : public ScriptableEntity
@@ -58,13 +58,13 @@ namespace Game
 				void OnUpdate(float deltaTime)
 				{
 					if (Input::EventHandler::IsKeyDown(ANOR_KEY_I))
-						GetComponent<TransformComponent>().Translate(0, 5.0f * deltaTime, 0);
+						GetComponent<TransformComponent>().Translation.y += 5.0f * deltaTime;
 					else if (Input::EventHandler::IsKeyDown(ANOR_KEY_K))
-						GetComponent<TransformComponent>().Translate(0, -5.0f * deltaTime, 0);
+						GetComponent<TransformComponent>().Translation.y -= 5.0f * deltaTime;
 					if (Input::EventHandler::IsKeyDown(ANOR_KEY_J))
-						GetComponent<TransformComponent>().Translate(-5.0f * deltaTime, 0, 0);
+						GetComponent<TransformComponent>().Translation.x -= 5.0f * deltaTime;
 					else if (Input::EventHandler::IsKeyDown(ANOR_KEY_L))
-						GetComponent<TransformComponent>().Translate(5.0f * deltaTime, 0, 0);
+						GetComponent<TransformComponent>().Translation.x += 5.0f * deltaTime;
 				}
 			};
 			if (m_CameraEntity)
@@ -78,14 +78,12 @@ namespace Game
 			}
 			if (m_Entity2)
 			{
-				m_Entity2->GetComponent<TransformComponent>().Translate(2.0f, 1.0f, 0.0f);
 				m_Entity2->AddComponent<SpriteRendererComponent>(m_Color, m_Entity2_Texture);
 			}
 			//TODO : Make this line of code work. This Paritlce System class should be derived from entity or scriptable entity ?.
 			//m_ParticleSystem->AddComponent<SpriteRendererComponent>(m_Texture);
 			if (m_Entity3)
 			{
-				m_Entity3->GetComponent<TransformComponent>().Translate(1.0f, 1.0f, 0.0f);
 				m_Entity3->AddComponent<SpriteRendererComponent>(m_Color, m_Entity3TextureAtlas, glm::vec2{ 1.0f, 1.0f }, glm::vec2{ 0 ,1 }, glm::vec2{ 192.0f, 175.0f });
 				m_Entity3->AddComponent<NativeScriptComponent>().Bind<CharacterController>();
 			}

@@ -32,15 +32,15 @@ namespace AnorEngine
 
 		//Retrieving the camera component of each entity in the scene. What you do after you retrieve them is up to you / to user.
 		Graphics::Camera* mainCamera = nullptr;
-		glm::mat4* mainCameraTransform = nullptr; 
 		auto view = m_Registry.view<TransformComponent, CameraComponent>();
+		glm::mat4 mainCameraTransform;
 		for (auto& entity : view)
 		{
 			auto [transform, camera] = view.get<TransformComponent, CameraComponent>(entity);
 			if (camera.Primary)
 			{
 				mainCamera = &camera.Camera;
-				mainCameraTransform = &transform.Transform;
+				mainCameraTransform = transform.GetTransform();
 				break;
 			}
 		}
@@ -48,12 +48,12 @@ namespace AnorEngine
 		//Retrieving sprite renderer component here so that we can send the corresponding data to the renderer2D.
 		if (mainCamera)
 		{
-			Graphics::Renderer2D::BeginScene(mainCamera, *mainCameraTransform);
+			Graphics::Renderer2D::BeginScene(mainCamera, mainCameraTransform);
 			auto group = m_Registry.group<TransformComponent>(entt::get<SpriteRendererComponent>);
 			for (auto& entity : group)
 			{
-				auto [transform, sprite] = group.get<TransformComponent, SpriteRendererComponent>(entity);
-				Graphics::Renderer2D::Submit(transform, sprite.TextureSize, sprite.Texture, sprite.SubTextureOffset, sprite.SubTextureDimensions, 0.0f, sprite.Color);
+				auto [transformComponent, spriteRendererComponent] = group.get<TransformComponent, SpriteRendererComponent>(entity);
+				Graphics::Renderer2D::Submit(transformComponent, spriteRendererComponent);
 			}
 			Graphics::Renderer2D::EndScene();
 		}

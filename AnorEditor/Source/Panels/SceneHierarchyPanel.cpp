@@ -2,9 +2,62 @@
 #include "SceneHierarchyPanel.h"
 #include <Scene/Components.h>
 #include <imgui.h>
+#include <imgui_internal.h>
 namespace AnorEngine
 {
-	
+	static void DrawVec3Control(const std::string& label, glm::vec3& values, float dragSensetivity = 0.01f, float resetValue = 0.0f, float columnWidth = 100.0f)
+	{
+		ImGui::PushID(label.c_str());
+		ImGui::Columns(2);
+		ImGui::SetColumnWidth(0, columnWidth);
+		ImGui::Text(label.c_str());
+		ImGui::NextColumn();
+
+		ImGui::PushMultiItemsWidths(3, ImGui::CalcItemWidth());
+		ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2{ 0,0 });
+
+		float lineHeight = GImGui->Font->FontSize + GImGui->Style.FramePadding.y + 2.0f;
+		ImVec2 buttonSize = { lineHeight + 3.0f, lineHeight };
+
+		ImGui::PushStyleColor(ImGuiCol_Button, ImVec4{ 0.8f, 0.1f, 0.15f, 1.0f });
+		ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4{ 0.9f, 0.2f, 0.2f, 1.0f });
+		ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4{ 0.8f, 0.1f, 0.15f, 1.0f });
+		if (ImGui::Button("X", buttonSize))
+			values.x = resetValue;
+		ImGui::PopStyleColor(3);
+
+		ImGui::SameLine();
+		ImGui::DragFloat("##X", &values.x, dragSensetivity, 0.0f, 0.0f, "%.2f");
+		ImGui::PopItemWidth();
+		ImGui::SameLine();
+
+		ImGui::PushStyleColor(ImGuiCol_Button, ImVec4{ 0.2f, 0.7f, 0.2f, 1.0f });
+		ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4{ 0.3f, 0.8f, 0.3f, 1.0f });
+		ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4{ 0.2f, 0.9f, 0.2f, 1.0f });
+		if (ImGui::Button("Y", buttonSize))
+			values.y = resetValue;
+		ImGui::PopStyleColor(3);
+
+		ImGui::SameLine();
+		ImGui::DragFloat("##Y", &values.y, dragSensetivity, 0.0f, 0.0f, "%.2f");
+		ImGui::PopItemWidth();
+		ImGui::SameLine();
+
+		ImGui::PushStyleColor(ImGuiCol_Button, ImVec4{ 0.1f, 0.25f, 0.8f, 1.0f });
+		ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4{ 0.2f, 0.35f, 0.9f, 1.0f });
+		ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4{ 0.1f, 0.25f, 0.8f, 1.0f });
+		if (ImGui::Button("Z", buttonSize))
+			values.z = resetValue;
+		ImGui::PopStyleColor(3);
+
+		ImGui::SameLine();
+		ImGui::DragFloat("##Z", &values.z, dragSensetivity, 0.0f, 0.0f, "%.2f");
+		ImGui::PopItemWidth();
+
+		ImGui::PopStyleVar();
+		ImGui::Columns(1);
+		ImGui::PopID();
+	}
 	SceneHierarchyPanel::SceneHierarchyPanel(const Ref<Scene>& scene)
 	{
 		SetContext(scene);
@@ -17,7 +70,6 @@ namespace AnorEngine
 	{
 		DrawComponent<TagComponent>("Tag", entity, [&entity]()
 		{
-
 			//Grabbing the tag component of an entity by reference here.
 			auto& tag = entity.GetComponent<TagComponent>().Tag;
 			//Create a local buffer and set its content to 0 so it is clear.
@@ -31,17 +83,17 @@ namespace AnorEngine
 				//If the buffer was modified we change the tag component of the entity with the newly typed in tag.
 				tag = std::string(buffer);
 			}
-
 		});
 
 		DrawComponent<TransformComponent>("Transform", entity, [&entity]()
 		{
-			auto& transform = entity.GetComponent<TransformComponent>().Transform;
+			auto& transform = entity.GetComponent<TransformComponent>();
 			//You can modify the transform translation values (x,y) with an ImGui DragFloat3 like this.
-			if (ImGui::DragFloat3("Position", glm::value_ptr(transform[3]), 0.01f))
-			{
-				;
-			}
+			DrawVec3Control("Position", transform.Translation);
+			glm::vec3 rotationDegree = glm::degrees(transform.Rotation);
+			DrawVec3Control("Rotation", rotationDegree , 1.0f);
+			transform.Rotation = glm::radians(rotationDegree);
+			DrawVec3Control("Scale", transform.Scale, 0.1f, 1.0f);
 		});
 
 		DrawComponent<CameraComponent>("Camera", entity, [&entity]()
