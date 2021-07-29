@@ -19,11 +19,27 @@ namespace AnorEngine
 		{
 			if (entity.HasComponent<T>())
 			{
-				if (ImGui::TreeNodeEx((void*)typeid(T).hash_code(), ImGuiTreeNodeFlags_DefaultOpen, componentName))
+				bool open = ImGui::TreeNodeEx((void*)typeid(T).hash_code(), ImGuiTreeNodeFlags_DefaultOpen | ImGuiTreeNodeFlags_AllowItemOverlap, componentName);
+				ImGui::SameLine();
+				if (ImGui::Button("+"))
+				{
+					ImGui::OpenPopup("Component Settings");
+
+				}
+				bool removeComponent = false;
+				if (ImGui::BeginPopup("Component Settings"))
+				{
+					if (ImGui::MenuItem("Remove Component"))
+						removeComponent = true;
+					ImGui::EndPopup();
+				}
+				if (open)
 				{
 					fnc();
 					ImGui::TreePop();
 				}
+				if (removeComponent)
+					entity.RemoveComponent<T>();
 			}
 		}
 	private:

@@ -71,7 +71,6 @@ namespace AnorEngine
 			if (!cameraComponent.FixedAspectRatio)	
 				cameraComponent.Camera.SetViewportSize(width, height);
 		}
-
 	}
 	void Scene::OnMouseScroll(float xoffset, float yoffset)
 	{
@@ -90,6 +89,10 @@ namespace AnorEngine
 		auto& tag = entity.AddComponent<TagComponent>();
 		tag.Tag = name.empty() ? "Unnamed Entity" : name;
 		return entity;
+	}
+	void Scene::DestroyEntity(Entity entity)
+	{
+		m_Registry.destroy(entity);
 	}
 }
 

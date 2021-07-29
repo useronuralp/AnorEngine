@@ -18,7 +18,7 @@ namespace AnorEngine
 		}
 		void Framebuffer::SetupFramebuffer()
 		{
-			if (m_Specs.FramebufferID)
+			if (m_Specs.FramebufferID) //If the ID is not 0, then it means this framebuffer was already in use and we want to delete it and start the recreation fresh.
 			{
 				glDeleteFramebuffers(1, &m_Specs.FramebufferID);
 				glDeleteTextures(1, &m_Specs.ColorAttachment);

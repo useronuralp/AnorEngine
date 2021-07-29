@@ -98,6 +98,7 @@ namespace AnorEngine
 
 		DrawComponent<CameraComponent>("Camera", entity, [&entity]()
 		{
+			auto& cameraComponent = entity.GetComponent<CameraComponent>();
 			auto& camera = entity.GetComponent<CameraComponent>().Camera;
 
 			if (camera.GetProjectionType() == ProjectionType::Perspective)
@@ -114,6 +115,8 @@ namespace AnorEngine
 			}
 			else
 			{
+
+				ImGui::Checkbox("Is Primary", &cameraComponent.Primary);
 				float orthoSize = camera.GetOrhographicSize();
 				if (ImGui::DragFloat("Size", &orthoSize))
 					camera.SetOrthoGraphicSize(orthoSize);
@@ -123,6 +126,10 @@ namespace AnorEngine
 				float orthoFar = camera.GetFarClipOrthographic();
 				if (ImGui::DragFloat("Far", &orthoFar))
 					camera.SetFarClipOrthographic(orthoFar);
+				if (ImGui::DragFloat("AspectRatio", &camera.m_AspectRatio))
+				{
+
+				}
 			}
 		});
 
@@ -150,12 +157,42 @@ namespace AnorEngine
 
 		if (ImGui::IsMouseClicked(0) && ImGui::IsWindowHovered())
 			m_SelectionContext = {};
+
+		if (ImGui::BeginPopupContextWindow(0 ,1, false))
+		{
+			if (ImGui::MenuItem("Create Entity"))
+				m_Context->CreateEntity();
+			ImGui::EndPopup();
+		}
 		ImGui::End();
 
 		ImGui::Begin("Properties");
 		//Check to see if there is something assigned to selection context, if so, draw its components.
 		if (m_SelectionContext)
+		{
 			DrawComponents(m_SelectionContext);
+
+			if (ImGui::Button("Add Component"))
+				ImGui::OpenPopup("Add Component");
+
+			if (ImGui::BeginPopup("Add Component"))
+			{
+				if (ImGui::MenuItem("Camera"))
+				{
+					//TODO : The aspect ratio for the first frame is incorrect when you create a camera like this.
+					auto& cameraComponent = m_SelectionContext.AddComponent<CameraComponent>();
+					cameraComponent.Camera.SetViewportSize(m_Context->m_ViewportWidth, m_Context->m_ViewportHeight);
+					ImGui::CloseCurrentPopup();
+				}
+				if (ImGui::MenuItem("Sprite Renderer"))
+				{
+					m_SelectionContext.AddComponent<SpriteRendererComponent>();
+					ImGui::CloseCurrentPopup();
+				}
+				ImGui::EndPopup();
+			}
+
+		}
 		ImGui::End();
 	}
 	void SceneHierarchyPanel::DrawEntityNode(Entity entity)
@@ -163,13 +200,31 @@ namespace AnorEngine
 		auto& tag = entity.GetComponent<TagComponent>().Tag;
 		ImGuiTreeNodeFlags flags = ((m_SelectionContext == entity) ?  ImGuiTreeNodeFlags_Selected : 0) | ImGuiTreeNodeFlags_OpenOnArrow;
 		bool opened = ImGui::TreeNodeEx((void*)(uint64_t)(uint32_t)entity, flags, tag.c_str());
+
 		if (ImGui::IsItemClicked())
 		{
 			m_SelectionContext = entity;
 		}
+
+		bool entityDeleted = false;
+		if (ImGui::BeginPopupContextItem())
+		{
+			if (ImGui::MenuItem("Delete Entity"))
+				entityDeleted = true;
+			ImGui::EndPopup();
+		}
+
 		if (opened)
 		{
 			ImGui::TreePop();
+		}
+
+		if (entityDeleted)
+		{
+			
+			m_Context->DestroyEntity(entity);
+			if (m_SelectionContext = entity)
+				m_SelectionContext = {};
 		}
 	}
 }

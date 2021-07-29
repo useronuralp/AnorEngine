@@ -43,7 +43,6 @@ namespace AnorEngine
 		float m_OrthographicSize = 10.0f;
 		float m_OrthographicNear = -1.0f;
 		float m_OrthographicFar = 1.0f;
-
 		float m_AspectRatio = 1.0f;
 	};
 }
