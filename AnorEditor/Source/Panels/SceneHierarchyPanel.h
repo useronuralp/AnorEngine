@@ -2,6 +2,7 @@
 #include <Scene/Scene.h>
 #include <Scene/Entity.h>
 #include <imgui.h>
+#include <imgui_internal.h>
 namespace AnorEngine
 {
 	class ANOR_API SceneHierarchyPanel
@@ -14,18 +15,27 @@ namespace AnorEngine
 	private:
 		void DrawEntityNode(Entity entity);
 		void DrawComponents(Entity entity);
-		template <typename T>
-		void DrawComponent(const char* componentName, Entity entity, std::function<void(void)> fnc)
+		template <typename Component, typename UIFunction>
+		void DrawComponent(const char* componentName, Entity entity, UIFunction uiFunction)
 		{
-			if (entity.HasComponent<T>())
+			if (entity.HasComponent<Component>())
 			{
-				bool open = ImGui::TreeNodeEx((void*)typeid(T).hash_code(), ImGuiTreeNodeFlags_DefaultOpen | ImGuiTreeNodeFlags_AllowItemOverlap, componentName);
-				ImGui::SameLine();
-				if (ImGui::Button("+"))
+				//Grabbing T component of an entity by reference here.
+				auto& component = entity.GetComponent<Component>();
+				float availableContentRegion = ImGui::GetContentRegionAvail().x;
+				ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2{ 4,4 });
+				float lineHeight = GImGui->Font->FontSize + GImGui->Style.FramePadding.y * 2.0f;
+				ImGui::Separator();
+				bool open = ImGui::TreeNodeEx((void*)typeid(Component).hash_code(), ImGuiTreeNodeFlags_DefaultOpen | ImGuiTreeNodeFlags_FramePadding | ImGuiTreeNodeFlags_Framed | ImGuiTreeNodeFlags_SpanAvailWidth | ImGuiTreeNodeFlags_AllowItemOverlap, componentName);
+
+				ImGui::PopStyleVar();
+				ImGui::SameLine(availableContentRegion - lineHeight * 0.5f);
+
+				if (ImGui::Button("...", ImVec2{ lineHeight, lineHeight }))
 				{
 					ImGui::OpenPopup("Component Settings");
-
 				}
+				ImGui::Separator();
 				bool removeComponent = false;
 				if (ImGui::BeginPopup("Component Settings"))
 				{
@@ -35,11 +45,11 @@ namespace AnorEngine
 				}
 				if (open)
 				{
-					fnc();
+					uiFunction(component);
 					ImGui::TreePop();
 				}
 				if (removeComponent)
-					entity.RemoveComponent<T>();
+					entity.RemoveComponent<Component>();
 			}
 		}
 	private:

@@ -13,6 +13,7 @@ namespace AnorEngine
 		static void Begin();
 		static void End();
 		static bool Init();
+		static void SetDarkThemeColors();
 	private:
 		static float m_Time;
 	};

@@ -18,13 +18,17 @@ namespace AnorEngine
 
 		float lineHeight = GImGui->Font->FontSize + GImGui->Style.FramePadding.y + 2.0f;
 		ImVec2 buttonSize = { lineHeight + 3.0f, lineHeight };
-
+		auto& io = ImGui::GetIO();
+		auto boldFont = io.Fonts->Fonts[0];
+		
 		ImGui::PushStyleColor(ImGuiCol_Button, ImVec4{ 0.8f, 0.1f, 0.15f, 1.0f });
 		ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4{ 0.9f, 0.2f, 0.2f, 1.0f });
 		ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4{ 0.8f, 0.1f, 0.15f, 1.0f });
+		ImGui::PushFont(boldFont);
 		if (ImGui::Button("X", buttonSize))
 			values.x = resetValue;
 		ImGui::PopStyleColor(3);
+		ImGui::PopFont();
 
 		ImGui::SameLine();
 		ImGui::DragFloat("##X", &values.x, dragSensetivity, 0.0f, 0.0f, "%.2f");
@@ -34,9 +38,11 @@ namespace AnorEngine
 		ImGui::PushStyleColor(ImGuiCol_Button, ImVec4{ 0.2f, 0.7f, 0.2f, 1.0f });
 		ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4{ 0.3f, 0.8f, 0.3f, 1.0f });
 		ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4{ 0.2f, 0.9f, 0.2f, 1.0f });
+		ImGui::PushFont(boldFont);
 		if (ImGui::Button("Y", buttonSize))
 			values.y = resetValue;
 		ImGui::PopStyleColor(3);
+		ImGui::PopFont();
 
 		ImGui::SameLine();
 		ImGui::DragFloat("##Y", &values.y, dragSensetivity, 0.0f, 0.0f, "%.2f");
@@ -46,14 +52,17 @@ namespace AnorEngine
 		ImGui::PushStyleColor(ImGuiCol_Button, ImVec4{ 0.1f, 0.25f, 0.8f, 1.0f });
 		ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4{ 0.2f, 0.35f, 0.9f, 1.0f });
 		ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4{ 0.1f, 0.25f, 0.8f, 1.0f });
+		ImGui::PushFont(boldFont);
 		if (ImGui::Button("Z", buttonSize))
 			values.z = resetValue;
 		ImGui::PopStyleColor(3);
+		ImGui::PopFont();
 
 		ImGui::SameLine();
 		ImGui::DragFloat("##Z", &values.z, dragSensetivity, 0.0f, 0.0f, "%.2f");
 		ImGui::PopItemWidth();
 
+		io.FontDefault = io.Fonts->Fonts[1];
 		ImGui::PopStyleVar();
 		ImGui::Columns(1);
 		ImGui::PopID();
@@ -68,77 +77,100 @@ namespace AnorEngine
 	}
 	void SceneHierarchyPanel::DrawComponents(Entity entity)
 	{
-		DrawComponent<TagComponent>("Tag", entity, [&entity]()
+		//Grabbing T component of an entity by reference here.
+		auto& component = entity.GetComponent<TagComponent>();
+		float availableContentRegion = ImGui::GetContentRegionAvail().x;
+		ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2{ 4,4 });
+		float lineHeight = GImGui->Font->FontSize + GImGui->Style.FramePadding.y * 2.0f;
+
+
+		ImGui::PopStyleVar();
+		ImGui::SameLine(availableContentRegion - lineHeight * 0.5f);
+
+		ImGui::Separator();
+		//Create a local buffer and set its content to 0 so it is clear.
+		char buffer[256];
+		memset(buffer, 0, sizeof(buffer));
+		strcpy_s(buffer, sizeof(buffer), component.Tag.c_str());
+		//ImGui statements can be checked in an if statement cause they return booleans.
+		//ImGui::InputText returns true if the buffer you send in to that function was modified.
+		if (ImGui::InputText("##Tag", buffer, sizeof(buffer)))
 		{
-			//Grabbing the tag component of an entity by reference here.
-			auto& tag = entity.GetComponent<TagComponent>().Tag;
-			//Create a local buffer and set its content to 0 so it is clear.
-			char buffer[256];
-			memset(buffer, 0, sizeof(buffer));
-			strcpy_s(buffer, sizeof(buffer), tag.c_str());
-			//ImGui statements can be checked in an if statement cause they return booleans.
-			//ImGui::InputText returns true if the buffer you send in to that function was modified.
-			if (ImGui::InputText("Tag", buffer, sizeof(buffer)))
+			//If the buffer was modified we change the tag component of the entity with the newly typed in tag.
+			component.Tag = std::string(buffer);
+		}
+
+
+		ImGui::SameLine();
+		ImGui::PushItemWidth(-1);
+
+		if (ImGui::Button("Add Component"))
+			ImGui::OpenPopup("Add Component");
+
+		if (ImGui::BeginPopup("Add Component"))
+		{
+			if (ImGui::MenuItem("Camera"))
 			{
-				//If the buffer was modified we change the tag component of the entity with the newly typed in tag.
-				tag = std::string(buffer);
+				//TODO : The aspect ratio for the first frame is incorrect when you create a camera like this.
+				auto& cameraComponent = m_SelectionContext.AddComponent<CameraComponent>();
+				cameraComponent.Camera.SetViewportSize(m_Context->m_ViewportWidth, m_Context->m_ViewportHeight);
+				ImGui::CloseCurrentPopup();
 			}
-		});
-
-		DrawComponent<TransformComponent>("Transform", entity, [&entity]()
-		{
-			auto& transform = entity.GetComponent<TransformComponent>();
-			//You can modify the transform translation values (x,y) with an ImGui DragFloat3 like this.
-			DrawVec3Control("Position", transform.Translation);
-			glm::vec3 rotationDegree = glm::degrees(transform.Rotation);
-			DrawVec3Control("Rotation", rotationDegree , 1.0f);
-			transform.Rotation = glm::radians(rotationDegree);
-			DrawVec3Control("Scale", transform.Scale, 0.1f, 1.0f);
-		});
-
-		DrawComponent<CameraComponent>("Camera", entity, [&entity]()
-		{
-			auto& cameraComponent = entity.GetComponent<CameraComponent>();
-			auto& camera = entity.GetComponent<CameraComponent>().Camera;
-
-			if (camera.GetProjectionType() == ProjectionType::Perspective)
+			if (ImGui::MenuItem("Sprite Renderer"))
 			{
-				float FOV = camera.GetPerspectiveFOV();
+				m_SelectionContext.AddComponent<SpriteRendererComponent>();
+				ImGui::CloseCurrentPopup();
+			}
+			ImGui::EndPopup();
+		}
+		ImGui::PopItemWidth();
+		ImGui::Separator();
+		DrawComponent<TransformComponent>("Transform", entity, [](auto& component)
+		{
+			//You can modify the transform translation values (x,y) with an ImGui DragFloat3 like this.
+			DrawVec3Control("Position", component.Translation);
+			glm::vec3 rotationDegree = glm::degrees(component.Rotation);
+			DrawVec3Control("Rotation", rotationDegree , 1.0f);
+			component.Rotation = glm::radians(rotationDegree);
+			DrawVec3Control("Scale", component.Scale, 0.1f, 1.0f);
+		});
+
+		DrawComponent<CameraComponent>("Camera", entity, [](auto& component)
+		{
+			if (component.Camera.GetProjectionType() == ProjectionType::Perspective)
+			{
+				float FOV = component.Camera.GetPerspectiveFOV();
 				if (ImGui::DragFloat("FOV", &FOV))
-					camera.SetPerspectiveFOV(FOV);
-				float perspectiveNear = camera.GetNearClipPerspective();
+					component.Camera.SetPerspectiveFOV(FOV);
+				float perspectiveNear = component.Camera.GetNearClipPerspective();
 				if (ImGui::DragFloat("Near", &perspectiveNear))
-					camera.SetNearClipPerspective(perspectiveNear);
-				float perspectiveFar = camera.GetFarClipPerspective();
+					component.Camera.SetNearClipPerspective(perspectiveNear);
+				float perspectiveFar = component.Camera.GetFarClipPerspective();
 				if (ImGui::DragFloat("Far", &perspectiveFar))
-					camera.SetFarClipPerspective(perspectiveFar);
+					component.Camera.SetFarClipPerspective(perspectiveFar);
 			}
 			else
 			{
 
-				ImGui::Checkbox("Is Primary", &cameraComponent.Primary);
-				float orthoSize = camera.GetOrhographicSize();
+				ImGui::Checkbox("Is Primary", &component.Primary);
+				float orthoSize = component.Camera.GetOrhographicSize();
 				if (ImGui::DragFloat("Size", &orthoSize))
-					camera.SetOrthoGraphicSize(orthoSize);
-				float orthoNear = camera.GetNearClipOrthographic();
+					component.Camera.SetOrthoGraphicSize(orthoSize);
+				float orthoNear = component.Camera.GetNearClipOrthographic();
 				if (ImGui::DragFloat("Near", &orthoNear))
-					camera.SetNearClipOrthographic(orthoNear);
-				float orthoFar = camera.GetFarClipOrthographic();
+					component.Camera.SetNearClipOrthographic(orthoNear);
+				float orthoFar = component.Camera.GetFarClipOrthographic();
 				if (ImGui::DragFloat("Far", &orthoFar))
-					camera.SetFarClipOrthographic(orthoFar);
+					component.Camera.SetFarClipOrthographic(orthoFar);
 			}
 		});
 
-		DrawComponent<SpriteRendererComponent>("Sprite Renderer", entity, [&entity]()
+		DrawComponent<SpriteRendererComponent>("Sprite Renderer", entity, [](auto& component)
 		{
-			if (entity.HasComponent<SpriteRendererComponent>())
-			{
-				auto& spriteRenderer = entity.GetComponent<SpriteRendererComponent>();
 				ImGui::Separator();
-				ImGui::ColorEdit4("Color", glm::value_ptr(spriteRenderer.Color));
-				ImGui::DragFloat2("Repeat Textures", glm::value_ptr(spriteRenderer.TextureSize));
+				ImGui::ColorEdit4("Color", glm::value_ptr(component.Color));
+				ImGui::DragFloat2("Repeat Textures", glm::value_ptr(component.TextureSize));
 				ImGui::Separator();
-			}
 		});
 
 	}
@@ -165,36 +197,14 @@ namespace AnorEngine
 		ImGui::Begin("Properties");
 		//Check to see if there is something assigned to selection context, if so, draw its components.
 		if (m_SelectionContext)
-		{
 			DrawComponents(m_SelectionContext);
 
-			if (ImGui::Button("Add Component"))
-				ImGui::OpenPopup("Add Component");
-
-			if (ImGui::BeginPopup("Add Component"))
-			{
-				if (ImGui::MenuItem("Camera"))
-				{
-					//TODO : The aspect ratio for the first frame is incorrect when you create a camera like this.
-					auto& cameraComponent = m_SelectionContext.AddComponent<CameraComponent>();
-					cameraComponent.Camera.SetViewportSize(m_Context->m_ViewportWidth, m_Context->m_ViewportHeight);
-					ImGui::CloseCurrentPopup();
-				}
-				if (ImGui::MenuItem("Sprite Renderer"))
-				{
-					m_SelectionContext.AddComponent<SpriteRendererComponent>();
-					ImGui::CloseCurrentPopup();
-				}
-				ImGui::EndPopup();
-			}
-
-		}
 		ImGui::End();
 	}
 	void SceneHierarchyPanel::DrawEntityNode(Entity entity)
 	{
 		auto& tag = entity.GetComponent<TagComponent>().Tag;
-		ImGuiTreeNodeFlags flags = ((m_SelectionContext == entity) ?  ImGuiTreeNodeFlags_Selected : 0) | ImGuiTreeNodeFlags_OpenOnArrow;
+		ImGuiTreeNodeFlags flags = ((m_SelectionContext == entity) ?  ImGuiTreeNodeFlags_Selected : 0) | ImGuiTreeNodeFlags_OpenOnArrow | ImGuiTreeNodeFlags_SpanAvailWidth;
 		bool opened = ImGui::TreeNodeEx((void*)(uint64_t)(uint32_t)entity, flags, tag.c_str());
 
 		if (ImGui::IsItemClicked())
@@ -212,6 +222,10 @@ namespace AnorEngine
 
 		if (opened)
 		{
+			ImGuiTreeNodeFlags flags = ImGuiTreeNodeFlags_OpenOnArrow | ImGuiTreeNodeFlags_SpanAvailWidth;
+			bool opened = ImGui::TreeNodeEx((void*)6846456, flags, tag.c_str());
+			if (opened)
+				ImGui::TreePop();
 			ImGui::TreePop();
 		}
 
