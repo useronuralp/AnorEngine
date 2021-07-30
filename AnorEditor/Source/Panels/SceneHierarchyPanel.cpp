@@ -126,10 +126,6 @@ namespace AnorEngine
 				float orthoFar = camera.GetFarClipOrthographic();
 				if (ImGui::DragFloat("Far", &orthoFar))
 					camera.SetFarClipOrthographic(orthoFar);
-				if (ImGui::DragFloat("AspectRatio", &camera.m_AspectRatio))
-				{
-
-				}
 			}
 		});
 
