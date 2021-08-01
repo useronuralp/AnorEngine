@@ -28,8 +28,8 @@ namespace AnorEngine
 		}
 
 		std::string solutionDir = __SOLUTION_DIR;
-		io.Fonts->AddFontFromFileTTF((solutionDir + "AnorEngine\\Assets\\Fonts\\OpenSans\\OpenSans-ExtraBold.ttf").c_str(), 18.0f);
-		io.FontDefault = io.Fonts->AddFontFromFileTTF((solutionDir + "AnorEngine\\Assets\\Fonts\\OpenSans\\OpenSans-Regular.ttf").c_str(), 18.0f);
+		io.Fonts->AddFontFromFileTTF((solutionDir + "AnorEngine\\Assets\\Fonts\\OpenSans\\OpenSans-ExtraBold.ttf").c_str(), 21.0f);
+		io.FontDefault = io.Fonts->AddFontFromFileTTF((solutionDir + "AnorEngine\\Assets\\Fonts\\OpenSans\\OpenSans-Regular.ttf").c_str(), 21.0f);
 
 		Application& app = Application::Get();
 		GLFWwindow* window = static_cast<GLFWwindow*>(app.GetOpenGLWindow()->GetNativeWindow());
@@ -132,7 +132,7 @@ namespace AnorEngine
 		// DockSpace
 		auto& style = ImGui::GetStyle();
 		float minWinSizeX = style.WindowMinSize.x;
-		style.WindowMinSize.x = 370.f;
+		style.WindowMinSize.x = 420.0f;
 		ImGuiIO& io = ImGui::GetIO();
 		if (io.ConfigFlags & ImGuiConfigFlags_DockingEnable)
 		{

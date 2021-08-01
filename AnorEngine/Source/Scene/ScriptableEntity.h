@@ -14,6 +14,7 @@ namespace AnorEngine
 		{
 			return m_Entity.GetComponent<T>();
 		}
+		Position2D GetPlayerLocation() { return m_Entity.m_Scene->GetPlayerLocation(); }
 	protected:
 		virtual void OnUpdate(float deltaTime) {};
 		virtual void OnDestroy() {};

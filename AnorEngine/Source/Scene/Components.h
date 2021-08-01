@@ -70,8 +70,11 @@ namespace AnorEngine
 	};
 	struct ANOR_API NativeScriptComponent
 	{
-		ScriptableEntity* Instance = nullptr;
+		NativeScriptComponent(bool enableOnStart = false)
+		:isEnabled(enableOnStart){};
 
+		bool isEnabled;
+		ScriptableEntity* Instance = nullptr;
 		ScriptableEntity* (*InstantiateScript)();
 		void (*DestroyScript)(NativeScriptComponent*);
 

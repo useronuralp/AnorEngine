@@ -5,6 +5,11 @@
 
 namespace AnorEngine
 {
+	struct Position2D
+	{
+		float x;
+		float y;
+	};
 	class Entity;
 	class ANOR_API Scene
 	{
@@ -15,6 +20,7 @@ namespace AnorEngine
 		void OnResizeViewport(uint32_t width, uint32_t height);
 		void OnMouseScroll(float xoffset, float yoffset);
 		Entity CreateEntity(const std::string& name = std::string());
+		Position2D GetPlayerLocation();
 		void DestroyEntity(Entity entity);
 	private:
 		entt::registry m_Registry;

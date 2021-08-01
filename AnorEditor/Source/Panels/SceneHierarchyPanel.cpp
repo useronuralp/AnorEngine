@@ -77,14 +77,13 @@ namespace AnorEngine
 	}
 	void SceneHierarchyPanel::DrawComponents(Entity entity)
 	{
-		//Grabbing T component of an entity by reference here.
+		//Grabbing Tag component of an entity by reference here.
 		auto& component = entity.GetComponent<TagComponent>();
 		float availableContentRegion = ImGui::GetContentRegionAvail().x;
 		ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2{ 4,4 });
 		float lineHeight = GImGui->Font->FontSize + GImGui->Style.FramePadding.y * 2.0f;
-
-
 		ImGui::PopStyleVar();
+
 		ImGui::SameLine(availableContentRegion - lineHeight * 0.5f);
 
 		ImGui::Separator();
@@ -111,7 +110,6 @@ namespace AnorEngine
 		{
 			if (ImGui::MenuItem("Camera"))
 			{
-				//TODO : The aspect ratio for the first frame is incorrect when you create a camera like this.
 				auto& cameraComponent = m_SelectionContext.AddComponent<CameraComponent>();
 				cameraComponent.Camera.SetViewportSize(m_Context->m_ViewportWidth, m_Context->m_ViewportHeight);
 				ImGui::CloseCurrentPopup();
@@ -127,7 +125,6 @@ namespace AnorEngine
 		ImGui::Separator();
 		DrawComponent<TransformComponent>("Transform", entity, [](auto& component)
 		{
-			//You can modify the transform translation values (x,y) with an ImGui DragFloat3 like this.
 			DrawVec3Control("Position", component.Translation);
 			glm::vec3 rotationDegree = glm::degrees(component.Rotation);
 			DrawVec3Control("Rotation", rotationDegree , 1.0f);
@@ -152,7 +149,6 @@ namespace AnorEngine
 			else
 			{
 
-				ImGui::Checkbox("Is Primary", &component.Primary);
 				float orthoSize = component.Camera.GetOrhographicSize();
 				if (ImGui::DragFloat("Size", &orthoSize))
 					component.Camera.SetOrthoGraphicSize(orthoSize);
@@ -162,6 +158,7 @@ namespace AnorEngine
 				float orthoFar = component.Camera.GetFarClipOrthographic();
 				if (ImGui::DragFloat("Far", &orthoFar))
 					component.Camera.SetFarClipOrthographic(orthoFar);
+				ImGui::Checkbox("Is Primary", &component.Primary);
 			}
 		});
 
@@ -171,6 +168,12 @@ namespace AnorEngine
 				ImGui::ColorEdit4("Color", glm::value_ptr(component.Color));
 				ImGui::DragFloat2("Repeat Textures", glm::value_ptr(component.TextureSize));
 				ImGui::Separator();
+		});
+		DrawComponent<NativeScriptComponent>("Script", entity, [](auto& component)
+		{
+			ImGui::Separator();
+			ImGui::Checkbox("Is Enabled", &component.isEnabled);
+			ImGui::Separator();
 		});
 
 	}
@@ -230,8 +233,7 @@ namespace AnorEngine
 		}
 
 		if (entityDeleted)
-		{
-			
+		{		
 			m_Context->DestroyEntity(entity);
 			if (m_SelectionContext = entity)
 				m_SelectionContext = {};

@@ -26,7 +26,8 @@ namespace AnorEngine
 					nsc.Instance->m_Entity = Entity { entity, this };
 					nsc.Instance->OnCreate();
 				}
-				nsc.Instance->OnUpdate(deltaTime);
+				if(nsc.isEnabled)
+					nsc.Instance->OnUpdate(deltaTime);
 			});
 		}
 
@@ -89,6 +90,18 @@ namespace AnorEngine
 		auto& tag = entity.AddComponent<TagComponent>();
 		tag.Tag = name.empty() ? "Unnamed Entity" : name;
 		return entity;
+	}
+	Position2D Scene::GetPlayerLocation()
+	{
+		auto view = m_Registry.view<TransformComponent, TagComponent>();
+		for (auto& entity : view)
+		{
+			auto [transform, tag] = view.get<TransformComponent, TagComponent>(entity);
+			if (tag.Tag == "Player")
+			{			
+				return Position2D { transform.Translation.x, transform.Translation.y };
+			}
+		}
 	}
 	void Scene::DestroyEntity(Entity entity)
 	{

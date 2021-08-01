@@ -20,7 +20,7 @@ namespace Game
 		Ref<Entity>			m_Entity2 = std::make_shared<Entity>(m_Scene->CreateEntity("Block"));
 		Ref<Texture>		m_Entity2_Texture = std::make_shared<Texture>(solutionDir + "AnorEngine\\Assets\\Textures\\381f5a63791945.5abc4ccf1297d.png");
 		//Entity3----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-		Ref<Entity>			m_Entity3 = std::make_shared<Entity>(m_Scene->CreateEntity("Cute Guy"));
+		Ref<Entity>			m_Entity3 = std::make_shared<Entity>(m_Scene->CreateEntity("Player"));
 		Ref<Texture>		m_Entity3TextureAtlas = std::make_shared<Texture>(solutionDir + "AnorEngine\\Assets\\Textures\\PlatformerTextures\\Tilesheet\\platformerPack_character@2.png");
 		//-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 		Ref<Entity>			m_CameraEntity = std::make_shared<Entity>(m_Scene->CreateEntity("Camera"));
@@ -67,17 +67,45 @@ namespace Game
 						GetComponent<TransformComponent>().Translation.x += 5.0f * deltaTime;
 				}
 			};
+			struct EnemyBehaviour : public ScriptableEntity
+			{
+				void OnCreate()
+				{
+				}
+				void OnDestroy()
+				{
+				}
+				void OnUpdate(float deltaTime)
+				{
+
+					auto [playerX, playerY] = GetPlayerLocation();
+					auto& position = GetComponent<TransformComponent>().Translation;
+
+					if(abs(playerX - position.x) > 0 && abs(playerY - position.y) > 0)
+					{
+						position.x += (0.75f * (playerX - position.x)) * deltaTime;
+						position.y += (0.75f * (playerY - position.y)) * deltaTime;
+					}
+				}
+			};
+			
 			if (m_CameraEntity)
 			{
 				m_CameraEntity->AddComponent<CameraComponent>();
-				m_CameraEntity->AddComponent<NativeScriptComponent>().Bind<CameraController>();
+				//You can initialize scripts by passing a bool to their constructors. If it is true the script is enabled upon engine launch. Default value is false.
+				m_CameraEntity->AddComponent<NativeScriptComponent>(true).Bind<CameraController>();
 			}
 			if (m_Entity1)
 			{
+				m_Entity1->GetComponent<TransformComponent>().Translation.x = 3.5f;
+				m_Entity1->GetComponent<TransformComponent>().Translation.y = 3.5f;
 				m_Entity1->AddComponent<SpriteRendererComponent>(m_Color, m_Entity1TextureAtlas, glm::vec2{ 2.0f, 1.0f }, glm::vec2{ 9, 3 }, glm::vec2{ 128.0f, 128.0f });
+				m_Entity1->AddComponent<NativeScriptComponent>().Bind<EnemyBehaviour>();
 			}
 			if (m_Entity2)
 			{
+				m_Entity2->GetComponent<TransformComponent>().Translation.x = -3.5f;
+				m_Entity2->GetComponent<TransformComponent>().Translation.y = -3.5f;
 				m_Entity2->AddComponent<SpriteRendererComponent>(m_Color, m_Entity2_Texture);
 			}
 			//TODO : Make this line of code work. This Paritlce System class should be derived from entity or scriptable entity ?.
@@ -85,7 +113,7 @@ namespace Game
 			if (m_Entity3)
 			{
 				m_Entity3->AddComponent<SpriteRendererComponent>(m_Color, m_Entity3TextureAtlas, glm::vec2{ 1.0f, 1.0f }, glm::vec2{ 0 ,1 }, glm::vec2{ 192.0f, 175.0f });
-				m_Entity3->AddComponent<NativeScriptComponent>().Bind<CharacterController>();
+				m_Entity3->AddComponent<NativeScriptComponent>(true).Bind<CharacterController>();
 			}
 
 			m_SceneHierarchyPanel.SetContext(m_Scene);
