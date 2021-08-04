@@ -82,7 +82,7 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LinkIncremental>true</LinkIncremental>
-    <IncludePath>$(SolutionDir)AnorEngine\Source;$(SolutionDir)Dependencies\GLM;$(SolutionDir)Dependencies\FreeImage\include;$(SolutionDir)Dependencies\GLEW\include;$(SolutionDir)Dependencies\GLFW\includex64;$(SolutionDir)Dependencies\Assimp\include;$(SolutionDir)AnorEngine\Vendor\spdlog-1.x\include;$(SolutionDir)AnorEngine\Vendor\imgui;$(SolutionDir)Dependencies\Entt\include;$(IncludePath)</IncludePath>
+    <IncludePath>$(SolutionDir)AnorEngine\Source;$(SolutionDir)Dependencies\GLM;$(SolutionDir)Dependencies\FreeImage\include;$(SolutionDir)Dependencies\GLEW\include;$(SolutionDir)Dependencies\GLFW\includex64;$(SolutionDir)Dependencies\Assimp\include;$(SolutionDir)AnorEngine\Vendor\spdlog-1.x\include;$(SolutionDir)AnorEngine\Vendor\imgui;$(SolutionDir)Dependencies\Entt\include;$(SolutionDir)AnorEngine\Vendor\yaml-cpp\include;$(IncludePath)</IncludePath>
     <LibraryPath>$(SolutionDir)Dependencies\FreeImage\lib;$(SolutionDir)Dependencies\GLEW\lib\x64;$(SolutionDir)Dependencies\GLFW\lib-vc2019x64;$(SolutionDir)Dependencies\Assimp\lib;$(LibraryPath)</LibraryPath>
     <IntDir>$(SolutionDir)IntermediateFiles\$(ProjectName)_$(Configuration)_$(Platform)</IntDir>
     <OutDir>$(SolutionDir)bin\$(ProjectName)_$(Configuration)_$(Platform)</OutDir>
@@ -91,7 +91,7 @@
     <LinkIncremental>false</LinkIncremental>
     <OutDir>$(SolutionDir)bin\$(ProjectName)_$(Configuration)_$(Platform)</OutDir>
     <IntDir>$(SolutionDir)IntermediateFiles\$(ProjectName)_$(Configuration)_$(Platform)</IntDir>
-    <IncludePath>$(SolutionDir)AnorEngine\Source;$(SolutionDir)Dependencies\GLM;$(SolutionDir)Dependencies\FreeImage\include;$(SolutionDir)Dependencies\GLEW\include;$(SolutionDir)Dependencies\GLFW\includex64;$(SolutionDir)Dependencies\Assimp\include;$(SolutionDir)AnorEngine\Vendor\spdlog-1.x\include;$(SolutionDir)AnorEngine\Vendor\imgui;$(SolutionDir)Dependencies\Entt\include;$(IncludePath)</IncludePath>
+    <IncludePath>$(SolutionDir)AnorEngine\Source;$(SolutionDir)Dependencies\GLM;$(SolutionDir)Dependencies\FreeImage\include;$(SolutionDir)Dependencies\GLEW\include;$(SolutionDir)Dependencies\GLFW\includex64;$(SolutionDir)Dependencies\Assimp\include;$(SolutionDir)AnorEngine\Vendor\spdlog-1.x\include;$(SolutionDir)AnorEngine\Vendor\imgui;$(SolutionDir)Dependencies\Entt\include;$(SolutionDir)AnorEngine\Vendor\yaml-cpp\include;$(IncludePath)</IncludePath>
     <LibraryPath>$(SolutionDir)Dependencies\FreeImage\lib;$(SolutionDir)Dependencies\GLEW\lib\x64;$(SolutionDir)Dependencies\GLFW\lib-vc2019x64;$(SolutionDir)Dependencies\Assimp\lib;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
@@ -131,8 +131,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>WIN32;ENGINE_PLATFORM_WINDOWS;ENGINE_BUILD_DLL;__SOLUTION_DIR=R"($(SolutionDir))";_DEBUG;_CONSOLE;GLEW_STATIC;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>
-      </AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
       <AdditionalOptions>/Zm1000 %(AdditionalOptions)</AdditionalOptions>
@@ -157,8 +156,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>WIN32;ENGINE_PLATFORM_WINDOWS;ENGINE_BUILD_DLL;__SOLUTION_DIR=R"($(SolutionDir))";_RELEASE;_CONSOLE;GLEW_STATIC;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>
-      </AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp17</LanguageStandard>
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
@@ -182,6 +180,7 @@
     <ClCompile Include="Source\Graphics\Framebuffer.cpp" />
     <ClCompile Include="Source\Scene\Scene.cpp" />
     <ClCompile Include="Source\Scene\SceneCamera.cpp" />
+    <ClCompile Include="Source\Scene\SceneSerializer.cpp" />
     <ClCompile Include="Source\Utility\Timer.cpp" />
     <ClCompile Include="Source\Graphics\ParticleSystem.cpp" />
     <ClCompile Include="Source\pch.cpp">
@@ -220,6 +219,37 @@
     <ClCompile Include="Vendor\ImGUI\imgui_tables.cpp" />
     <ClCompile Include="Vendor\ImGUI\imgui_widgets.cpp" />
     <ClCompile Include="Vendor\stb_image\stb_image.cpp" />
+    <ClCompile Include="Vendor\yaml-cpp\src\binary.cpp" />
+    <ClCompile Include="Vendor\yaml-cpp\src\contrib\graphbuilder.cpp" />
+    <ClCompile Include="Vendor\yaml-cpp\src\contrib\graphbuilderadapter.cpp" />
+    <ClCompile Include="Vendor\yaml-cpp\src\convert.cpp" />
+    <ClCompile Include="Vendor\yaml-cpp\src\depthguard.cpp" />
+    <ClCompile Include="Vendor\yaml-cpp\src\directives.cpp" />
+    <ClCompile Include="Vendor\yaml-cpp\src\emit.cpp" />
+    <ClCompile Include="Vendor\yaml-cpp\src\emitfromevents.cpp" />
+    <ClCompile Include="Vendor\yaml-cpp\src\emitter.cpp" />
+    <ClCompile Include="Vendor\yaml-cpp\src\emitterstate.cpp" />
+    <ClCompile Include="Vendor\yaml-cpp\src\emitterutils.cpp" />
+    <ClCompile Include="Vendor\yaml-cpp\src\exceptions.cpp" />
+    <ClCompile Include="Vendor\yaml-cpp\src\exp.cpp" />
+    <ClCompile Include="Vendor\yaml-cpp\src\memory.cpp" />
+    <ClCompile Include="Vendor\yaml-cpp\src\node.cpp" />
+    <ClCompile Include="Vendor\yaml-cpp\src\nodebuilder.cpp" />
+    <ClCompile Include="Vendor\yaml-cpp\src\nodeevents.cpp" />
+    <ClCompile Include="Vendor\yaml-cpp\src\node_data.cpp" />
+    <ClCompile Include="Vendor\yaml-cpp\src\null.cpp" />
+    <ClCompile Include="Vendor\yaml-cpp\src\ostream_wrapper.cpp" />
+    <ClCompile Include="Vendor\yaml-cpp\src\parse.cpp" />
+    <ClCompile Include="Vendor\yaml-cpp\src\parser.cpp" />
+    <ClCompile Include="Vendor\yaml-cpp\src\regex_yaml.cpp" />
+    <ClCompile Include="Vendor\yaml-cpp\src\scanner.cpp" />
+    <ClCompile Include="Vendor\yaml-cpp\src\scanscalar.cpp" />
+    <ClCompile Include="Vendor\yaml-cpp\src\scantag.cpp" />
+    <ClCompile Include="Vendor\yaml-cpp\src\scantoken.cpp" />
+    <ClCompile Include="Vendor\yaml-cpp\src\simplekey.cpp" />
+    <ClCompile Include="Vendor\yaml-cpp\src\singledocparser.cpp" />
+    <ClCompile Include="Vendor\yaml-cpp\src\stream.cpp" />
+    <ClCompile Include="Vendor\yaml-cpp\src\tag.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Assets\Models\cube.h" />
@@ -235,6 +265,7 @@
     <ClInclude Include="Source\Scene\Entity.h" />
     <ClInclude Include="Source\Scene\SceneCamera.h" />
     <ClInclude Include="Source\Scene\Scene.h" />
+    <ClInclude Include="Source\Scene\SceneSerializer.h" />
     <ClInclude Include="Source\Scene\ScriptableEntity.h" />
     <ClInclude Include="Source\Utility\Timer.h" />
     <ClInclude Include="Source\Events\Event.h" />
@@ -278,6 +309,65 @@
     <ClInclude Include="Vendor\ImGUI\imstb_truetype.h" />
     <ClInclude Include="Vendor\Models\cube.h" />
     <ClInclude Include="Vendor\stb_image\stb_image.h" />
+    <ClInclude Include="Vendor\yaml-cpp\include\yaml-cpp\anchor.h" />
+    <ClInclude Include="Vendor\yaml-cpp\include\yaml-cpp\binary.h" />
+    <ClInclude Include="Vendor\yaml-cpp\include\yaml-cpp\contrib\anchordict.h" />
+    <ClInclude Include="Vendor\yaml-cpp\include\yaml-cpp\contrib\graphbuilder.h" />
+    <ClInclude Include="Vendor\yaml-cpp\include\yaml-cpp\depthguard.h" />
+    <ClInclude Include="Vendor\yaml-cpp\include\yaml-cpp\dll.h" />
+    <ClInclude Include="Vendor\yaml-cpp\include\yaml-cpp\emitfromevents.h" />
+    <ClInclude Include="Vendor\yaml-cpp\include\yaml-cpp\emitter.h" />
+    <ClInclude Include="Vendor\yaml-cpp\include\yaml-cpp\emitterdef.h" />
+    <ClInclude Include="Vendor\yaml-cpp\include\yaml-cpp\emittermanip.h" />
+    <ClInclude Include="Vendor\yaml-cpp\include\yaml-cpp\emitterstyle.h" />
+    <ClInclude Include="Vendor\yaml-cpp\include\yaml-cpp\eventhandler.h" />
+    <ClInclude Include="Vendor\yaml-cpp\include\yaml-cpp\exceptions.h" />
+    <ClInclude Include="Vendor\yaml-cpp\include\yaml-cpp\mark.h" />
+    <ClInclude Include="Vendor\yaml-cpp\include\yaml-cpp\node\convert.h" />
+    <ClInclude Include="Vendor\yaml-cpp\include\yaml-cpp\node\detail\impl.h" />
+    <ClInclude Include="Vendor\yaml-cpp\include\yaml-cpp\node\detail\iterator.h" />
+    <ClInclude Include="Vendor\yaml-cpp\include\yaml-cpp\node\detail\iterator_fwd.h" />
+    <ClInclude Include="Vendor\yaml-cpp\include\yaml-cpp\node\detail\memory.h" />
+    <ClInclude Include="Vendor\yaml-cpp\include\yaml-cpp\node\detail\node.h" />
+    <ClInclude Include="Vendor\yaml-cpp\include\yaml-cpp\node\detail\node_data.h" />
+    <ClInclude Include="Vendor\yaml-cpp\include\yaml-cpp\node\detail\node_iterator.h" />
+    <ClInclude Include="Vendor\yaml-cpp\include\yaml-cpp\node\detail\node_ref.h" />
+    <ClInclude Include="Vendor\yaml-cpp\include\yaml-cpp\node\emit.h" />
+    <ClInclude Include="Vendor\yaml-cpp\include\yaml-cpp\node\impl.h" />
+    <ClInclude Include="Vendor\yaml-cpp\include\yaml-cpp\node\iterator.h" />
+    <ClInclude Include="Vendor\yaml-cpp\include\yaml-cpp\node\node.h" />
+    <ClInclude Include="Vendor\yaml-cpp\include\yaml-cpp\node\parse.h" />
+    <ClInclude Include="Vendor\yaml-cpp\include\yaml-cpp\node\ptr.h" />
+    <ClInclude Include="Vendor\yaml-cpp\include\yaml-cpp\node\type.h" />
+    <ClInclude Include="Vendor\yaml-cpp\include\yaml-cpp\noexcept.h" />
+    <ClInclude Include="Vendor\yaml-cpp\include\yaml-cpp\null.h" />
+    <ClInclude Include="Vendor\yaml-cpp\include\yaml-cpp\ostream_wrapper.h" />
+    <ClInclude Include="Vendor\yaml-cpp\include\yaml-cpp\parser.h" />
+    <ClInclude Include="Vendor\yaml-cpp\include\yaml-cpp\stlemitter.h" />
+    <ClInclude Include="Vendor\yaml-cpp\include\yaml-cpp\traits.h" />
+    <ClInclude Include="Vendor\yaml-cpp\include\yaml-cpp\yaml.h" />
+    <ClInclude Include="Vendor\yaml-cpp\src\collectionstack.h" />
+    <ClInclude Include="Vendor\yaml-cpp\src\contrib\graphbuilderadapter.h" />
+    <ClInclude Include="Vendor\yaml-cpp\src\directives.h" />
+    <ClInclude Include="Vendor\yaml-cpp\src\emitterstate.h" />
+    <ClInclude Include="Vendor\yaml-cpp\src\emitterutils.h" />
+    <ClInclude Include="Vendor\yaml-cpp\src\exp.h" />
+    <ClInclude Include="Vendor\yaml-cpp\src\indentation.h" />
+    <ClInclude Include="Vendor\yaml-cpp\src\nodebuilder.h" />
+    <ClInclude Include="Vendor\yaml-cpp\src\nodeevents.h" />
+    <ClInclude Include="Vendor\yaml-cpp\src\ptr_vector.h" />
+    <ClInclude Include="Vendor\yaml-cpp\src\regeximpl.h" />
+    <ClInclude Include="Vendor\yaml-cpp\src\regex_yaml.h" />
+    <ClInclude Include="Vendor\yaml-cpp\src\scanner.h" />
+    <ClInclude Include="Vendor\yaml-cpp\src\scanscalar.h" />
+    <ClInclude Include="Vendor\yaml-cpp\src\scantag.h" />
+    <ClInclude Include="Vendor\yaml-cpp\src\setting.h" />
+    <ClInclude Include="Vendor\yaml-cpp\src\singledocparser.h" />
+    <ClInclude Include="Vendor\yaml-cpp\src\stream.h" />
+    <ClInclude Include="Vendor\yaml-cpp\src\streamcharsource.h" />
+    <ClInclude Include="Vendor\yaml-cpp\src\stringsource.h" />
+    <ClInclude Include="Vendor\yaml-cpp\src\tag.h" />
+    <ClInclude Include="Vendor\yaml-cpp\src\token.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Assets\Models\Backpack\backpack.mtl" />

@@ -1,6 +1,7 @@
 #include "pch.h"
 #include "Application.h"
 #include "EngineInitializer.h"
+
 namespace AnorEngine
 {	
 	Application* Application::s_Instance = nullptr;
@@ -20,11 +21,8 @@ namespace AnorEngine
 		}
 		else
 			WARN("APP::{0}", "OpenGLWindow was successfuly created");
-
-
 		Graphics::Renderer::Init(); //Enables Blending for now.
 		Graphics::Renderer2D::Init(); //Initializes 2DRenderer for now.
-
 		LogInfoDebug();
 	}
 	Application::~Application()

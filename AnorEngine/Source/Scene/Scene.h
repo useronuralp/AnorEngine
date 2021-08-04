@@ -2,7 +2,6 @@
 #include "entt.h"
 #include "Renderer/Renderer2D.h"
 #include "Graphics/Camera.h"
-
 namespace AnorEngine
 {
 	struct Position2D
@@ -26,6 +25,7 @@ namespace AnorEngine
 		entt::registry m_Registry;
 		uint32_t m_ViewportWidth = 0, m_ViewportHeight = 0;
 		friend class Entity;
+		friend class SceneSerializer;
 		friend class SceneHierarchyPanel;
 	};
 }

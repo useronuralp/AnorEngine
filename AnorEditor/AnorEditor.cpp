@@ -1,6 +1,7 @@
 #include <Core/Engine.h>
 #include <Core/EntryPoint.h>
 #include <Panels/SceneHierarchyPanel.h>
+#include "Scene/SceneSerializer.h"
 namespace Game
 {
 	using namespace AnorEngine;
@@ -115,8 +116,9 @@ namespace Game
 				m_Entity3->AddComponent<SpriteRendererComponent>(m_Color, m_Entity3TextureAtlas, glm::vec2{ 1.0f, 1.0f }, glm::vec2{ 0 ,1 }, glm::vec2{ 192.0f, 175.0f });
 				m_Entity3->AddComponent<NativeScriptComponent>(true).Bind<CharacterController>();
 			}
-
-			m_SceneHierarchyPanel.SetContext(m_Scene);
+			//SceneSerializer serializer(m_Scene);
+			//serializer.Deserialize(solutionDir + "AnorEngine\\Assets\\Scenes\\Example.Anor");
+			m_SceneHierarchyPanel.SetContext(m_Scene);			
 		}
 		virtual void OnUpdate(float deltaTime) override
 		{
@@ -154,6 +156,12 @@ namespace Game
 		virtual void OnMouseScroll(float xoffset, float yoffset) override
 		{
 			m_Scene->OnMouseScroll(xoffset, yoffset);
+		}
+		virtual ~ExampleLayer()
+		{
+			//Save the scene upon closing
+			//SceneSerializer serializer(m_Scene);
+			//serializer.Serialize(solutionDir + "AnorEngine\\Assets\\Scenes\\Example.Anor");
 		}
 	};
 	class Background : public Layer

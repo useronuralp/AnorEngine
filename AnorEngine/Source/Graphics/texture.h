@@ -8,7 +8,6 @@ namespace AnorEngine {
 			
 			std::string m_FilePath;
 			uint32_t m_RendererID, m_Width, m_Height, m_Channels;
-
 		public:
 			Texture(const std::string& path);
 			~Texture();
@@ -20,6 +19,7 @@ namespace AnorEngine {
 			inline int GetHeight() const { return m_Height; }
 			inline unsigned int GetTextureID() const{ return m_RendererID; }
 
+			inline std::string GetPath() { return m_FilePath; }
 			bool operator == (const Texture& other) const
 			{
 				return m_RendererID == other.m_RendererID;

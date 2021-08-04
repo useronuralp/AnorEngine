@@ -1,0 +1,59 @@
+Scene: Untitled
+Entities:
+  - Entity: 12837192831273
+    TagComponent:
+      Tag: Camera
+    TransformComponent:
+      Translation: [-12.8578835, -5.97669125, 0]
+      Rotation: [0, 0, 0]
+      Scale: [1, 1, 1]
+    CameraComponent:
+      Camera:
+        ProjectionType: 0
+        PerspectiveFOV: 45
+        PerspectiveNear: 0.00999999978
+        PerspectiveFar: 10000
+        OrthographicSize: 26
+        OrthographicNear: -1
+        OrthographicFar: 1
+      Primary: true
+      FixedAspectRatio: false
+  - Entity: 12837192831273
+    TagComponent:
+      Tag: Player
+    TransformComponent:
+      Translation: [0, 0, 0]
+      Rotation: [0, 0, 0]
+      Scale: [1, 1, 1]
+    SpriteRendererComponent:
+      Color: [1, 1, 1, 1]
+      Texture: H:\ProgrammingProjects\repos\AnorEngine\AnorEngine\Assets\Textures\PlatformerTextures\Tilesheet\platformerPack_character@2.png
+      TextureSize: [1, 1]
+      SubTextureOffset: [0, 1]
+      SubTextureDimensions: [192, 175]
+  - Entity: 12837192831273
+    TagComponent:
+      Tag: Block
+    TransformComponent:
+      Translation: [-3.5, -3.5, 0]
+      Rotation: [0, 0, 0]
+      Scale: [1, 1, 1]
+    SpriteRendererComponent:
+      Color: [1, 1, 1, 1]
+      Texture: H:\ProgrammingProjects\repos\AnorEngine\AnorEngine\Assets\Textures\381f5a63791945.5abc4ccf1297d.png
+      TextureSize: [1, 1]
+      SubTextureOffset: [1, 1]
+      SubTextureDimensions: [512, 512]
+  - Entity: 12837192831273
+    TagComponent:
+      Tag: Diamonds
+    TransformComponent:
+      Translation: [1.22441924, 1.22441924, 0]
+      Rotation: [0, 0, 0]
+      Scale: [1, 1, 1]
+    SpriteRendererComponent:
+      Color: [1, 1, 1, 1]
+      Texture: H:\ProgrammingProjects\repos\AnorEngine\AnorEngine\Assets\Textures\PlatformerTextures\Tilesheet\platformPack_tilesheet@2.png
+      TextureSize: [2, 1]
+      SubTextureOffset: [9, 3]
+      SubTextureDimensions: [128, 128]

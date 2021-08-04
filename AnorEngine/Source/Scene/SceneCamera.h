@@ -30,7 +30,7 @@ namespace AnorEngine
 		void SetOrthoGraphicSize(float size) { m_OrthographicSize = size; RecalculateProjectionMatrix(); }
 		float GetOrhographicSize() { return m_OrthographicSize; }
 
-
+		void SetProjectionType(ProjectionType type) { m_ProjectionType = type; }
 	private:
 		void RecalculateProjectionMatrix();
 	private:
