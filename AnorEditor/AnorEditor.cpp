@@ -2,6 +2,7 @@
 #include <Core/EntryPoint.h>
 #include <Panels/SceneHierarchyPanel.h>
 #include "Scene/SceneSerializer.h"
+#include "Utility/WindowsUtils.h"
 namespace Game
 {
 	using namespace AnorEngine;
@@ -26,6 +27,8 @@ namespace Game
 		//-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 		Ref<Entity>			m_CameraEntity = std::make_shared<Entity>(m_Scene->CreateEntity("Camera"));
 	public:
+		Ref<Scene>& GetActiveScene() { return m_Scene; }
+		SceneHierarchyPanel& GetSceneHierarchyPanel() { return m_SceneHierarchyPanel; }
 		virtual void OnAttach() override
 		{
 			struct CameraController : public ScriptableEntity
@@ -273,8 +276,120 @@ namespace Game
 					Renderer2D::EndScene();
 				}
 				m_Framebuffer->Unbind();
-
 				ImGuiBase::Begin(); //-----------------------ImGui Beginning-------------------------
+
+				// In 99% case you should be able to just call DockSpaceOverViewport() and ignore all the code below!
+				// In this specific demo, we are not using DockSpaceOverViewport() because:
+				// - we allow the host window to be floating/moveable instead of filling the viewport (when opt_fullscreen == false)
+				// - we allow the host window to have padding (when opt_padding == true)
+				// - we have a local menu bar in the host window (vs. you could use BeginMainMenuBar() + DockSpaceOverViewport() in your code!)
+				// TL;DR; this demo is more complicated than what you would normally use.
+				// If we removed all the options we are showcasing, this demo would become:
+				//     void ShowExampleAppDockSpace()
+				//     {
+				//         ImGui::DockSpaceOverViewport(ImGui::GetMainViewport());
+				//     }
+				static bool dockspaceOpen = true;
+				static bool opt_fullscreen = true;
+				static bool opt_padding = false;
+				static ImGuiDockNodeFlags dockspace_flags = ImGuiDockNodeFlags_None;
+
+				// We are using the ImGuiWindowFlags_NoDocking flag to make the parent window not dockable into,
+				// because it would be confusing to have two docking targets within each others.
+				ImGuiWindowFlags window_flags = ImGuiWindowFlags_MenuBar | ImGuiWindowFlags_NoDocking;
+				if (opt_fullscreen)
+				{
+					const ImGuiViewport* viewport = ImGui::GetMainViewport();
+					ImGui::SetNextWindowPos(viewport->WorkPos);
+					ImGui::SetNextWindowSize(viewport->WorkSize);
+					ImGui::SetNextWindowViewport(viewport->ID);
+					ImGui::PushStyleVar(ImGuiStyleVar_WindowRounding, 0.0f);
+					ImGui::PushStyleVar(ImGuiStyleVar_WindowBorderSize, 0.0f);
+					window_flags |= ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove;
+					window_flags |= ImGuiWindowFlags_NoBringToFrontOnFocus | ImGuiWindowFlags_NoNavFocus;
+				}
+				else
+				{
+					dockspace_flags &= ~ImGuiDockNodeFlags_PassthruCentralNode;
+				}
+
+				// When using ImGuiDockNodeFlags_PassthruCentralNode, DockSpace() will render our background
+				// and handle the pass-thru hole, so we ask Begin() to not render a background.
+				if (dockspace_flags & ImGuiDockNodeFlags_PassthruCentralNode)
+					window_flags |= ImGuiWindowFlags_NoBackground;
+
+				// Important: note that we proceed even if Begin() returns false (aka window is collapsed).
+				// This is because we want to keep our DockSpace() active. If a DockSpace() is inactive,
+				// all active windows docked into it will lose their parent and become undocked.
+				// We cannot preserve the docking relationship between an active window and an inactive docking, otherwise
+				// any change of dockspace/settings would lead to windows being stuck in limbo and never being visible.
+				if (!opt_padding)
+					ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0.0f, 0.0f));
+
+				ImGui::Begin("DockSpace Demo", &dockspaceOpen, window_flags);
+
+				if (!opt_padding)
+					ImGui::PopStyleVar();
+
+				if (opt_fullscreen)
+					ImGui::PopStyleVar(2);
+
+				if (ImGui::BeginMenuBar())
+				{
+					if (ImGui::BeginMenu("File"))
+					{
+						// Disabling fullscreen would allow the window to be moved to the front of other windows,
+						// which we can't undo at the moment without finer window depth/z control.
+						if (ImGui::MenuItem("New"))
+						{
+							auto& activeScene = m_Layer->GetActiveScene();
+							activeScene = std::make_shared<Scene>();
+							//activeScene->OnResizeViewport(m_ViewportSize.x, m_ViewportSize.y);
+							m_Layer->GetSceneHierarchyPanel().SetContext(activeScene);
+						}
+						if (ImGui::MenuItem("Open..."))
+						{
+							std::string filepath = FileDialogs::OpenFile("Anor Scene (*.anor)\0*.anor\0");
+							if (!filepath.empty())
+							{
+								auto& activeScene = m_Layer->GetActiveScene();
+								activeScene = std::make_shared<Scene>();
+								m_Layer->GetSceneHierarchyPanel().SetContext(activeScene);
+								SceneSerializer serializer(activeScene);
+								serializer.Deserialize(filepath);
+								activeScene->OnResizeViewport(m_ViewportSize.x, m_ViewportSize.y);
+							}
+						}
+						if (ImGui::MenuItem("Save As..."))
+						{
+							std::string filepath = FileDialogs::SaveFile("Anor Scene (*.anor)\0*.anor\0");
+							if (!filepath.empty())
+							{
+								SceneSerializer serializer(m_Layer->GetActiveScene());
+								serializer.Serialize(filepath);
+							}
+						}
+						ImGui::EndMenu();
+					}
+
+					ImGui::EndMenuBar();
+				}
+
+				// DockSpace
+				auto& style = ImGui::GetStyle();
+				float minWinSizeX = style.WindowMinSize.x;
+				style.WindowMinSize.x = 420.0f;
+				ImGuiIO& io = ImGui::GetIO();
+				if (io.ConfigFlags & ImGuiConfigFlags_DockingEnable)
+				{
+					ImGuiID dockspace_id = ImGui::GetID("MyDockSpace");
+					ImGui::DockSpace(dockspace_id, ImVec2(0.0f, 0.0f), dockspace_flags);
+				}
+				style.WindowMinSize.x = minWinSizeX;
+
+				static bool show = true;
+				ImGui::End();
+				
 				for (Ref<Layer> layer : m_LayerStack)
 				{
 					layer->OnImGuiRender();

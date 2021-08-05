@@ -70,6 +70,7 @@ namespace AnorEngine
 	SceneHierarchyPanel::SceneHierarchyPanel(const Ref<Scene>& scene)
 	{
 		SetContext(scene);
+		m_SelectionContext = {};
 	}
 	void SceneHierarchyPanel::SetContext(const Ref<Scene>& scene)
 	{
@@ -202,6 +203,7 @@ namespace AnorEngine
 		if (m_SelectionContext)
 			DrawComponents(m_SelectionContext);
 
+		
 		ImGui::End();
 	}
 	void SceneHierarchyPanel::DrawEntityNode(Entity entity)

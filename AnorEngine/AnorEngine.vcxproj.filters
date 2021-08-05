@@ -228,6 +228,9 @@
     <ClCompile Include="Vendor\yaml-cpp\src\tag.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Source\Utility\WindowsUtils.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Source\Events\Event.h">
@@ -576,6 +579,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Vendor\yaml-cpp\src\token.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Utility\WindowsUtils.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

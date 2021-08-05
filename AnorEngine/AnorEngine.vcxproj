@@ -213,6 +213,7 @@
     <ClCompile Include="Source\Math\vec3.cpp" />
     <ClCompile Include="Source\Math\vec4.cpp" />
     <ClCompile Include="Source\Utility\Logger.cpp" />
+    <ClCompile Include="Source\Utility\WindowsUtils.cpp" />
     <ClCompile Include="Vendor\ImGUI\imgui.cpp" />
     <ClCompile Include="Vendor\ImGUI\imgui_demo.cpp" />
     <ClCompile Include="Vendor\ImGUI\imgui_draw.cpp" />
@@ -301,6 +302,7 @@
     <ClInclude Include="Source\Math\vec4.h" />
     <ClInclude Include="Source\Utility\fileutils.h" />
     <ClInclude Include="Source\Utility\Randomizer.h" />
+    <ClInclude Include="Source\Utility\WindowsUtils.h" />
     <ClInclude Include="Vendor\ImGUI\imconfig.h" />
     <ClInclude Include="Vendor\ImGUI\imgui.h" />
     <ClInclude Include="Vendor\ImGUI\imgui_internal.h" />
