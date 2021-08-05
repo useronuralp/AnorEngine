@@ -70,11 +70,11 @@ namespace AnorEngine
 	SceneHierarchyPanel::SceneHierarchyPanel(const Ref<Scene>& scene)
 	{
 		SetContext(scene);
-		m_SelectionContext = {};
 	}
 	void SceneHierarchyPanel::SetContext(const Ref<Scene>& scene)
 	{
 		m_Context = scene;
+		m_SelectionContext = {};
 	}
 	void SceneHierarchyPanel::DrawComponents(Entity entity)
 	{
