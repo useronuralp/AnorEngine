@@ -1,0 +1,59 @@
+Scene: Untitled
+Entities:
+  - Entity: 12837192831273
+    TagComponent:
+      Tag: Camera
+    TransformComponent:
+      Translation: [0.0500000007, 3.1500001, 8.03999996]
+      Rotation: [0, 0, 0]
+      Scale: [1, 1, 1]
+    CameraComponent:
+      Camera:
+        ProjectionType: 1
+        PerspectiveFOV: 45
+        PerspectiveNear: 0.00999999978
+        PerspectiveFar: 10000
+        OrthographicSize: 10
+        OrthographicNear: -1
+        OrthographicFar: 1
+      Primary: true
+      FixedAspectRatio: false
+  - Entity: 12837192831273
+    TagComponent:
+      Tag: Left
+    TransformComponent:
+      Translation: [-0.419999987, 0, 0]
+      Rotation: [0, -0.785398185, 0]
+      Scale: [1, 1, 1]
+    SpriteRendererComponent:
+      Color: [0.215753436, 0, 0, 1]
+      Texture: H:\ProgrammingProjects\repos\AnorEngine\AnorEngine\Assets\Textures\WhiteTexture.PNG
+      TextureSize: [1, 1]
+      SubTextureOffset: [1, 1]
+      SubTextureDimensions: [83, 88]
+  - Entity: 12837192831273
+    TagComponent:
+      Tag: Right
+    TransformComponent:
+      Translation: [0.280000001, 0, 0]
+      Rotation: [0, 0.785398185, 0]
+      Scale: [1, 1, 1]
+    SpriteRendererComponent:
+      Color: [0.801369846, 0, 0, 1]
+      Texture: H:\ProgrammingProjects\repos\AnorEngine\AnorEngine\Assets\Textures\WhiteTexture.PNG
+      TextureSize: [1, 1]
+      SubTextureOffset: [1, 1]
+      SubTextureDimensions: [83, 88]
+  - Entity: 12837192831273
+    TagComponent:
+      Tag: Top
+    TransformComponent:
+      Translation: [-0.0700000003, 0.5, -0.349999994]
+      Rotation: [1.57079637, 0.802851439, 0]
+      Scale: [1, 1, 1]
+    SpriteRendererComponent:
+      Color: [0.544520557, 0, 0, 1]
+      Texture: H:\ProgrammingProjects\repos\AnorEngine\AnorEngine\Assets\Textures\WhiteTexture.PNG
+      TextureSize: [1, 1]
+      SubTextureOffset: [1, 1]
+      SubTextureDimensions: [83, 88]

@@ -20,7 +20,8 @@ namespace AnorEngine
 			void SetProjectionMatrix(float left, float right, float bottom, float top);
 			glm::mat4& GetProjectionMatrix() { return m_ProjectionMatrix; }
 		protected:
-			glm::mat4 m_ProjectionMatrix = glm::mat4(1.0f);
+			glm::mat4 m_ProjectionMatrix{ 1.0f };
+			glm::mat4 m_ViewMatrix{ 1.0f };
 		};
 
 		class ANOR_API PerspectiveCamera

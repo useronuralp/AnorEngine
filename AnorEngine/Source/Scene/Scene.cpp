@@ -10,7 +10,18 @@ namespace AnorEngine
 	Scene::~Scene()
 	{
 	}
-	void Scene::OnRender(float deltaTime)
+	void Scene::OnUpdateEditor(float deltaTime, Ref<Graphics::EditorCamera> camera)
+	{
+		Graphics::Renderer2D::BeginScene(camera);
+		auto group = m_Registry.group<TransformComponent>(entt::get<SpriteRendererComponent>);
+		for (auto& entity : group)
+		{
+			auto [transformComponent, spriteRendererComponent] = group.get<TransformComponent, SpriteRendererComponent>(entity);
+			Graphics::Renderer2D::Submit(transformComponent, spriteRendererComponent);
+		}
+		Graphics::Renderer2D::EndScene();
+	}
+	void Scene::OnUpdateRuntime(float deltaTime)
 	{
 		//Exaplanation: In this OnRender function, the user can retrieve whatever component they want and do operations on them.
 
@@ -59,7 +70,6 @@ namespace AnorEngine
 			Graphics::Renderer2D::EndScene();
 		}
 	}
-
 	void Scene::OnResizeViewport(uint32_t width, uint32_t height)
 	{
 		m_ViewportWidth = width;

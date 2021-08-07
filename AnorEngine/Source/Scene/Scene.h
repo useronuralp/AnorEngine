@@ -2,6 +2,7 @@
 #include "entt.h"
 #include "Renderer/Renderer2D.h"
 #include "Graphics/Camera.h"
+#include "Graphics/EditorCamera.h"
 namespace AnorEngine
 {
 	struct Position2D
@@ -15,7 +16,8 @@ namespace AnorEngine
 	public:
 		Scene();
 		~Scene();
-		void OnRender(float deltaTime);
+		void OnUpdateRuntime(float deltaTime);
+		void OnUpdateEditor(float deltaTime, Ref<Graphics::EditorCamera> camera);
 		void OnResizeViewport(uint32_t width, uint32_t height);
 		void OnMouseScroll(float xoffset, float yoffset);
 		Entity CreateEntity(const std::string& name = std::string());

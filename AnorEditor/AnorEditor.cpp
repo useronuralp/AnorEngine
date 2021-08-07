@@ -11,6 +11,7 @@ namespace Game
 
 	class ExampleLayer : public Layer
 	{
+		Ref<EditorCamera>   m_EditorCamera;
 		SceneHierarchyPanel m_SceneHierarchyPanel;
 		glm::vec4			m_Color = { 1,1,1,1 };
 		std::string			solutionDir = __SOLUTION_DIR;
@@ -29,6 +30,8 @@ namespace Game
 	public:
 		Ref<Scene>& GetActiveScene() { return m_Scene; }
 		SceneHierarchyPanel& GetSceneHierarchyPanel() { return m_SceneHierarchyPanel; }
+		ExampleLayer(Ref<EditorCamera>& camera)
+			:m_EditorCamera(camera){}
 		virtual void OnAttach() override
 		{
 			struct CameraController : public ScriptableEntity
@@ -125,7 +128,7 @@ namespace Game
 		}
 		virtual void OnUpdate(float deltaTime) override
 		{
-			m_Scene->OnRender(deltaTime);
+			m_Scene->OnUpdateEditor(deltaTime, m_EditorCamera);
 		}
 		virtual void OnImGuiRender() override
 		{
@@ -215,6 +218,7 @@ namespace Game
 	private:
 		LayerStack						  m_LayerStack;
 		Ref<OrthographicCamera>			  m_OrthoCamera;
+		Ref<EditorCamera>				  m_EditorCamera;
 		Ref<PerspectiveCamera>			  m_PersCamera;
 		Ref<ExampleLayer>				  m_Layer;
 		Ref<Background>					  m_Bg;
@@ -232,11 +236,12 @@ namespace Game
 		AnorEditor(const char* appName)
 			:Application(appName), m_OrthoCamera(std::make_shared<OrthographicCamera>(-1280.0f / 720.0f * (5), 1280.0f / 720.0f * (5), -1 * (5), 1 * (5))), m_PersCamera(std::make_shared<PerspectiveCamera>(1280, 720))
 		{
+			m_EditorCamera = std::make_shared<EditorCamera>();
 			Input::EventHandler::SetTargetApplication(this); //Important to set this to the active Application else, you won't get your input processed.	
 			//Framebuffer Settings --------------------------------------------------------------------------------------------
 			m_Framebuffer = std::make_shared<Framebuffer>(FramebufferSpecifications());
 			//Layer Creation--------------------------------------------------------------------------------------------
-			m_Layer = std::make_shared<ExampleLayer>();
+			m_Layer = std::make_shared<ExampleLayer>(m_EditorCamera);
 			m_Bg = std::make_shared<Background>(m_OrthoCamera);
 			//Particle Settings----------------------------------------------------------------------------------
 			ParticleProperties particleProperties;
@@ -418,7 +423,9 @@ namespace Game
 					{
 						layerIterator->get()->OnResizeViewport(m_ViewportSize.x, m_ViewportSize.y);
 					}
+					m_EditorCamera->SetViewportSize(m_ViewportSize.x, m_ViewportSize.y);
 				}
+				m_EditorCamera->OnUpdate(deltaTime);
 				m_ProfileResults.clear();
 				m_OpenGLWindow->Update();
 			}
@@ -428,6 +435,7 @@ namespace Game
 			e->Log();
 			//Propogating the recieved event to layers.
 			//One of the layers can set the 'm_Handled' value of an event to true so that further propogation is prevented.
+			m_EditorCamera->OnEvent(e);
 			if (e->GetEventType() == Input::EventType::WindowResizeEvent)
 			{
 				for (auto layerIterator = m_LayerStack.rbegin(); layerIterator != m_LayerStack.rend(); layerIterator++)

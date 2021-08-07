@@ -40,6 +40,7 @@ namespace AnorEngine
 
 		static Renderer2DData s_Data;
 		Ref<OrthographicCamera> Renderer2D::s_OrthoCamera;
+		Ref<EditorCamera> Renderer2D::s_EditorCamera;
 
 		void Renderer2D::Init()
 		{
@@ -526,6 +527,18 @@ namespace AnorEngine
 			s_OrthoCamera = camera;
 			s_Data.QuadShader->enable();
 			s_Data.QuadShader->UploadMat4("u_ViewProjMat", s_OrthoCamera->GetViewProjectionMatrix());
+			s_Data.QuadShader->disable();
+			s_Data.NumberOfDrawCalls = 0;
+			s_Data.QuadIndexCount = 0;
+			s_Data.QuadVertexBufferPtr = s_Data.QuadVertexBufferBase;
+			s_Data.TextureSlotIndex = 1;
+		}
+		void Renderer2D::BeginScene(const Ref<EditorCamera>& camera)
+		{
+			//Check here if you you get black screen.
+			s_EditorCamera = camera;
+			s_Data.QuadShader->enable();
+			s_Data.QuadShader->UploadMat4("u_ViewProjMat", s_EditorCamera->GetViewProjectionMatrix());
 			s_Data.QuadShader->disable();
 			s_Data.NumberOfDrawCalls = 0;
 			s_Data.QuadIndexCount = 0;

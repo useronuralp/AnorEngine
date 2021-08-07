@@ -3,6 +3,7 @@
 #include "Graphics/Shader.h"
 #include "Graphics/Texture.h"
 #include "Graphics/Camera.h"
+#include "Graphics/EditorCamera.h"
 namespace AnorEngine
 {
 	//Forward declerations.
@@ -32,6 +33,7 @@ namespace AnorEngine
 			static void Submit(const TransformComponent& tc, const SpriteRendererComponent& sc);
 			static void Flush();
 			static void BeginScene(const Ref<OrthographicCamera> camera);
+			static void BeginScene(const Ref<EditorCamera>& camera);
 			static void BeginScene(Camera* camera, const glm::mat4& transform);
 			static void EndScene();
 		public:
@@ -40,6 +42,7 @@ namespace AnorEngine
 		private:
 			static uint32_t QuadIndexCount;
 			static Ref<OrthographicCamera> s_OrthoCamera;
+			static Ref<EditorCamera> s_EditorCamera;
 		};
 	}
 }
