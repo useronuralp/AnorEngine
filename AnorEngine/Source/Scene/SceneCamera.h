@@ -13,8 +13,9 @@ namespace AnorEngine
 		SceneCamera();
 		virtual ~SceneCamera() = default;
 		void SetViewportSize(uint32_t width, uint32_t height);
-		ProjectionType GetProjectionType() { return m_ProjectionType; }
+		ProjectionType& GetProjectionType() { return m_ProjectionType; }
 
+		void SetPerpsective(float FOV, float nearClip, float farClip);
 		void SetNearClipPerspective(float nearClip) { m_PerspectiveNear = nearClip; RecalculateProjectionMatrix(); }
 		void SetFarClipPerspective(float farClip) { m_PerspectiveFar = farClip; RecalculateProjectionMatrix(); }
 		void SetPerspectiveFOV(float FOV) { m_FOV = FOV; RecalculateProjectionMatrix(); }
@@ -31,7 +32,7 @@ namespace AnorEngine
 		float GetOrhographicSize() { return m_OrthographicSize; }
 
 		void SetProjectionType(ProjectionType type) { m_ProjectionType = type; }
-	private:
+		public:
 		void RecalculateProjectionMatrix();
 	private:
 		ProjectionType m_ProjectionType = ProjectionType::Orthographic;

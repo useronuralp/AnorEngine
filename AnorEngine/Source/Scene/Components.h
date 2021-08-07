@@ -3,6 +3,9 @@
 #include "Graphics/texture.h"
 #include "SceneCamera.h"
 #include "ScriptableEntity.h"
+#define GLM_ENABLE_EXPERIMENTAL
+#include <gtx/quaternion.hpp>
+
 namespace AnorEngine
 {
 	struct ANOR_API TransformComponent
@@ -17,15 +20,15 @@ namespace AnorEngine
 		glm::mat4 GetTransform()
 		{
 			glm::mat4 transform(1.0f);
-			transform = glm::translate(transform, Translation) * (glm::rotate(transform, Rotation.x, { 1.0f, 0.0f, 0.0f }) *
-				glm::rotate(transform, Rotation.y, { 0.0f, 1.0f, 0.0f }) * glm::rotate(transform, Rotation.z, { 0.0f, 0.0f, 1.0f })) * glm::scale(transform, { Scale.x, Scale.y, Scale.z });
+			glm::mat4 rotation = glm::toMat4(glm::quat(Rotation));
+			transform = glm::translate(transform, Translation) * rotation * glm::scale(transform, { Scale.x, Scale.y, Scale.z });
 			return transform;
 		}
 		const glm::mat4 GetTransform() const
 		{
 			glm::mat4 transform(1.0f);
-			transform = glm::translate(transform, Translation) * (glm::rotate(transform, Rotation.x, { 1.0f, 0.0f, 0.0f }) * 
-				glm::rotate(transform, Rotation.y, { 0.0f, 1.0f, 0.0f }) * glm::rotate(transform, Rotation.z, { 0.0f, 0.0f, 1.0f })) * glm::scale(transform, { Scale.x, Scale.y, Scale.z });
+			glm::mat4 rotation = glm::toMat4(glm::quat(Rotation));
+			transform = glm::translate(transform, Translation) * rotation * glm::scale(transform, { Scale.x, Scale.y, Scale.z });
 			return transform;
 		}
 	};

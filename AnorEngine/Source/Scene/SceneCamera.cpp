@@ -14,6 +14,14 @@ namespace AnorEngine
 
 		RecalculateProjectionMatrix();
 	}
+	void SceneCamera::SetPerpsective(float FOV, float nearClip, float farClip)
+	{
+		m_FOV = FOV;
+		m_PerspectiveNear = nearClip;
+		m_PerspectiveFar = farClip;
+
+		RecalculateProjectionMatrix();
+	}
 	void SceneCamera::SetViewportSize(uint32_t width, uint32_t height)
 	{
 		m_AspectRatio = (float)width / (float)height;

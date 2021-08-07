@@ -146,6 +146,22 @@ namespace AnorEngine
 				float perspectiveFar = component.Camera.GetFarClipPerspective();
 				if (ImGui::DragFloat("Far", &perspectiveFar))
 					component.Camera.SetFarClipPerspective(perspectiveFar);
+				ImGui::Checkbox("Is Primary", &component.Primary);
+				auto& projectionType = component.Camera.GetProjectionType();
+				if (ImGui::TreeNodeEx("Camera Projection"))
+				{
+					if (ImGui::SmallButton("Orhtographic"))
+					{
+						projectionType = ProjectionType::Orthographic;
+						component.Camera.RecalculateProjectionMatrix();
+					}
+					if (ImGui::SmallButton("Perspective"))
+					{
+						projectionType = ProjectionType::Perspective;
+						component.Camera.RecalculateProjectionMatrix();
+					}
+					ImGui::TreePop();
+				}
 			}
 			else
 			{
@@ -160,6 +176,20 @@ namespace AnorEngine
 				if (ImGui::DragFloat("Far", &orthoFar))
 					component.Camera.SetFarClipOrthographic(orthoFar);
 				ImGui::Checkbox("Is Primary", &component.Primary);
+
+				auto& projectionType = component.Camera.GetProjectionType();
+				if(ImGui::TreeNodeEx("Camera Projection"))
+				{
+					if (ImGui::SmallButton("Orhtographic"))
+					{
+						projectionType = ProjectionType::Orthographic;
+					}
+					if (ImGui::SmallButton("Perspective"))
+					{
+						projectionType = ProjectionType::Perspective;
+					}
+					ImGui::TreePop();
+				}
 			}
 		});
 
