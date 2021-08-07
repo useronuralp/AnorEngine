@@ -21,7 +21,7 @@ namespace AnorEngine
 		void EditorCamera::OnUpdate(float deltaTime)
 		{
 			auto window = Application::Get().GetOpenGLWindow()->GetNativeWindow();
-			if (Input::EventHandler::IsKeyDown(ANOR_KEY_LEFT_ALT))
+			if (Input::EventHandler::IsKeyDown(ANOR_KEY_LEFT_CONTROL))
 			{
 				const glm::vec2& mouse{ Input::EventHandler::GetMouseXOffset(window), Input::EventHandler::GetMouseYOffset(window) };
 				glm::vec2 delta = (mouse - m_InitialMousePosition) * 0.003f;
