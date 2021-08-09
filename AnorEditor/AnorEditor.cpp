@@ -239,7 +239,9 @@ namespace Game
 			m_EditorCamera = std::make_shared<EditorCamera>();
 			Input::EventHandler::SetTargetApplication(this); //Important to set this to the active Application else, you won't get your input processed.	
 			//Framebuffer Settings --------------------------------------------------------------------------------------------
-			m_Framebuffer = std::make_shared<Framebuffer>(FramebufferSpecifications());
+			FramebufferSpecifications fbSpecs;
+			fbSpecs.Attachments = { {FramebufferTextureFormat::RGBA8}, {FramebufferTextureFormat::RGBA8}, {FramebufferTextureFormat::DEPTH24STENCIL8} };
+			m_Framebuffer = std::make_shared<Framebuffer>(fbSpecs);
 			//Layer Creation--------------------------------------------------------------------------------------------
 			m_Layer = std::make_shared<ExampleLayer>(m_EditorCamera);
 			m_Bg = std::make_shared<Background>(m_OrthoCamera);
