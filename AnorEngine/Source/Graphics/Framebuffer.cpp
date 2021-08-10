@@ -11,6 +11,7 @@ namespace AnorEngine
 		}
 		static void CreateTextures(bool multiSample, uint32_t* outID, uint32_t count)
 		{
+			//Memory allocation part for the textures.
 			glCreateTextures(TextureTarget(multiSample), count, outID);
 		}
 		static bool IsDepthFormat(FramebufferTextureFormat format)
@@ -26,16 +27,17 @@ namespace AnorEngine
 		{
 			glBindTexture(TextureTarget(multiSample), id);
 		}
-		static void AttachColorTexture(uint32_t id, int samples, GLenum format, uint32_t width, uint32_t height, int index)
+		static void AttachColorTexture(uint32_t id, int samples, GLenum internalFormat, GLenum format, uint32_t width, uint32_t height, int index)
 		{
 			bool multisampled = samples > 1;
 			if (multisampled)
 			{
-				glTexImage2DMultisample(GL_TEXTURE_2D_MULTISAMPLE, samples, format, width, height, GL_FALSE);
+				glTexImage2DMultisample(GL_TEXTURE_2D_MULTISAMPLE, samples, internalFormat, width, height, GL_FALSE);
 			}
 			else
 			{
-				glTexImage2D(GL_TEXTURE_2D, 0, format, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, nullptr);
+				//GL_RGBA here is hard coded for now since we are only using GL_RGBA8 formats right now.
+				glTexImage2D(GL_TEXTURE_2D, 0, internalFormat, width, height, 0, format, GL_UNSIGNED_BYTE, nullptr);
 				glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 				glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 				glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
@@ -67,14 +69,14 @@ namespace AnorEngine
 		Framebuffer::Framebuffer(const FramebufferSpecifications& specs)
 			:m_Specs(specs)
 		{
-			for (auto& attachment : m_Specs.Attachments)
+			for (auto& attachmentSpec : m_Specs.Attachments)
 			{
-				for(auto& specification : attachment.Attachments)
+				for(auto& textureSpec : attachmentSpec.Attachments)
 				{
-					if(!IsDepthFormat(specification.TextureFormat))
-						m_ColorAttachmentsSpecs.emplace_back(specification);
+					if(!IsDepthFormat(textureSpec.TextureFormat))
+						m_ColorAttachmentsSpecs.emplace_back(textureSpec);
 					else
-						m_DepthAttachmentSpec = specification.TextureFormat;
+						m_DepthAttachmentSpec = textureSpec.TextureFormat;
 				}
 			}
 			
@@ -104,22 +106,23 @@ namespace AnorEngine
 			bool multisample = m_Specs.Samples > 1;
 
 			//Attachments
-			if(m_ColorAttachmentsSpecs.size())
+			if(m_ColorAttachmentsSpecs.size()) // Check if there is any attachments in here.
 			{
-				//Avoid unnecessary allocation inside the vector.
 				m_ColorAttachments.resize(m_ColorAttachmentsSpecs.size());
+				//Passing a pointer to the empty m_ColorAttachments to the CreateTextures. This memory block will be filled by CreateTextures.
 				CreateTextures(multisample, m_ColorAttachments.data(), m_ColorAttachments.size());
-				for (auto& spec : m_ColorAttachmentsSpecs)
+				for(size_t i = 0; i < m_ColorAttachments.size(); i++)
 				{
-					for(size_t i = 0; i < m_ColorAttachments.size(); i++)
+					BindTexture(multisample, m_ColorAttachments[i]);
+					switch(m_ColorAttachmentsSpecs[i].TextureFormat)
 					{
-						BindTexture(multisample, m_ColorAttachments[i]);
-						switch(m_ColorAttachmentsSpecs[i].TextureFormat)
-						{
-							case FramebufferTextureFormat::RGBA8:
-								AttachColorTexture(m_ColorAttachments[i], m_Specs.Samples, GL_RGBA8, m_Specs.Width, m_Specs.Height, i);
-								break;
-						}
+						//This switch is where you extend this code path when there is more types to add.
+						case FramebufferTextureFormat::RGBA8:
+							AttachColorTexture(m_ColorAttachments[i], m_Specs.Samples, GL_RGBA8, GL_RGBA, m_Specs.Width, m_Specs.Height, i);
+							break;
+						case FramebufferTextureFormat::RED_INTEGER:
+							AttachColorTexture(m_ColorAttachments[i], m_Specs.Samples, GL_R32I, GL_RED_INTEGER, m_Specs.Width, m_Specs.Height, i);
+							break;
 					}
 				}
 			}
@@ -139,6 +142,14 @@ namespace AnorEngine
 			if (m_ColorAttachments.size() > 1)
 			{
 				GLenum buffers[4] = { GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1, GL_COLOR_ATTACHMENT2, GL_COLOR_ATTACHMENT3 };
+				if (m_ColorAttachments.size() > 4)
+				{
+					CRITICAL_ASSERT("Buffer size overflowed!");
+				}
+				//This line of code specifies which attachments to draw to. For example: If you have two color attachments. This function allows you to write to both of them in a fragment shader by specifying 
+				// a second layout(location = 1) out vec4 color2; like this.
+				
+				//The default value for this call is glDrawBuffers(GL_COLOR_ATTACHMENT0); That is why you don't need to specify a color attachment when you draw using only the default one. It calls this function itself.
 				glDrawBuffers(m_ColorAttachments.size(), buffers);
 			}
 			else if (m_ColorAttachments.empty())
@@ -169,6 +180,18 @@ namespace AnorEngine
 		{
 			glBindFramebuffer(GL_FRAMEBUFFER, 0);
 		}
-		
+
+		int Framebuffer::ReadPixel(uint32_t attachmentIndex, int x, int y)
+		{
+			if (attachmentIndex > m_ColorAttachments.size())
+			{
+				CRITICAL_ASSERT("Sizes dont match!");
+			}
+
+			glReadBuffer(GL_COLOR_ATTACHMENT0 + attachmentIndex);
+			int pixelData;
+			glReadPixels(x, y, 1, 1, GL_RED_INTEGER, GL_INT, &pixelData);
+			return pixelData;
+		}	
 	}
 }

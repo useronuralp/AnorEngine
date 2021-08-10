@@ -12,7 +12,6 @@ namespace Game
 	class ExampleLayer : public Layer
 	{
 		Ref<EditorCamera>   m_EditorCamera;
-		SceneHierarchyPanel m_SceneHierarchyPanel;
 		glm::vec4			m_Color = { 1,1,1,1 };
 		std::string			solutionDir = __SOLUTION_DIR;
 		Ref<Scene>			m_Scene = std::make_shared<Scene>();
@@ -29,7 +28,6 @@ namespace Game
 		Ref<Entity>			m_CameraEntity = std::make_shared<Entity>(m_Scene->CreateEntity("Camera"));
 	public:
 		Ref<Scene>& GetActiveScene() { return m_Scene; }
-		SceneHierarchyPanel& GetSceneHierarchyPanel() { return m_SceneHierarchyPanel; }
 		ExampleLayer(Ref<EditorCamera>& camera)
 			:m_EditorCamera(camera){}
 		virtual void OnAttach() override
@@ -115,44 +113,35 @@ namespace Game
 				m_Entity2->GetComponent<TransformComponent>().Translation.y = -3.5f;
 				m_Entity2->AddComponent<SpriteRendererComponent>(m_Color, m_Entity2_Texture);
 			}
-			//TODO : Make this line of code work. This Paritlce System class should be derived from entity or scriptable entity ?.
-			//m_ParticleSystem->AddComponent<SpriteRendererComponent>(m_Texture);
 			if (m_Entity3)
 			{
 				m_Entity3->AddComponent<SpriteRendererComponent>(m_Color, m_Entity3TextureAtlas, glm::vec2{ 1.0f, 1.0f }, glm::vec2{ 0 ,1 }, glm::vec2{ 192.0f, 175.0f });
 				m_Entity3->AddComponent<NativeScriptComponent>(true).Bind<CharacterController>();
 			}
-			//SceneSerializer serializer(m_Scene);
-			//serializer.Deserialize(solutionDir + "AnorEngine\\Assets\\Scenes\\Example.Anor");
-			m_SceneHierarchyPanel.SetContext(m_Scene);			
 		}
 		virtual void OnUpdate(float deltaTime) override
 		{
 			m_Scene->OnUpdateEditor(deltaTime, m_EditorCamera);
 		}
-		virtual void OnImGuiRender() override
-		{
-			m_SceneHierarchyPanel.OnImGuiRender();
-		}
 		virtual void OnEvent(Ref<Input::Event> e) override
 		{
 			if (!e->m_Handled)
 			{
-				//This resizing event handling is currently not needed since the viewport code does the resizing and sends it to the framebuffer.
-				//However, I will leave this code here in case the rendering target changes from a framebuffer to a glfw window, then, I would need this resizing event to properly resize the window
-				//and if I delete it now, I will have a hard time trying to find the reason why the window won't resize in the future.
-				if (e->GetEventType() == Input::EventType::WindowResizeEvent)
-				{
-					auto castEvent = std::static_pointer_cast<Input::WindowResizeEvent>(e);
-					OnResizeViewport(castEvent->GetWidth(), castEvent->GetHeight());
-					e->m_Handled = true;
-				}
-				if (e->GetEventType() == Input::EventType::MouseScrollEvent)
-				{
-					auto castEvent = std::static_pointer_cast<Input::MouseScrollEvent>(e);
-					OnMouseScroll(castEvent->GetXOffset(), castEvent->GetYOffset());
-					e->m_Handled = true;
-				}
+				////This resizing event handling is currently not needed since the viewport code does the resizing and sends it to the framebuffer.
+				////However, I will leave this code here in case the rendering target changes from a framebuffer to a glfw window, then, I would need this resizing event to properly resize the window
+				////and if I delete it now, I will have a hard time trying to find the reason why the window won't resize in the future.
+				//if (e->GetEventType() == Input::EventType::WindowResizeEvent)
+				//{
+				//	auto castEvent = std::static_pointer_cast<Input::WindowResizeEvent>(e);
+				//	OnResizeViewport(castEvent->GetWidth(), castEvent->GetHeight());
+				//	e->m_Handled = true;
+				//}
+				//if (e->GetEventType() == Input::EventType::MouseScrollEvent)
+				//{
+				//	auto castEvent = std::static_pointer_cast<Input::MouseScrollEvent>(e);
+				//	OnMouseScroll(castEvent->GetXOffset(), castEvent->GetYOffset());
+				//	e->m_Handled = true;
+				//}
 			}
 		}
 		virtual void OnResizeViewport(uint32_t width, uint32_t height) override
@@ -162,12 +151,6 @@ namespace Game
 		virtual void OnMouseScroll(float xoffset, float yoffset) override
 		{
 			m_Scene->OnMouseScroll(xoffset, yoffset);
-		}
-		virtual ~ExampleLayer()
-		{
-			//Save the scene upon closing
-			//SceneSerializer serializer(m_Scene);
-			//serializer.Serialize(solutionDir + "AnorEngine\\Assets\\Scenes\\Example.Anor");
 		}
 	};
 	class Background : public Layer
@@ -216,6 +199,7 @@ namespace Game
 	class AnorEditor : public Application
 	{
 	private:
+		SceneHierarchyPanel               m_SceneHierarchyPanel;
 		LayerStack						  m_LayerStack;
 		Ref<OrthographicCamera>			  m_OrthoCamera;
 		Ref<EditorCamera>				  m_EditorCamera;
@@ -225,6 +209,8 @@ namespace Game
 		Ref<ParticleSystem>				  m_ParticleSystem;
 		Ref<Framebuffer>				  m_Framebuffer;
 		glm::vec2						  m_ViewportSize;
+		glm::vec2						  m_MousePositionRelativeToRenderViewport;
+		glm::vec2						  m_ViewportBounds[2];
 		float							  m_LastFrameRenderTime;
 		bool							  m_Minimized = false;
 		bool							  m_ViewportHovered = false;
@@ -240,10 +226,11 @@ namespace Game
 			Input::EventHandler::SetTargetApplication(this); //Important to set this to the active Application else, you won't get your input processed.	
 			//Framebuffer Settings --------------------------------------------------------------------------------------------
 			FramebufferSpecifications fbSpecs;
-			fbSpecs.Attachments = { {FramebufferTextureFormat::RGBA8}, {FramebufferTextureFormat::RGBA8}, {FramebufferTextureFormat::DEPTH24STENCIL8} };
+			fbSpecs.Attachments = { {FramebufferTextureFormat::RGBA8}, {FramebufferTextureFormat::RED_INTEGER}, {FramebufferTextureFormat::DEPTH24STENCIL8} };
 			m_Framebuffer = std::make_shared<Framebuffer>(fbSpecs);
 			//Layer Creation--------------------------------------------------------------------------------------------
 			m_Layer = std::make_shared<ExampleLayer>(m_EditorCamera);
+			m_SceneHierarchyPanel.SetContext(m_Layer->GetActiveScene());
 			m_Bg = std::make_shared<Background>(m_OrthoCamera);
 			//Particle Settings----------------------------------------------------------------------------------
 			ParticleProperties particleProperties;
@@ -285,122 +272,9 @@ namespace Game
 				m_Framebuffer->Unbind();
 				ImGuiBase::Begin(); //-----------------------ImGui Beginning-------------------------
 
-				// In 99% case you should be able to just call DockSpaceOverViewport() and ignore all the code below!
-				// In this specific demo, we are not using DockSpaceOverViewport() because:
-				// - we allow the host window to be floating/moveable instead of filling the viewport (when opt_fullscreen == false)
-				// - we allow the host window to have padding (when opt_padding == true)
-				// - we have a local menu bar in the host window (vs. you could use BeginMainMenuBar() + DockSpaceOverViewport() in your code!)
-				// TL;DR; this demo is more complicated than what you would normally use.
-				// If we removed all the options we are showcasing, this demo would become:
-				//     void ShowExampleAppDockSpace()
-				//     {
-				//         ImGui::DockSpaceOverViewport(ImGui::GetMainViewport());
-				//     }
-				static bool dockspaceOpen = true;
-				static bool opt_fullscreen = true;
-				static bool opt_padding = false;
-				static ImGuiDockNodeFlags dockspace_flags = ImGuiDockNodeFlags_None;
+				ImGuiDockspaceSetup();
+				m_SceneHierarchyPanel.OnImGuiRender();
 
-				// We are using the ImGuiWindowFlags_NoDocking flag to make the parent window not dockable into,
-				// because it would be confusing to have two docking targets within each others.
-				ImGuiWindowFlags window_flags = ImGuiWindowFlags_MenuBar | ImGuiWindowFlags_NoDocking;
-				if (opt_fullscreen)
-				{
-					const ImGuiViewport* viewport = ImGui::GetMainViewport();
-					ImGui::SetNextWindowPos(viewport->WorkPos);
-					ImGui::SetNextWindowSize(viewport->WorkSize);
-					ImGui::SetNextWindowViewport(viewport->ID);
-					ImGui::PushStyleVar(ImGuiStyleVar_WindowRounding, 0.0f);
-					ImGui::PushStyleVar(ImGuiStyleVar_WindowBorderSize, 0.0f);
-					window_flags |= ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove;
-					window_flags |= ImGuiWindowFlags_NoBringToFrontOnFocus | ImGuiWindowFlags_NoNavFocus;
-				}
-				else
-				{
-					dockspace_flags &= ~ImGuiDockNodeFlags_PassthruCentralNode;
-				}
-
-				// When using ImGuiDockNodeFlags_PassthruCentralNode, DockSpace() will render our background
-				// and handle the pass-thru hole, so we ask Begin() to not render a background.
-				if (dockspace_flags & ImGuiDockNodeFlags_PassthruCentralNode)
-					window_flags |= ImGuiWindowFlags_NoBackground;
-
-				// Important: note that we proceed even if Begin() returns false (aka window is collapsed).
-				// This is because we want to keep our DockSpace() active. If a DockSpace() is inactive,
-				// all active windows docked into it will lose their parent and become undocked.
-				// We cannot preserve the docking relationship between an active window and an inactive docking, otherwise
-				// any change of dockspace/settings would lead to windows being stuck in limbo and never being visible.
-				if (!opt_padding)
-					ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0.0f, 0.0f));
-
-				ImGui::Begin("DockSpace Demo", &dockspaceOpen, window_flags);
-
-				if (!opt_padding)
-					ImGui::PopStyleVar();
-
-				if (opt_fullscreen)
-					ImGui::PopStyleVar(2);
-
-				if (ImGui::BeginMenuBar())
-				{
-					if (ImGui::BeginMenu("File"))
-					{
-						// Disabling fullscreen would allow the window to be moved to the front of other windows,
-						// which we can't undo at the moment without finer window depth/z control.
-						if (ImGui::MenuItem("New"))
-						{
-							auto& activeScene = m_Layer->GetActiveScene();
-							activeScene = std::make_shared<Scene>();
-							//activeScene->OnResizeViewport(m_ViewportSize.x, m_ViewportSize.y);
-							m_Layer->GetSceneHierarchyPanel().SetContext(activeScene);
-						}
-						if (ImGui::MenuItem("Open..."))
-						{
-							std::string filepath = FileDialogs::OpenFile("Anor Scene (*.anor)\0*.anor\0");
-							if (!filepath.empty())
-							{
-								auto& activeScene = m_Layer->GetActiveScene();
-								activeScene = std::make_shared<Scene>();
-								m_Layer->GetSceneHierarchyPanel().SetContext(activeScene);
-								SceneSerializer serializer(activeScene);
-								serializer.Deserialize(filepath);
-								activeScene->OnResizeViewport(m_ViewportSize.x, m_ViewportSize.y);
-							}
-						}
-						if (ImGui::MenuItem("Save As..."))
-						{
-							std::string filepath = FileDialogs::SaveFile("Anor Scene (*.anor)\0*.anor\0");
-							if (!filepath.empty())
-							{
-								SceneSerializer serializer(m_Layer->GetActiveScene());
-								serializer.Serialize(filepath);
-							}
-						}
-						ImGui::EndMenu();
-					}
-
-					ImGui::EndMenuBar();
-				}
-
-				// DockSpace
-				auto& style = ImGui::GetStyle();
-				float minWinSizeX = style.WindowMinSize.x;
-				style.WindowMinSize.x = 420.0f;
-				ImGuiIO& io = ImGui::GetIO();
-				if (io.ConfigFlags & ImGuiConfigFlags_DockingEnable)
-				{
-					ImGuiID dockspace_id = ImGui::GetID("MyDockSpace");
-					ImGui::DockSpace(dockspace_id, ImVec2(0.0f, 0.0f), dockspace_flags);
-				}
-				style.WindowMinSize.x = minWinSizeX;
-
-				static bool show = true;
-				ImGui::End();
-				
-				for (Ref<Layer> layer : m_LayerStack)
-				{
-					layer->OnImGuiRender();
-				}
 				//Frames of the scene will be rendered to this panel. Every frame will be rendered to a framebuffer and ImGui will read that data in here and render it to one of its viewport window objects as a texture. 
 				ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0, 0));
 				ImGui::Begin("Viewport");
@@ -410,33 +284,182 @@ namespace Game
 				//Saving the viewport size in m_ViewportSize.
 				m_ViewportSize.x = ImGui::GetContentRegionAvail().x;
 				m_ViewportSize.y = ImGui::GetContentRegionAvail().y;
+
+				//Mouse picking calculations.
+				ReadDataFromMousePos();
+
 				uint32_t texture = m_Framebuffer->GetColorAttachmentID();
 				ImGui::Image((void*)texture, { m_Framebuffer->GetDimensions().x, m_Framebuffer->GetDimensions().y }, { 0,1 }, { 1,0 });
 				ImGui::End();
 				ImGui::PopStyleVar();
+
 				ImGuiBase::End(); //-----------------------ImGui END -------------------------------
 
-				//Resizing the framebuffer if the ImGui panel happens to get resized. (Framebuffer and the panel sizes should be equal.)
 				//Try to resize the framebuffer at the end. Otherwise it causes weird flickering problems.
-				if (m_Framebuffer->GetDimensions().x != m_ViewportSize.x || m_Framebuffer->GetDimensions().y != m_ViewportSize.y)
-				{
-					m_Framebuffer->Resize(m_ViewportSize.x, m_ViewportSize.y);
-					for (auto layerIterator = m_LayerStack.rbegin(); layerIterator != m_LayerStack.rend(); layerIterator++)
-					{
-						layerIterator->get()->OnResizeViewport(m_ViewportSize.x, m_ViewportSize.y);
-					}
-					m_EditorCamera->SetViewportSize(m_ViewportSize.x, m_ViewportSize.y);
-				}
+				UpdateScreenBoundaries();
+
 				m_EditorCamera->OnUpdate(deltaTime);
 				m_ProfileResults.clear();
 				m_OpenGLWindow->Update();
 			}
 		}
+		void ReadDataFromMousePos()
+		{
+			auto viewPortOffset = ImGui::GetCursorPos();
+			auto windowSize = ImGui::GetWindowSize();
+			auto minBound = ImGui::GetWindowPos();
+			ImVec2 maxBound = { minBound.x + windowSize.x, minBound.y + windowSize.y };
+			minBound.x += viewPortOffset.x;
+			minBound.y += viewPortOffset.y;
+			m_ViewportBounds[0] = { minBound.x, minBound.y };
+			m_ViewportBounds[1] = { maxBound.x, maxBound.y };
+			auto [mx, my] = ImGui::GetMousePos();
+			mx -= m_ViewportBounds[0].x;
+			my -= m_ViewportBounds[0].y;
+			my = m_ViewportSize.y - my;
+			int mouseX = (int)mx;
+			int mouseY = (int)my;
+			m_MousePositionRelativeToRenderViewport.x = mouseX;
+			m_MousePositionRelativeToRenderViewport.y = mouseY;
+			if (mouseX >= 0 && mouseY >= 0 && mouseX < (int)m_ViewportSize.x && mouseY < (int)m_ViewportSize.y)
+			{
+				m_Framebuffer->Bind();
+				int pixelData = m_Framebuffer->ReadPixel(1, mouseX, mouseY);
+				WARN("Pixel Data : {0}", pixelData);
+				m_Framebuffer->Unbind();
+			}
+		}
+		void UpdateScreenBoundaries()
+		{
+			//Resizing the framebuffer if the ImGui panel happens to get resized. (Framebuffer and the panel sizes should be equal.)
+			if (m_Framebuffer->GetDimensions().x != m_ViewportSize.x || m_Framebuffer->GetDimensions().y != m_ViewportSize.y)
+			{
+				m_Framebuffer->Resize(m_ViewportSize.x, m_ViewportSize.y);
+				for (auto layerIterator = m_LayerStack.rbegin(); layerIterator != m_LayerStack.rend(); layerIterator++)
+				{
+					layerIterator->get()->OnResizeViewport(m_ViewportSize.x, m_ViewportSize.y);
+				}
+				m_EditorCamera->SetViewportSize(m_ViewportSize.x, m_ViewportSize.y);
+			}
+		}
+		void ImGuiDockspaceSetup()
+		{
+			// In 99% case you should be able to just call DockSpaceOverViewport() and ignore all the code below!
+			// In this specific demo, we are not using DockSpaceOverViewport() because:
+			// - we allow the host window to be floating/moveable instead of filling the viewport (when opt_fullscreen == false)
+			// - we allow the host window to have padding (when opt_padding == true)
+			// - we have a local menu bar in the host window (vs. you could use BeginMainMenuBar() + DockSpaceOverViewport() in your code!)
+			// TL;DR; this demo is more complicated than what you would normally use.
+			// If we removed all the options we are showcasing, this demo would become:
+			//     void ShowExampleAppDockSpace()
+			//     {
+			//         ImGui::DockSpaceOverViewport(ImGui::GetMainViewport());
+			//     }
+			static bool dockspaceOpen = true;
+			static bool opt_fullscreen = true;
+			static bool opt_padding = false;
+			static ImGuiDockNodeFlags dockspace_flags = ImGuiDockNodeFlags_None;
+
+			// We are using the ImGuiWindowFlags_NoDocking flag to make the parent window not dockable into,
+			// because it would be confusing to have two docking targets within each others.
+			ImGuiWindowFlags window_flags = ImGuiWindowFlags_MenuBar | ImGuiWindowFlags_NoDocking;
+			if (opt_fullscreen)
+			{
+				const ImGuiViewport* viewport = ImGui::GetMainViewport();
+				ImGui::SetNextWindowPos(viewport->WorkPos);
+				ImGui::SetNextWindowSize(viewport->WorkSize);
+				ImGui::SetNextWindowViewport(viewport->ID);
+				ImGui::PushStyleVar(ImGuiStyleVar_WindowRounding, 0.0f);
+				ImGui::PushStyleVar(ImGuiStyleVar_WindowBorderSize, 0.0f);
+				window_flags |= ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove;
+				window_flags |= ImGuiWindowFlags_NoBringToFrontOnFocus | ImGuiWindowFlags_NoNavFocus;
+			}
+			else
+			{
+				dockspace_flags &= ~ImGuiDockNodeFlags_PassthruCentralNode;
+			}
+
+			// When using ImGuiDockNodeFlags_PassthruCentralNode, DockSpace() will render our background
+			// and handle the pass-thru hole, so we ask Begin() to not render a background.
+			if (dockspace_flags & ImGuiDockNodeFlags_PassthruCentralNode)
+				window_flags |= ImGuiWindowFlags_NoBackground;
+
+			// Important: note that we proceed even if Begin() returns false (aka window is collapsed).
+			// This is because we want to keep our DockSpace() active. If a DockSpace() is inactive,
+			// all active windows docked into it will lose their parent and become undocked.
+			// We cannot preserve the docking relationship between an active window and an inactive docking, otherwise
+			// any change of dockspace/settings would lead to windows being stuck in limbo and never being visible.
+			if (!opt_padding)
+				ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0.0f, 0.0f));
+
+			ImGui::Begin("DockSpace Demo", &dockspaceOpen, window_flags);
+
+			if (!opt_padding)
+				ImGui::PopStyleVar();
+
+			if (opt_fullscreen)
+				ImGui::PopStyleVar(2);
+
+			if (ImGui::BeginMenuBar())
+			{
+				if (ImGui::BeginMenu("File"))
+				{
+					// Disabling fullscreen would allow the window to be moved to the front of other windows,
+					// which we can't undo at the moment without finer window depth/z control.
+					if (ImGui::MenuItem("New"))
+					{
+						auto& activeScene = m_Layer->GetActiveScene();
+						activeScene = std::make_shared<Scene>();
+						//activeScene->OnResizeViewport(m_ViewportSize.x, m_ViewportSize.y);
+						m_SceneHierarchyPanel.SetContext(m_Layer->GetActiveScene());
+					}
+					if (ImGui::MenuItem("Open..."))
+					{
+						std::string filepath = FileDialogs::OpenFile("Anor Scene (*.anor)\0*.anor\0");
+						if (!filepath.empty())
+						{
+							auto& activeScene = m_Layer->GetActiveScene();
+							activeScene = std::make_shared<Scene>();
+							m_SceneHierarchyPanel.SetContext(m_Layer->GetActiveScene());
+							SceneSerializer serializer(activeScene);
+							serializer.Deserialize(filepath);
+							activeScene->OnResizeViewport(m_ViewportSize.x, m_ViewportSize.y);
+						}
+					}
+					if (ImGui::MenuItem("Save As..."))
+					{
+						std::string filepath = FileDialogs::SaveFile("Anor Scene (*.anor)\0*.anor\0");
+						if (!filepath.empty())
+						{
+							SceneSerializer serializer(m_Layer->GetActiveScene());
+							serializer.Serialize(filepath);
+						}
+					}
+					ImGui::EndMenu();
+				}
+
+				ImGui::EndMenuBar();
+			}
+
+			// DockSpace
+			auto& style = ImGui::GetStyle();
+			float minWinSizeX = style.WindowMinSize.x;
+			style.WindowMinSize.x = 420.0f;
+			ImGuiIO& io = ImGui::GetIO();
+			if (io.ConfigFlags & ImGuiConfigFlags_DockingEnable)
+			{
+				ImGuiID dockspace_id = ImGui::GetID("MyDockSpace");
+				ImGui::DockSpace(dockspace_id, ImVec2(0.0f, 0.0f), dockspace_flags);
+			}
+			style.WindowMinSize.x = minWinSizeX;
+
+			static bool show = true;
+			ImGui::End();
+		}
 		virtual void OnEvent(Ref<Input::Event> e) override
 		{
-			e->Log();
-			//Propogating the recieved event to layers.
-			//One of the layers can set the 'm_Handled' value of an event to true so that further propogation is prevented.
+			//e->Log();
+			//Handle events for editor camera.
 			m_EditorCamera->OnEvent(e);
 			if (e->GetEventType() == Input::EventType::WindowResizeEvent)
 			{
@@ -460,16 +483,14 @@ namespace Game
 				}
 				if (e->GetEventType() == Input::EventType::MouseMoveEvent)
 				{
-					auto ev = std::static_pointer_cast<Input::MouseMoveEvent>(e);
-					float x = ev->GetMouseXPosition();
-					float y = ev->GetMouseYPosition();
 					int width, height;
 					m_OpenGLWindow->GetWindowSize(&width, &height);
 					float xoffset = width - m_ViewportSize.x;
 					float yoffset = height - m_ViewportSize.y;
 					float aspectRatio = (float)width / (float)height;
 					OrthographicCameraBounds bounds = {-aspectRatio * 5, aspectRatio* 5, -5, 5 };
-					m_ParticleSystem->SetEmissionPoint((x - xoffset) / m_ViewportSize.x * bounds.GetWidth() - bounds.GetWidth() * 0.5f, bounds.GetHeight() * 0.5f - (y - yoffset) / m_ViewportSize.y * bounds.GetHeight());
+					m_ParticleSystem->SetEmissionPoint(m_MousePositionRelativeToRenderViewport.x / m_ViewportSize.x * bounds.GetWidth() - bounds.GetWidth() * 0.5f,
+						-(bounds.GetHeight() * 0.5f - m_MousePositionRelativeToRenderViewport.y / m_ViewportSize.y * bounds.GetHeight()));
 				}
 			}
 		}

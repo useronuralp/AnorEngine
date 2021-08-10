@@ -8,14 +8,14 @@ namespace AnorEngine
 		{
 			None = 0,
 			//Color
-			RGBA8 = 1,
-			RGBA16F = 2,
-			RGBA32F = 3,
-			RG32F = 4,
-
+			RGBA8,
+			RGBA16F,
+			RGBA32F,
+			RG32F,
+			RED_INTEGER,
 			//Depth / Stencil
-			DEPTH32F = 5,
-			DEPTH24STENCIL8 = 6,
+			DEPTH32F,
+			DEPTH24STENCIL8,
 
 			//Defaults
 			Depth = DEPTH24STENCIL8
@@ -51,6 +51,7 @@ namespace AnorEngine
 		private:
 			FramebufferSpecifications m_Specs;
 
+			//Two buckets to sort out the Color and Depth attachments in the constructor.
 			std::vector<FramebufferTextureSpecification> m_ColorAttachmentsSpecs;
 			FramebufferTextureSpecification m_DepthAttachmentSpec;
 
@@ -60,6 +61,7 @@ namespace AnorEngine
 			Framebuffer(const FramebufferSpecifications& specs);
 			~Framebuffer();
 		public:
+			int ReadPixel(uint32_t attachmentIndex, int x, int y);
 			void Resize(uint32_t width, uint32_t height);
 			glm::vec2 GetDimensions() { return { m_Specs.Width, m_Specs.Height }; }
 			void Bind();
