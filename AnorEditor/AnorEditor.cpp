@@ -191,9 +191,9 @@ namespace Game
 		}
 		virtual void OnUpdate(float deltaTime) override
 		{
-			Renderer2D::BeginScene(m_MainCamera);
-			Renderer2D::DrawPrimitive(m_BgVAO, m_BgShader, m_BgModelMatrix, { 1,1,1, 0.4f }, m_BgTexture);
-			Renderer2D::EndScene();
+			//Renderer2D::BeginScene(m_MainCamera);
+			//Renderer2D::DrawPrimitive(m_BgVAO, m_BgShader, m_BgModelMatrix, { 1,1,1, 0.4f }, m_BgTexture);
+			//Renderer2D::EndScene();
 		}
 	};
 	class AnorEditor : public Application
@@ -259,15 +259,16 @@ namespace Game
 				m_Framebuffer->Bind();
 				Renderer2D::ClearColor(glm::vec4(0.1f, 0.1f, 0.1f, 1));
 				Renderer2D::Clear();
+				m_Framebuffer->ClearTextureAttachmentWithIntegerValue(1, -1);
 				if (!m_Minimized) //We don't want to render if the window is minimized.
 				{
 					for (Ref<Layer> layer : m_LayerStack)
 					{
 						layer->OnUpdate(deltaTime);
 					}
-					Renderer2D::BeginScene(m_OrthoCamera);
-					m_ParticleSystem->OnUpdate(deltaTime);
-					Renderer2D::EndScene();
+					//Renderer2D::BeginScene(m_OrthoCamera);
+					//m_ParticleSystem->OnUpdate(deltaTime);
+					//Renderer2D::EndScene();
 				}
 				m_Framebuffer->Unbind();
 				ImGuiBase::Begin(); //-----------------------ImGui Beginning-------------------------

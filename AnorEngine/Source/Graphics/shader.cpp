@@ -78,21 +78,26 @@ namespace AnorEngine {
 			glLinkProgram(program);
 			glValidateProgram(program);
 
-			GLint result;
-			glGetProgramiv(program, GL_LINK_STATUS, &result);
-			if (!result) {
-				GLint length;
-				glGetProgramiv(program, GL_INFO_LOG_LENGTH, &length);
-				std::vector<char> error(length);
-				glGetProgramInfoLog(program, length, &length, &error[0]);
+			GLint isLinked = 0;
+			glGetProgramiv(program, GL_LINK_STATUS, (int*)&isLinked);
+			if (isLinked == GL_FALSE)
+			{
+				CRITICAL_ASSERT("Failed to link shaders!, {0}");
+				GLint maxLength = 0;
+				glGetProgramiv(program, GL_INFO_LOG_LENGTH, &maxLength);
+
+				// The maxLength includes the NULL character
+				std::vector<GLchar> infoLog(maxLength);
+				glGetProgramInfoLog(program, maxLength, &maxLength, &infoLog[0]);
+
 				for (auto& shaderID : shaderIDs)
 				{
 					glDeleteShader(shaderID);
 				}
-				CRITICAL_ASSERT("Failed to link shaders!, {0}", &error[0]);
 				glDeleteProgram(program);
+				
+				return;
 			}
-
 			for (auto& shaderID : shaderIDs)
 			{
 				glDetachShader(program, shaderID);

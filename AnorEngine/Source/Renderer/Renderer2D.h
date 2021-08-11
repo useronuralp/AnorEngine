@@ -30,7 +30,7 @@ namespace AnorEngine
 			static void Submit(const glm::mat4& transform, const Ref<Texture> texture, float rotationDegree = 0.0f, const glm::vec4& tintColor = { 1.0f, 1.0f, 1.0f, 1.0f });
 			static void Submit(const glm::mat4& transform, const glm::vec2& size, const Ref<Texture> texture, const glm::vec2& subTextureOffset, const glm::vec2& subTextureDimensions, const glm::vec4& tintColor = { 1.0f, 1.0f, 1.0f, 1.0f });
 			//This submit is here for convenience only. Above ones require too many parameters and sometimes it is a pain in the neck to debug and stuff.
-			static void Submit(const TransformComponent& tc, const SpriteRendererComponent& sc);
+			static void Submit(const TransformComponent& tc, const SpriteRendererComponent& sc, int entityID);
 			static void Flush();
 			static void BeginScene(const Ref<OrthographicCamera> camera);
 			static void BeginScene(const Ref<EditorCamera>& camera);

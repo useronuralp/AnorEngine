@@ -5,6 +5,15 @@ namespace AnorEngine
 {
 	namespace Graphics
 	{
+		static GLenum FromAnorFormatToOpenGLFormat(FramebufferTextureFormat format)
+		{
+			switch (format)
+			{
+				case FramebufferTextureFormat::RED_INTEGER:	return GL_RED_INTEGER; break;
+				case FramebufferTextureFormat::RGBA8:       return GL_RGBA8;        break;
+			}
+			return GL_INVALID_ENUM;
+		}
 		static GLenum TextureTarget(bool multisampled)
 		{
 			return multisampled ? GL_TEXTURE_2D_MULTISAMPLE : GL_TEXTURE_2D;
@@ -27,7 +36,7 @@ namespace AnorEngine
 		{
 			glBindTexture(TextureTarget(multiSample), id);
 		}
-		static void AttachColorTexture(uint32_t id, int samples, GLenum internalFormat, GLenum format, uint32_t width, uint32_t height, int index)
+		static void AttachColorTexture(uint32_t id, int samples, GLenum internalFormat, GLenum format, GLenum type, uint32_t width, uint32_t height, int index)
 		{
 			bool multisampled = samples > 1;
 			if (multisampled)
@@ -37,13 +46,15 @@ namespace AnorEngine
 			else
 			{
 				//GL_RGBA here is hard coded for now since we are only using GL_RGBA8 formats right now.
-				glTexImage2D(GL_TEXTURE_2D, 0, internalFormat, width, height, 0, format, GL_UNSIGNED_BYTE, nullptr);
+				glTexImage2D(GL_TEXTURE_2D, 0, internalFormat, width, height, 0, format, type, nullptr);
 				glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 				glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 				glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
 				glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
 				glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 			}
+			//glFramebufferTexture2D attaches the texture image specified by TEXTURE and LEVEL as one of the logical buffers of the currently bound framebuffer object.
+			//Attachment specifies whether the texture image should be attached to the framebuffer object's color, depth, or stencil buffer.
 			glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0 + index, TextureTarget(multisampled), id, 0);
 		}
 		static void AttachDepthTexture(uint32_t id, int samples, GLenum format, GLenum attachmentType, uint32_t width, uint32_t height)
@@ -109,7 +120,7 @@ namespace AnorEngine
 			if(m_ColorAttachmentsSpecs.size()) // Check if there is any attachments in here.
 			{
 				m_ColorAttachments.resize(m_ColorAttachmentsSpecs.size());
-				//Passing a pointer to the empty m_ColorAttachments to the CreateTextures. This memory block will be filled by CreateTextures.
+				//Passing a pointer to the empty m_ColorAttachments to the CreateTextures. Memory block of m_ColorAttachments will be filled by CreateTextures.
 				CreateTextures(multisample, m_ColorAttachments.data(), m_ColorAttachments.size());
 				for(size_t i = 0; i < m_ColorAttachments.size(); i++)
 				{
@@ -118,10 +129,10 @@ namespace AnorEngine
 					{
 						//This switch is where you extend this code path when there is more types to add.
 						case FramebufferTextureFormat::RGBA8:
-							AttachColorTexture(m_ColorAttachments[i], m_Specs.Samples, GL_RGBA8, GL_RGBA, m_Specs.Width, m_Specs.Height, i);
+							AttachColorTexture(m_ColorAttachments[i], m_Specs.Samples, GL_RGBA8, GL_RGBA, GL_UNSIGNED_BYTE, m_Specs.Width, m_Specs.Height, i);
 							break;
 						case FramebufferTextureFormat::RED_INTEGER:
-							AttachColorTexture(m_ColorAttachments[i], m_Specs.Samples, GL_R32I, GL_RED_INTEGER, m_Specs.Width, m_Specs.Height, i);
+							AttachColorTexture(m_ColorAttachments[i], m_Specs.Samples, GL_R32I, GL_RED_INTEGER, GL_INT, m_Specs.Width, m_Specs.Height, i);
 							break;
 					}
 				}
@@ -141,6 +152,7 @@ namespace AnorEngine
 			
 			if (m_ColorAttachments.size() > 1)
 			{
+				//Currently supporting max 4 color attachments.
 				GLenum buffers[4] = { GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1, GL_COLOR_ATTACHMENT2, GL_COLOR_ATTACHMENT3 };
 				if (m_ColorAttachments.size() > 4)
 				{
@@ -175,6 +187,13 @@ namespace AnorEngine
 		{
 			glBindFramebuffer(GL_FRAMEBUFFER, m_Specs.FramebufferID);
 			glViewport(0, 0, m_Specs.Width, m_Specs.Height);
+		}
+		void Framebuffer::ClearTextureAttachmentWithIntegerValue(GLuint colorAttachmentID, int clearValue)
+		{
+			auto format = FromAnorFormatToOpenGLFormat(m_ColorAttachmentsSpecs[colorAttachmentID].TextureFormat);
+			
+			//Since the clear value is int in the function paramater, the type is hard coded to GL_INT for now.
+			glClearTexImage(m_ColorAttachments[colorAttachmentID], 0, format, GL_INT, &clearValue);
 		}
 		void Framebuffer::Unbind()
 		{

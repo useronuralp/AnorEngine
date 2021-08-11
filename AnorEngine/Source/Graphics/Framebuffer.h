@@ -65,6 +65,7 @@ namespace AnorEngine
 			void Resize(uint32_t width, uint32_t height);
 			glm::vec2 GetDimensions() { return { m_Specs.Width, m_Specs.Height }; }
 			void Bind();
+			void ClearTextureAttachmentWithIntegerValue(GLuint colorAttachmentID, int clearValue);
 			void Unbind();
 			inline uint32_t GetColorAttachmentID(uint32_t index = 0) const { return m_ColorAttachments[index]; }
 		private:

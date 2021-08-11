@@ -18,8 +18,32 @@ namespace AnorEngine {
 			auto& layout = buffer->GetBufferLayout();
 			for (const auto& element : layout) //This is a vector.
 			{
-				glEnableVertexAttribArray(element.m_ShaderLayoutLocation);
-				glVertexAttribPointer(element.m_ShaderLayoutLocation, element.m_ComponentCount, ShaderDataTypeToOpenGLBaseType(element.m_Type), element.m_Normalized ? GL_TRUE : GL_FALSE, buffer->GetBufferLayout().GetStride(), (void*)element.m_Offset);
+				switch (element.m_Type)
+				{
+					//Multiple cases use the same body.
+					case ShaderDataType::Int:
+					case ShaderDataType::Int2:
+					case ShaderDataType::Int3:
+					case ShaderDataType::Int4:
+					case ShaderDataType::Bool:
+					{
+						glEnableVertexAttribArray(element.m_ShaderLayoutLocation);
+						glVertexAttribIPointer(element.m_ShaderLayoutLocation, element.m_ComponentCount, ShaderDataTypeToOpenGLBaseType(element.m_Type),
+							buffer->GetBufferLayout().GetStride(), (void*)element.m_Offset);
+						break;
+					}
+					case ShaderDataType::vec:
+					case ShaderDataType::vec2:
+					case ShaderDataType::vec3:
+					case ShaderDataType::vec4:
+					{
+						glEnableVertexAttribArray(element.m_ShaderLayoutLocation);
+						glVertexAttribPointer(element.m_ShaderLayoutLocation, element.m_ComponentCount, 
+							ShaderDataTypeToOpenGLBaseType(element.m_Type), element.m_Normalized ? GL_TRUE : GL_FALSE, buffer->GetBufferLayout().GetStride(), (void*)element.m_Offset);
+						break;
+					}
+				}
+				
 			}
 			m_VertexBuffers.push_back(buffer);
 			buffer->Unbind();

@@ -17,7 +17,7 @@ namespace AnorEngine
 		for (auto& entity : group)
 		{
 			auto [transformComponent, spriteRendererComponent] = group.get<TransformComponent, SpriteRendererComponent>(entity);
-			Graphics::Renderer2D::Submit(transformComponent, spriteRendererComponent);
+			Graphics::Renderer2D::Submit(transformComponent, spriteRendererComponent, (int)entity);
 		}
 		Graphics::Renderer2D::EndScene();
 	}
@@ -65,7 +65,7 @@ namespace AnorEngine
 			for (auto& entity : group)
 			{
 				auto [transformComponent, spriteRendererComponent] = group.get<TransformComponent, SpriteRendererComponent>(entity);
-				Graphics::Renderer2D::Submit(transformComponent, spriteRendererComponent);
+				Graphics::Renderer2D::Submit(transformComponent, spriteRendererComponent, (int)entity);
 			}
 			Graphics::Renderer2D::EndScene();
 		}
