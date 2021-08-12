@@ -126,7 +126,7 @@ namespace Game
 		virtual void OnEvent(Ref<Input::Event> e) override
 		{
 			if (!e->m_Handled)
-			{
+			{		
 				////This resizing event handling is currently not needed since the viewport code does the resizing and sends it to the framebuffer.
 				////However, I will leave this code here in case the rendering target changes from a framebuffer to a glfw window, then, I would need this resizing event to properly resize the window
 				////and if I delete it now, I will have a hard time trying to find the reason why the window won't resize in the future.
@@ -216,6 +216,7 @@ namespace Game
 		bool							  m_ViewportHovered = false;
 		bool							  m_ViewportFocused = false;
 		bool							  m_BlockEvents = false;
+		int								  m_HoveredPixel = -1;
 		std::vector<ProfileResult>		  m_ProfileResults;
 		std::string					      solutionDir = __SOLUTION_DIR;
 	public:
@@ -326,7 +327,7 @@ namespace Game
 			{
 				m_Framebuffer->Bind();
 				int pixelData = m_Framebuffer->ReadPixel(1, mouseX, mouseY);
-				WARN("Pixel Data : {0}", pixelData);
+				m_HoveredPixel = pixelData;
 				m_Framebuffer->Unbind();
 			}
 		}
@@ -461,7 +462,6 @@ namespace Game
 		{
 			//e->Log();
 			//Handle events for editor camera.
-			m_EditorCamera->OnEvent(e);
 			if (e->GetEventType() == Input::EventType::WindowResizeEvent)
 			{
 				for (auto layerIterator = m_LayerStack.rbegin(); layerIterator != m_LayerStack.rend(); layerIterator++)
@@ -477,11 +477,20 @@ namespace Game
 			}
 			if (!m_BlockEvents)
 			{
+				m_EditorCamera->OnEvent(e);
 				for (auto layerIterator = m_LayerStack.rbegin(); layerIterator != m_LayerStack.rend(); layerIterator++)
 				{
 					//Sending the events in reverse order here
 					layerIterator->get()->OnEvent(e);
 				}
+				//Clicking to select entities.
+				if (e->GetEventType() == Input::EventType::MouseClickEvent)
+				{
+					auto castEvent = std::static_pointer_cast<Input::MouseClickEvent>(e);
+					if (m_HoveredPixel != -1)
+						m_SceneHierarchyPanel.SetSelectionContext(m_HoveredPixel);
+				}
+				//Particle system event
 				if (e->GetEventType() == Input::EventType::MouseMoveEvent)
 				{
 					int width, height;

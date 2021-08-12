@@ -10,6 +10,7 @@ namespace AnorEngine
 	public:
 		SceneHierarchyPanel() = default;
 		SceneHierarchyPanel(const Ref<Scene>& scene);
+		void SetSelectionContext(int entityID) { m_SelectionContext = Entity{ (entt::entity)entityID, m_Context.get() }; }
 		void SetContext(const Ref<Scene>& scene);
 		void OnImGuiRender();
 	private:
