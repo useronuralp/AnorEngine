@@ -487,8 +487,11 @@ namespace Game
 				if (e->GetEventType() == Input::EventType::MouseClickEvent)
 				{
 					auto castEvent = std::static_pointer_cast<Input::MouseClickEvent>(e);
-					if (m_HoveredPixel != -1)
-						m_SceneHierarchyPanel.SetSelectionContext(m_HoveredPixel);
+					if (castEvent->GetMouseCode() == ANOR_MOUSE_BUTTON_LEFT)
+					{
+						if (m_HoveredPixel != -1)
+							m_SceneHierarchyPanel.SetSelectionContext(m_HoveredPixel);
+					}
 				}
 				//Particle system event
 				if (e->GetEventType() == Input::EventType::MouseMoveEvent)
