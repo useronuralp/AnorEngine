@@ -3,6 +3,7 @@
 #include <Scene/Entity.h>
 #include <imgui.h>
 #include <imgui_internal.h>
+#include "Graphics/Texture.h"
 namespace AnorEngine
 {
 	class ANOR_API SceneHierarchyPanel
@@ -12,7 +13,7 @@ namespace AnorEngine
 		SceneHierarchyPanel(const Ref<Scene>& scene);
 		void SetSelectionContext(int entityID) { m_SelectionContext = Entity{ (entt::entity)entityID, m_Context.get() }; }
 		void SetContext(const Ref<Scene>& scene);
-		void OnImGuiRender();
+		bool OnImGuiRender();
 	private:
 		void DrawEntityNode(Entity entity);
 		void DrawComponents(Entity entity);
@@ -54,6 +55,9 @@ namespace AnorEngine
 			}
 		}
 	private:
+		bool m_IsRuntime = false;
+		Ref<Graphics::Texture> m_PlayButtonTexture;
+		Ref<Graphics::Texture> m_PauseButtonTexture;
 		Ref<Scene> m_Context;
 		Entity m_SelectionContext;
 	};

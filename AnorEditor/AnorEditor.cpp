@@ -11,6 +11,7 @@ namespace Game
 
 	class ExampleLayer : public Layer
 	{
+		bool			    m_IsRuntime = false;
 		Ref<EditorCamera>   m_EditorCamera;
 		glm::vec4			m_Color = { 1,1,1,1 };
 		std::string			solutionDir = __SOLUTION_DIR;
@@ -119,9 +120,10 @@ namespace Game
 				m_Entity3->AddComponent<NativeScriptComponent>(true).Bind<CharacterController>();
 			}
 		}
-		virtual void OnUpdate(float deltaTime) override
+		virtual void OnUpdate(bool IsRuntime, float deltaTime) override
 		{
-			m_Scene->OnUpdateEditor(deltaTime, m_EditorCamera);
+			IsRuntime ? m_Scene->OnUpdateRuntime(deltaTime) : m_Scene->OnUpdateEditor(deltaTime, m_EditorCamera);
+			//m_Scene->OnUpdateEditor(deltaTime, m_EditorCamera);
 		}
 		virtual void OnEvent(Ref<Input::Event> e) override
 		{
@@ -189,7 +191,7 @@ namespace Game
 			m_BgVAO->SetIndexBuffer(std::make_shared<IndexBuffer>(m_Indices, 6));
 
 		}
-		virtual void OnUpdate(float deltaTime) override
+		virtual void OnUpdate(bool IsRuntime, float deltaTime) override
 		{
 			//Renderer2D::BeginScene(m_MainCamera);
 			//Renderer2D::DrawPrimitive(m_BgVAO, m_BgShader, m_BgModelMatrix, { 1,1,1, 0.4f }, m_BgTexture);
@@ -199,7 +201,7 @@ namespace Game
 	class AnorEditor : public Application
 	{
 	private:
-		SceneHierarchyPanel               m_SceneHierarchyPanel;
+		Ref<SceneHierarchyPanel>          m_SceneHierarchyPanel;
 		LayerStack						  m_LayerStack;
 		Ref<OrthographicCamera>			  m_OrthoCamera;
 		Ref<EditorCamera>				  m_EditorCamera;
@@ -216,6 +218,7 @@ namespace Game
 		bool							  m_ViewportHovered = false;
 		bool							  m_ViewportFocused = false;
 		bool							  m_BlockEvents = false;
+		bool							  m_IsRuntime = false; 
 		int								  m_HoveredPixel = -1;
 		std::vector<ProfileResult>		  m_ProfileResults;
 		std::string					      solutionDir = __SOLUTION_DIR;
@@ -231,8 +234,8 @@ namespace Game
 			m_Framebuffer = std::make_shared<Framebuffer>(fbSpecs);
 			//Layer Creation--------------------------------------------------------------------------------------------
 			m_Layer = std::make_shared<ExampleLayer>(m_EditorCamera);
-			m_SceneHierarchyPanel.SetContext(m_Layer->GetActiveScene());
 			m_Bg = std::make_shared<Background>(m_OrthoCamera);
+			m_SceneHierarchyPanel = std::make_shared<SceneHierarchyPanel>(m_Layer->GetActiveScene());
 			//Particle Settings----------------------------------------------------------------------------------
 			ParticleProperties particleProperties;
 			particleProperties.Color = { 1, 1, 1, 0.5f };
@@ -265,7 +268,7 @@ namespace Game
 				{
 					for (Ref<Layer> layer : m_LayerStack)
 					{
-						layer->OnUpdate(deltaTime);
+						layer->OnUpdate(m_IsRuntime, deltaTime);
 					}
 					//Renderer2D::BeginScene(m_OrthoCamera);
 					//m_ParticleSystem->OnUpdate(deltaTime);
@@ -275,7 +278,7 @@ namespace Game
 				ImGuiBase::Begin(); //-----------------------ImGui Beginning-------------------------
 
 				ImGuiDockspaceSetup();
-				m_SceneHierarchyPanel.OnImGuiRender();
+				m_IsRuntime = m_SceneHierarchyPanel->OnImGuiRender();
 
 				//Frames of the scene will be rendered to this panel. Every frame will be rendered to a framebuffer and ImGui will read that data in here and render it to one of its viewport window objects as a texture. 
 				ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0, 0));
@@ -413,7 +416,7 @@ namespace Game
 						auto& activeScene = m_Layer->GetActiveScene();
 						activeScene = std::make_shared<Scene>();
 						//activeScene->OnResizeViewport(m_ViewportSize.x, m_ViewportSize.y);
-						m_SceneHierarchyPanel.SetContext(m_Layer->GetActiveScene());
+						m_SceneHierarchyPanel->SetContext(m_Layer->GetActiveScene());
 					}
 					if (ImGui::MenuItem("Open..."))
 					{
@@ -422,7 +425,7 @@ namespace Game
 						{
 							auto& activeScene = m_Layer->GetActiveScene();
 							activeScene = std::make_shared<Scene>();
-							m_SceneHierarchyPanel.SetContext(m_Layer->GetActiveScene());
+							m_SceneHierarchyPanel->SetContext(m_Layer->GetActiveScene());
 							SceneSerializer serializer(activeScene);
 							serializer.Deserialize(filepath);
 							activeScene->OnResizeViewport(m_ViewportSize.x, m_ViewportSize.y);
@@ -490,7 +493,7 @@ namespace Game
 					if (castEvent->GetMouseCode() == ANOR_MOUSE_BUTTON_LEFT)
 					{
 						if (m_HoveredPixel != -1)
-							m_SceneHierarchyPanel.SetSelectionContext(m_HoveredPixel);
+							m_SceneHierarchyPanel->SetSelectionContext(m_HoveredPixel);
 					}
 				}
 				//Particle system event

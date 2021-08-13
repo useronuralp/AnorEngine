@@ -12,7 +12,7 @@ namespace AnorEngine {
 			virtual ~Layer();
 			Layer(const char* name);
 			virtual void OnAttach() {};
-			virtual void OnUpdate(float deltaTime = 1.0f) {};
+			virtual void OnUpdate(bool IsRuntime = false, float deltaTime = 1.0f) {};
 			virtual void OnEvent(Ref<Input::Event> event) {};
 			virtual void OnResizeViewport(uint32_t width, uint32_t height) {};
 			virtual void OnMouseScroll(float xoffset, float yoffset) {};
