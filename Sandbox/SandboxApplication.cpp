@@ -305,7 +305,7 @@ namespace Game
 			return deltaTime;
 		}
 	};
-#endif 
+#endif
 	AnorEngine::Application* CreateApplication()
 	{
 		return nullptr;
