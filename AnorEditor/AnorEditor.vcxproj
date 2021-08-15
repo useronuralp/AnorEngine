@@ -159,6 +159,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="AnorEditor.cpp" />
+    <ClCompile Include="ExampleLayer.cpp" />
     <ClCompile Include="Source\Panels\SceneHierarchyPanel.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -170,6 +171,7 @@
     <None Include="imgui.ini" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="ExampleLayer.h" />
     <ClInclude Include="Source\Panels\SceneHierarchyPanel.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

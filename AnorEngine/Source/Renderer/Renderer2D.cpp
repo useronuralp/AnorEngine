@@ -37,6 +37,14 @@ namespace AnorEngine
 
 			glm::vec4								  QuadVertexPositions[4] = {};
 			uint32_t								  NumberOfDrawCalls = 0;
+
+
+			//Experimenatal 3D stuff
+			Ref<VertexArray>						  CubeVertexArray;
+			Ref<VertexBuffer>						  CubeVertexBuffer;
+			Ref<CubeMapTexture>						  SkyboxTexture;
+			Ref<Shader>								  SkyboxShader;
+			Ref<Shader>								  CubeShader;
 		};
 
 		static Renderer2DData s_Data;
@@ -47,19 +55,82 @@ namespace AnorEngine
 		{
 			glEnable(GL_BLEND);
 			glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-			//glEnable(GL_DEPTH_TEST);
+			glEnable(GL_DEPTH_TEST);
+			std::string solutionDir = __SOLUTION_DIR;
 
-			BufferLayout QuadBufferLayout = { {ShaderDataType::vec3, "a_Position", 0} ,{ShaderDataType::vec4, "a_Color", 1} , {ShaderDataType::vec2, "a_TexCoord", 2} , {ShaderDataType::vec, "a_TexIndex", 3}, {ShaderDataType::Int, "a_EntityID", 4} };
+			float skyboxVertices[] = {
+				// positions          
+					-0.5f, -0.5f, -0.5f,  0.0f,  0.0f, -1.0f,
+					 0.5f, -0.5f, -0.5f,  0.0f,  0.0f, -1.0f,
+					 0.5f,  0.5f, -0.5f,  0.0f,  0.0f, -1.0f,
+					 0.5f,  0.5f, -0.5f,  0.0f,  0.0f, -1.0f,
+					-0.5f,  0.5f, -0.5f,  0.0f,  0.0f, -1.0f,
+					-0.5f, -0.5f, -0.5f,  0.0f,  0.0f, -1.0f,
+
+					-0.5f, -0.5f,  0.5f,  0.0f,  0.0f, 1.0f,
+					 0.5f, -0.5f,  0.5f,  0.0f,  0.0f, 1.0f,
+					 0.5f,  0.5f,  0.5f,  0.0f,  0.0f, 1.0f,
+					 0.5f,  0.5f,  0.5f,  0.0f,  0.0f, 1.0f,
+					-0.5f,  0.5f,  0.5f,  0.0f,  0.0f, 1.0f,
+					-0.5f, -0.5f,  0.5f,  0.0f,  0.0f, 1.0f,
+
+					-0.5f,  0.5f,  0.5f, -1.0f,  0.0f,  0.0f,
+					-0.5f,  0.5f, -0.5f, -1.0f,  0.0f,  0.0f,
+					-0.5f, -0.5f, -0.5f, -1.0f,  0.0f,  0.0f,
+					-0.5f, -0.5f, -0.5f, -1.0f,  0.0f,  0.0f,
+					-0.5f, -0.5f,  0.5f, -1.0f,  0.0f,  0.0f,
+					-0.5f,  0.5f,  0.5f, -1.0f,  0.0f,  0.0f,
+
+					 0.5f,  0.5f,  0.5f,  1.0f,  0.0f,  0.0f,
+					 0.5f,  0.5f, -0.5f,  1.0f,  0.0f,  0.0f,
+					 0.5f, -0.5f, -0.5f,  1.0f,  0.0f,  0.0f,
+					 0.5f, -0.5f, -0.5f,  1.0f,  0.0f,  0.0f,
+					 0.5f, -0.5f,  0.5f,  1.0f,  0.0f,  0.0f,
+					 0.5f,  0.5f,  0.5f,  1.0f,  0.0f,  0.0f,
+
+					-0.5f, -0.5f, -0.5f,  0.0f, -1.0f,  0.0f,
+					 0.5f, -0.5f, -0.5f,  0.0f, -1.0f,  0.0f,
+					 0.5f, -0.5f,  0.5f,  0.0f, -1.0f,  0.0f,
+					 0.5f, -0.5f,  0.5f,  0.0f, -1.0f,  0.0f,
+					-0.5f, -0.5f,  0.5f,  0.0f, -1.0f,  0.0f,
+					-0.5f, -0.5f, -0.5f,  0.0f, -1.0f,  0.0f,
+
+					-0.5f,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f,
+					 0.5f,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f,
+					 0.5f,  0.5f,  0.5f,  0.0f,  1.0f,  0.0f,
+					 0.5f,  0.5f,  0.5f,  0.0f,  1.0f,  0.0f,
+					-0.5f,  0.5f,  0.5f,  0.0f,  1.0f,  0.0f,
+					-0.5f,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f
+			};
+			
+			BufferLayout CubeBufferLayout = {
+				{ShaderDataType::vec3, "a_Position", 0},
+				{ShaderDataType::vec3, "a_Normal", 1}
+			};
+			s_Data.CubeVertexArray = std::make_shared<VertexArray>();
+			s_Data.CubeVertexBuffer = std::make_shared<VertexBuffer>(skyboxVertices, 216 * sizeof(float), CubeBufferLayout);
+			s_Data.CubeVertexArray->AddVertexBuffer(s_Data.CubeVertexBuffer);
+
+			BufferLayout QuadBufferLayout = {
+				{ShaderDataType::vec3, "a_Position", 0} ,
+				{ShaderDataType::vec4, "a_Color",    1} , 
+				{ShaderDataType::vec2, "a_TexCoord", 2} , 
+				{ShaderDataType::vec, "a_TexIndex",  3} , 
+				{ShaderDataType::Int, "a_EntityID",  4} 
+			};
+
 			s_Data.QuadVertexArray = std::make_shared<VertexArray>();
 			s_Data.QuadVertexBuffer = std::make_shared<VertexBuffer>(Renderer2DData::MaxQuads * sizeof(QuadVertex), QuadBufferLayout);
 			s_Data.QuadVertexArray->AddVertexBuffer(s_Data.QuadVertexBuffer);
 			s_Data.QuadVertexBufferBase = new QuadVertex[Renderer2DData::MaxVertices]; // Set the address of the base when initializing the renderer.
 
-			std::string solutionDir = __SOLUTION_DIR;
-			ShaderLibrary::LoadShader("2DShader", solutionDir + "AnorEngine\\Assets\\Shaders\\2DShader.shader");
+			
+			//Loading the shaders into the ShaderLibrary.
 			ShaderLibrary::LoadShader("2DBackgroundShader", solutionDir + "AnorEngine\\Assets\\Shaders\\2DBackgroundShader.shader");
 			ShaderLibrary::LoadShader("TextureShader", solutionDir + "AnorEngine\\Assets\\Shaders\\2DTextureShader.shader");
-			s_Data.QuadShader = ShaderLibrary::GetShader("2DShader");
+			s_Data.SkyboxShader = ShaderLibrary::LoadShader("CubemapShader", solutionDir + "AnorEngine\\Assets\\Shaders\\CubemapShader.shader");
+			s_Data.QuadShader = ShaderLibrary::LoadShader("2DShader", solutionDir + "AnorEngine\\Assets\\Shaders\\2DShader.shader");
+			s_Data.CubeShader = ShaderLibrary::LoadShader("CubeShader", solutionDir + "AnorEngine\\Assets\\Shaders\\CubeShader.shader");
 
 			int samplers[s_Data.MaxTextureSlots];
 			for (uint32_t i = 0; i < s_Data.MaxTextureSlots; i++)
@@ -92,363 +163,77 @@ namespace AnorEngine
 			s_Data.WhiteTexture = std::make_shared<Texture>(solutionDir + "AnorEngine\\Assets\\Textures\\WhiteTexture.PNG"); //TODO: Create this texture without a using a PNG.
 			s_Data.TextureSlots[0] = s_Data.WhiteTexture;
 
+			std::vector<std::string> cubeMapFaces
+			{
+				solutionDir + "AnorEngine\\Assets\\Textures\\Skyboxes\\skybox\\left.jpg",
+				solutionDir + "AnorEngine\\Assets\\Textures\\Skyboxes\\skybox\\right.jpg",
+				solutionDir + "AnorEngine\\Assets\\Textures\\Skyboxes\\skybox\\top.jpg",
+				solutionDir + "AnorEngine\\Assets\\Textures\\Skyboxes\\skybox\\bottom.jpg",
+				solutionDir + "AnorEngine\\Assets\\Textures\\Skyboxes\\skybox\\front.jpg",
+				solutionDir + "AnorEngine\\Assets\\Textures\\Skyboxes\\skybox\\back.jpg"
+			};
+
+			
+			s_Data.SkyboxTexture = std::make_shared<CubeMapTexture>(cubeMapFaces);
+
+
 			//Explicitly defining the vertex positions of the quads here so that we can do transform operations on these in CPU side.
 			s_Data.QuadVertexPositions[0] = { -0.5f, -0.5f, 0.0f, 1.0f };
 			s_Data.QuadVertexPositions[1] = {  0.5f, -0.5f, 0.0f, 1.0f };
 			s_Data.QuadVertexPositions[2] = {  0.5f,  0.5f, 0.0f, 1.0f };
 			s_Data.QuadVertexPositions[3] = { -0.5f,  0.5f, 0.0f, 1.0f };
 		}
-
-		void Renderer2D::Shutdown()
-		{
-		}
-
-		uint32_t Renderer2D::GetIndexCount()
-		{
-			return s_Data.QuadIndexCount;
-		}
-		uint32_t Renderer2D::GetNumberOfDrawCalls()
-		{
-			return s_Data.NumberOfDrawCalls;
-		}
-		void Renderer2D::ClearColor(const glm::vec4& color)
-		{
-			glClearColor(color.r, color.g, color.b, color.a);
-		}
-
-		void Renderer2D::Clear()
-		{
-			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-		}
 		void Renderer2D::DrawPrimitive(const Ref<VertexArray> vertexArray, const Ref<Shader> shader, const glm::mat4& modelMatrix, const glm::vec4& color, const Ref<Texture> texture)
 		{
 			shader->enable();
 			vertexArray->Bind();
+
 			if (shader->GetName() == "2DBackgroundShader")
-			{
 				shader->UploadMat4("u_ViewProjMat", s_OrthoCamera->GetBackgroundViewProjectionMatrix());
-			}
 			else
-			{
 				shader->UploadMat4("u_ViewProjMat", s_OrthoCamera->GetViewProjectionMatrix());
-			}
+
 			shader->UploadMat4("u_ModelMatrix", modelMatrix);
 			shader->UploadFloat4("u_Color", color);
 			if(texture != nullptr)
 				texture->Bind(0); //Binding the white texture.
-			glDrawElements(GL_TRIANGLES, vertexArray->GetIndexBuffer()->GetCount(), GL_UNSIGNED_INT, NULL);
+			//glDrawElements(GL_TRIANGLES, vertexArray->GetIndexBuffer()->GetCount(), GL_UNSIGNED_INT, NULL);
+			glDrawArrays(GL_TRIANGLES, 0, 36);
 			if(texture != nullptr)
 				texture->Unbind();
 			vertexArray->Unbind();
 			shader->disable();
 		}
-		void Renderer2D::Submit(const glm::vec3& position, const glm::vec2& size, const Ref<Texture> texture, float rotationDegree, const glm::vec4& tintColor)
+		void Renderer2D::DrawCube(const TransformComponent& tc,  const MeshRendererComponent& mc, int entityID)
 		{
-			//Check if the max buffer data size was exceeded. If that was the case then render the current buffer on hand and start a new batch.
-			//TODO: You should make this if check more readable.
-			if ((uint8_t*)s_Data.QuadVertexBufferPtr - (uint8_t*)s_Data.QuadVertexBufferBase == Renderer2DData::MaxQuads * sizeof(QuadVertex))
-			{
-				EndScene();
-				s_Data.QuadIndexCount = 0;
-				s_Data.QuadVertexBufferPtr = s_Data.QuadVertexBufferBase;
-				s_Data.TextureSlotIndex = 1;
-			}
+			s_Data.CubeShader->enable();
+			s_Data.CubeVertexArray->Bind();
 
-			float textureIndex = 0.0f;
-			//Setting the textureIndex to its proper value before using it. If we can't find a value for it, it should remain 0.0f.
-			for (uint32_t i = 1; i < s_Data.TextureSlotIndex; i++)
-			{
-				if (*s_Data.TextureSlots[i].get() == *texture.get())
-				{
-					textureIndex = (float)i;
-					break;
-				}
-			}
-			//Using the processed textureIndex
-			if (textureIndex == 0.0f)
-			{
-				textureIndex = (float)s_Data.TextureSlotIndex;
-				s_Data.TextureSlots[s_Data.TextureSlotIndex] = texture;
-				s_Data.TextureSlotIndex++;
-			}
+			s_Data.CubeShader->UploadMat4("u_Transform", tc.GetTransform());
+			s_Data.CubeShader->UploadMat4("u_ViewProjMat", s_EditorCamera->GetViewProjectionMatrix());
+			s_Data.CubeShader->UploadFloat4("u_Color", mc.Color);
+			s_Data.CubeShader->UploadInteger("u_EntityID", entityID);
+			s_Data.CubeShader->UploadFloat3("cameraPos", s_EditorCamera->GetPosition());
 
-			//Creating and changing this identiy 4 x 4 matrix using the parameters that we get from the function.
-			glm::mat4 transform = glm::mat4(1.0f);
-			transform = glm::translate(glm::mat4(1.0f), position) * glm::rotate(glm::mat4(1.0f), glm::radians(rotationDegree), { 0.0f, 0.0f, 1.0f }) * glm::scale(glm::mat4(1.0f), { size.x, size.y, 1.0f });
+			glDrawArrays(GL_TRIANGLES, 0, 36);
 
-			//If you don't pass a color, the default value is white. We also set the Position value to the transform we get from above.
-			s_Data.QuadVertexBufferPtr->Position = transform * s_Data.QuadVertexPositions[0];
-			s_Data.QuadVertexBufferPtr->Color = tintColor;
-			s_Data.QuadVertexBufferPtr->TexCoord = { 0.0f, 0.0f };
-			s_Data.QuadVertexBufferPtr->TexIndex = textureIndex;
-			s_Data.QuadVertexBufferPtr++;
-
-			s_Data.QuadVertexBufferPtr->Position = transform * s_Data.QuadVertexPositions[1];
-			s_Data.QuadVertexBufferPtr->Color = tintColor;
-			s_Data.QuadVertexBufferPtr->TexCoord = { 1.0f, 0.0f };
-			s_Data.QuadVertexBufferPtr->TexIndex = textureIndex;
-			s_Data.QuadVertexBufferPtr++;
-
-			s_Data.QuadVertexBufferPtr->Position = transform * s_Data.QuadVertexPositions[2];
-			s_Data.QuadVertexBufferPtr->Color = tintColor;
-			s_Data.QuadVertexBufferPtr->TexCoord = { 1.0f, 1.0f };
-			s_Data.QuadVertexBufferPtr->TexIndex = textureIndex;
-			s_Data.QuadVertexBufferPtr++;
-
-			s_Data.QuadVertexBufferPtr->Position = transform * s_Data.QuadVertexPositions[3];
-			s_Data.QuadVertexBufferPtr->Color = tintColor;
-			s_Data.QuadVertexBufferPtr->TexCoord = { 0.0f, 1.0f };
-			s_Data.QuadVertexBufferPtr->TexIndex = textureIndex;
-			s_Data.QuadVertexBufferPtr++;
-
-			s_Data.QuadIndexCount += 6;
+			s_Data.CubeVertexArray->Unbind();
+			s_Data.CubeShader->disable();
 		}
-
-		void Renderer2D::Submit(const glm::vec3& position, const glm::vec2& size, const Ref<Texture> texture, const glm::vec2& subTextureOffset, const glm::vec2& subTextureDimensions, float rotationDegree, const glm::vec4& tintColor)
+		void Renderer2D::DrawSkybox()
 		{
-			//The bottom left corner of the texture atlas is considered to be (0,0). 
-			//And the the subTextureOffset parameter in this function defines how many cells of size cellSize you need to offset in order to grab the texture you want from the atlas.
-			if ((uint8_t*)s_Data.QuadVertexBufferPtr - (uint8_t*)s_Data.QuadVertexBufferBase == Renderer2DData::MaxQuads * sizeof(QuadVertex))
-			{
-				EndScene();
-				s_Data.QuadIndexCount = 0;
-				s_Data.QuadVertexBufferPtr = s_Data.QuadVertexBufferBase;
-				s_Data.TextureSlotIndex = 1;
-			}
+			glDepthMask(GL_FALSE);
 
-			float textureIndex = 0.0f;
-			for (uint32_t i = 1; i < s_Data.TextureSlotIndex; i++)
-			{
-				if (*s_Data.TextureSlots[i].get() == *texture.get())
-				{
-					textureIndex = (float)i;
-					break;
-				}
-			}
-			if (textureIndex == 0.0f)
-			{
-				textureIndex = (float)s_Data.TextureSlotIndex;
-				s_Data.TextureSlots[s_Data.TextureSlotIndex] = texture;
-				s_Data.TextureSlotIndex++;
-			}
-			glm::mat4 transform = glm::mat4(1.0f);
-			transform = glm::translate(glm::mat4(1.0f), position) * glm::rotate(glm::mat4(1.0f), glm::radians(rotationDegree), { 0.0f, 0.0f, 1.0f }) * glm::scale(glm::mat4(1.0f), { size.x, size.y, 1.0f });
+			glBindTexture(GL_TEXTURE_CUBE_MAP, s_Data.SkyboxTexture->GetTextureID());
+			s_Data.SkyboxShader->enable();
+			s_Data.CubeVertexArray->Bind();
 
-			s_Data.QuadVertexBufferPtr->Position = transform * s_Data.QuadVertexPositions[0];
-			s_Data.QuadVertexBufferPtr->Color = tintColor;
-			s_Data.QuadVertexBufferPtr->TexCoord = { subTextureOffset.x * (subTextureDimensions.x / texture->GetWidth()), subTextureOffset.y * (subTextureDimensions.y / texture->GetHeight()) };
-			s_Data.QuadVertexBufferPtr->TexIndex = textureIndex;
-			s_Data.QuadVertexBufferPtr++;
+			glDrawArrays(GL_TRIANGLES, 0, 36);
+			glDepthMask(GL_TRUE);
 
-			s_Data.QuadVertexBufferPtr->Position = transform * s_Data.QuadVertexPositions[1];
-			s_Data.QuadVertexBufferPtr->Color = tintColor;
-			s_Data.QuadVertexBufferPtr->TexCoord = { (subTextureOffset.x + size.x) * (subTextureDimensions.x / texture->GetWidth()), subTextureOffset.y * (subTextureDimensions.y / texture->GetHeight())};
-			s_Data.QuadVertexBufferPtr->TexIndex = textureIndex;
-			s_Data.QuadVertexBufferPtr++;
-
-			s_Data.QuadVertexBufferPtr->Position = transform * s_Data.QuadVertexPositions[2];
-			s_Data.QuadVertexBufferPtr->Color = tintColor;
-			s_Data.QuadVertexBufferPtr->TexCoord = { (subTextureOffset.x + size.x) * (subTextureDimensions.x / texture->GetWidth()), (subTextureOffset.y + size.y ) * (subTextureDimensions.y / texture->GetHeight()) };
-			s_Data.QuadVertexBufferPtr->TexIndex = textureIndex;
-			s_Data.QuadVertexBufferPtr++;
-
-			s_Data.QuadVertexBufferPtr->Position = transform * s_Data.QuadVertexPositions[3];
-			s_Data.QuadVertexBufferPtr->Color = tintColor;
-			s_Data.QuadVertexBufferPtr->TexCoord = { subTextureOffset.x * (subTextureDimensions.x / texture->GetWidth()), (subTextureOffset.y + size.y) * (subTextureDimensions.y / texture->GetHeight()) };
-			s_Data.QuadVertexBufferPtr->TexIndex = textureIndex;
-			s_Data.QuadVertexBufferPtr++;
-
-			s_Data.QuadIndexCount += 6;
+			s_Data.CubeVertexArray->Unbind();
+			s_Data.SkyboxShader->disable();
 		}
-
-		//This Submit function is for when you don't want to submit a texture and draw using only a color.
-		//TODO::Add rotation to this.
-		void Renderer2D::Submit(const glm::vec3& position, const glm::vec2& size, const glm::vec4& color)
-		{
-			if ((uint8_t*)s_Data.QuadVertexBufferPtr - (uint8_t*)s_Data.QuadVertexBufferBase == Renderer2DData::MaxQuads * sizeof(QuadVertex))
-			{
-				EndScene();
-				s_Data.QuadIndexCount = 0;
-				s_Data.QuadVertexBufferPtr = s_Data.QuadVertexBufferBase;
-				s_Data.TextureSlotIndex = 1;			
-			}
-
-			s_Data.QuadVertexBufferPtr->Position = position;
-			s_Data.QuadVertexBufferPtr->Color = color;
-			s_Data.QuadVertexBufferPtr->TexCoord = { 0.0f, 0.0f };
-			s_Data.QuadVertexBufferPtr->TexIndex = 0.0f; //White texture
-			s_Data.QuadVertexBufferPtr++;
-
-			s_Data.QuadVertexBufferPtr->Position = { position.x + size.x, position.y, 0.0f};
-			s_Data.QuadVertexBufferPtr->Color = color;
-			s_Data.QuadVertexBufferPtr->TexCoord = { 1.0f, 0.0f };
-			s_Data.QuadVertexBufferPtr->TexIndex = 0.0f;
-			s_Data.QuadVertexBufferPtr++;
-
-			s_Data.QuadVertexBufferPtr->Position = { position.x + size.x, position.y + size.y, 0.0f };
-			s_Data.QuadVertexBufferPtr->Color = color;
-			s_Data.QuadVertexBufferPtr->TexCoord = { 1.0f, 1.0f };
-			s_Data.QuadVertexBufferPtr->TexIndex = 0.0f;
-			s_Data.QuadVertexBufferPtr++;
-
-			s_Data.QuadVertexBufferPtr->Position = { position.x, position.y + size.y, 0.0f };
-			s_Data.QuadVertexBufferPtr->Color = color;
-			s_Data.QuadVertexBufferPtr->TexCoord = { 0.0f, 1.0f };
-			s_Data.QuadVertexBufferPtr->TexIndex = 0.0f;
-			s_Data.QuadVertexBufferPtr++;
-
-			s_Data.QuadIndexCount += 6;
-		}
-
-		void Renderer2D::Submit(const glm::mat4& transform, glm::vec4& color)
-		{
-			if ((uint8_t*)s_Data.QuadVertexBufferPtr - (uint8_t*)s_Data.QuadVertexBufferBase == Renderer2DData::MaxQuads * sizeof(QuadVertex))
-			{
-				EndScene();
-				s_Data.QuadIndexCount = 0;
-				s_Data.QuadVertexBufferPtr = s_Data.QuadVertexBufferBase;
-				s_Data.TextureSlotIndex = 1;
-			}
-
-			s_Data.QuadVertexBufferPtr->Position = transform * s_Data.QuadVertexPositions[0];
-			s_Data.QuadVertexBufferPtr->Color = color;
-			s_Data.QuadVertexBufferPtr->TexCoord = { 0.0f, 0.0f };
-			s_Data.QuadVertexBufferPtr->TexIndex = 0.0f;
-			s_Data.QuadVertexBufferPtr++;
-
-			s_Data.QuadVertexBufferPtr->Position = transform * s_Data.QuadVertexPositions[1];
-			s_Data.QuadVertexBufferPtr->Color = color;
-			s_Data.QuadVertexBufferPtr->TexCoord = { 1.0f, 0.0f };
-			s_Data.QuadVertexBufferPtr->TexIndex = 0.0f;
-			s_Data.QuadVertexBufferPtr++;
-
-			s_Data.QuadVertexBufferPtr->Position = transform * s_Data.QuadVertexPositions[2];
-			s_Data.QuadVertexBufferPtr->Color = color;
-			s_Data.QuadVertexBufferPtr->TexCoord = { 1.0f, 1.0f };
-			s_Data.QuadVertexBufferPtr->TexIndex = 0.0f;
-			s_Data.QuadVertexBufferPtr++;
-
-			s_Data.QuadVertexBufferPtr->Position = transform * s_Data.QuadVertexPositions[3];
-			s_Data.QuadVertexBufferPtr->Color = color;
-			s_Data.QuadVertexBufferPtr->TexCoord = { 0.0f, 1.0f };
-			s_Data.QuadVertexBufferPtr->TexIndex = 0.0f;
-			s_Data.QuadVertexBufferPtr++;
-
-			s_Data.QuadIndexCount += 6;
-		}
-
-		void Renderer2D::Submit(const glm::mat4& transform, const Ref<Texture> texture, float rotationDegree, const glm::vec4& tintColor)
-		{
-			if ((uint8_t*)s_Data.QuadVertexBufferPtr - (uint8_t*)s_Data.QuadVertexBufferBase == Renderer2DData::MaxQuads * sizeof(QuadVertex))
-			{
-				EndScene();
-				s_Data.QuadIndexCount = 0;
-				s_Data.QuadVertexBufferPtr = s_Data.QuadVertexBufferBase;
-				s_Data.TextureSlotIndex = 1;
-			}
-
-			float textureIndex = 0.0f;
-			//Setting the textureIndex to its proper value before using it. If we can't find a value for it, it should remain 0.0f.
-			for (uint32_t i = 1; i < s_Data.TextureSlotIndex; i++)
-			{
-				if (*s_Data.TextureSlots[i].get() == *texture.get())
-				{
-					textureIndex = (float)i;
-					break;
-				}
-			}
-			//Using the processed textureIndex
-			if (textureIndex == 0.0f)
-			{
-				textureIndex = (float)s_Data.TextureSlotIndex;
-				s_Data.TextureSlots[s_Data.TextureSlotIndex] = texture;
-				s_Data.TextureSlotIndex++;
-			}
-			glm::mat4 transformEdited = glm::rotate(transform, glm::radians(rotationDegree), { 0.0f, 0.0f, 1.0f });
-			//If you don't pass a color, the default value is white. We also set the Position value to the transform we get from above.
-			s_Data.QuadVertexBufferPtr->Position = transformEdited * s_Data.QuadVertexPositions[0];
-			s_Data.QuadVertexBufferPtr->Color = tintColor;
-			s_Data.QuadVertexBufferPtr->TexCoord = { 0.0f, 0.0f };
-			s_Data.QuadVertexBufferPtr->TexIndex = textureIndex;
-			s_Data.QuadVertexBufferPtr++;
-
-			s_Data.QuadVertexBufferPtr->Position = transformEdited * s_Data.QuadVertexPositions[1];
-			s_Data.QuadVertexBufferPtr->Color = tintColor;
-			s_Data.QuadVertexBufferPtr->TexCoord = { 1.0f, 0.0f };
-			s_Data.QuadVertexBufferPtr->TexIndex = textureIndex;
-			s_Data.QuadVertexBufferPtr++;
-
-			s_Data.QuadVertexBufferPtr->Position = transformEdited * s_Data.QuadVertexPositions[2];
-			s_Data.QuadVertexBufferPtr->Color = tintColor;
-			s_Data.QuadVertexBufferPtr->TexCoord = { 1.0f, 1.0f };
-			s_Data.QuadVertexBufferPtr->TexIndex = textureIndex;
-			s_Data.QuadVertexBufferPtr++;
-
-			s_Data.QuadVertexBufferPtr->Position = transformEdited * s_Data.QuadVertexPositions[3];
-			s_Data.QuadVertexBufferPtr->Color = tintColor;
-			s_Data.QuadVertexBufferPtr->TexCoord = { 0.0f, 1.0f };
-			s_Data.QuadVertexBufferPtr->TexIndex = textureIndex;
-			s_Data.QuadVertexBufferPtr++;
-
-			s_Data.QuadIndexCount += 6;
-		}
-
-		void Renderer2D::Submit(const glm::mat4& transform, const glm::vec2& size, const Ref<Texture> texture, const glm::vec2& subTextureOffset, const glm::vec2& subTextureDimensions,const glm::vec4& tintColor)
-		{
-			if ((uint8_t*)s_Data.QuadVertexBufferPtr - (uint8_t*)s_Data.QuadVertexBufferBase == Renderer2DData::MaxQuads * sizeof(QuadVertex))
-			{
-				EndScene();
-				s_Data.QuadIndexCount = 0;
-				s_Data.QuadVertexBufferPtr = s_Data.QuadVertexBufferBase;
-				s_Data.TextureSlotIndex = 1;
-			}
-
-			float textureIndex = 0.0f;
-			for (uint32_t i = 1; i < s_Data.TextureSlotIndex; i++)
-			{
-				if (*s_Data.TextureSlots[i].get() == *texture.get())
-				{
-					textureIndex = (float)i;
-					break;
-				}
-			}
-			if (textureIndex == 0.0f)
-			{
-				textureIndex = (float)s_Data.TextureSlotIndex;
-				s_Data.TextureSlots[s_Data.TextureSlotIndex] = texture;
-				s_Data.TextureSlotIndex++;
-			}
-
-			//This scaling is neccessary to match the sizes of the textures and required quads to draw them.
-			glm::mat4 transformEdited =  glm::scale(transform, { size.x, size.y, 1.0f });
-
-			s_Data.QuadVertexBufferPtr->Position = transformEdited * s_Data.QuadVertexPositions[0];
-			s_Data.QuadVertexBufferPtr->Color = tintColor;
-			s_Data.QuadVertexBufferPtr->TexCoord = { subTextureOffset.x * (subTextureDimensions.x / texture->GetWidth()), subTextureOffset.y * (subTextureDimensions.y / texture->GetHeight()) };
-			s_Data.QuadVertexBufferPtr->TexIndex = textureIndex;
-			s_Data.QuadVertexBufferPtr++;
-
-			s_Data.QuadVertexBufferPtr->Position = transformEdited * s_Data.QuadVertexPositions[1];
-			s_Data.QuadVertexBufferPtr->Color = tintColor;
-			s_Data.QuadVertexBufferPtr->TexCoord = { (subTextureOffset.x + size.x) * (subTextureDimensions.x / texture->GetWidth()), subTextureOffset.y * (subTextureDimensions.y / texture->GetHeight()) };
-			s_Data.QuadVertexBufferPtr->TexIndex = textureIndex;
-			s_Data.QuadVertexBufferPtr++;
-
-			s_Data.QuadVertexBufferPtr->Position = transformEdited * s_Data.QuadVertexPositions[2];
-			s_Data.QuadVertexBufferPtr->Color = tintColor;
-			s_Data.QuadVertexBufferPtr->TexCoord = { (subTextureOffset.x + size.x) * (subTextureDimensions.x / texture->GetWidth()), (subTextureOffset.y + size.y) * (subTextureDimensions.y / texture->GetHeight()) };
-			s_Data.QuadVertexBufferPtr->TexIndex = textureIndex;
-			s_Data.QuadVertexBufferPtr++;
-
-			s_Data.QuadVertexBufferPtr->Position = transformEdited * s_Data.QuadVertexPositions[3];
-			s_Data.QuadVertexBufferPtr->Color = tintColor;
-			s_Data.QuadVertexBufferPtr->TexCoord = { subTextureOffset.x * (subTextureDimensions.x / texture->GetWidth()), (subTextureOffset.y + size.y) * (subTextureDimensions.y / texture->GetHeight()) };
-			s_Data.QuadVertexBufferPtr->TexIndex = textureIndex;
-			s_Data.QuadVertexBufferPtr++;
-
-			s_Data.QuadIndexCount += 6;
-		}
-
 		void Renderer2D::Submit(const TransformComponent& tc, const SpriteRendererComponent& sc, int entityID)
 		{
 			if ((uint8_t*)s_Data.QuadVertexBufferPtr - (uint8_t*)s_Data.QuadVertexBufferBase == Renderer2DData::MaxQuads * sizeof(QuadVertex))
@@ -508,13 +293,13 @@ namespace AnorEngine
 
 			s_Data.QuadIndexCount += 6;
 		}
-
-
 		void Renderer2D::Flush()
 		{
-			uint32_t count;
-			count = s_Data.QuadIndexCount ? s_Data.QuadIndexCount : 0;
+			//int clearValue = -1;
+			////TODO: Hard coded the color attachment index as 4 because it is known at the moments.
+			//glClearTexImage(4, 0, GL_RED_INTEGER, GL_INT, &clearValue);
 
+			uint32_t count = s_Data.QuadIndexCount ? s_Data.QuadIndexCount : 0;
 			for (uint32_t i = 0; i < s_Data.TextureSlotIndex; i++)
 			{
 				s_Data.TextureSlots[i]->Bind(i);
@@ -525,14 +310,23 @@ namespace AnorEngine
 			glDrawElements(GL_TRIANGLES, count, GL_UNSIGNED_INT, nullptr);
 			s_Data.QuadVertexArray->Unbind();
 			s_Data.QuadShader->disable();
+			
 		}
-
 		void Renderer2D::BeginScene(const Ref<OrthographicCamera> camera)
 		{
 			s_OrthoCamera = camera;
 			s_Data.QuadShader->enable();
 			s_Data.QuadShader->UploadMat4("u_ViewProjMat", s_OrthoCamera->GetViewProjectionMatrix());
 			s_Data.QuadShader->disable();
+
+
+			s_Data.SkyboxShader->enable();
+			glm::mat4 projectionMatrix = s_OrthoCamera->GetProjectionMatrix();
+			glm::mat4 viewMatrix = s_OrthoCamera->GetViewMatrix();
+			viewMatrix = glm::mat4(glm::mat3(viewMatrix));
+			s_Data.SkyboxShader->UploadMat4("u_ViewProjMat", projectionMatrix * viewMatrix);
+			s_Data.SkyboxShader->disable();
+
 			s_Data.NumberOfDrawCalls = 0;
 			s_Data.QuadIndexCount = 0;
 			s_Data.QuadVertexBufferPtr = s_Data.QuadVertexBufferBase;
@@ -540,11 +334,21 @@ namespace AnorEngine
 		}
 		void Renderer2D::BeginScene(const Ref<EditorCamera>& camera)
 		{
-			//Check here if you you get black screen.
+			DrawSkybox();
+
 			s_EditorCamera = camera;
 			s_Data.QuadShader->enable();
 			s_Data.QuadShader->UploadMat4("u_ViewProjMat", s_EditorCamera->GetViewProjectionMatrix());
 			s_Data.QuadShader->disable();
+
+			s_Data.SkyboxShader->enable();
+			glm::mat4 projectionMatrix = s_EditorCamera->GetProjectionMatrix();
+			glm::mat4 viewMatrix = s_EditorCamera->GetViewMatrix();
+			viewMatrix = glm::mat4(glm::mat3(viewMatrix));
+			s_Data.SkyboxShader->UploadMat4("u_ViewProjMat", projectionMatrix * viewMatrix);
+			s_Data.SkyboxShader->disable();
+
+
 			s_Data.NumberOfDrawCalls = 0;
 			s_Data.QuadIndexCount = 0;
 			s_Data.QuadVertexBufferPtr = s_Data.QuadVertexBufferBase;
@@ -556,6 +360,13 @@ namespace AnorEngine
 			s_Data.QuadShader->enable();
 			s_Data.QuadShader->UploadMat4("u_ViewProjMat", viewProjMatrix);
 			s_Data.QuadShader->disable();
+
+			s_Data.SkyboxShader->enable();
+			glm::mat4 viewMatrix = transform;
+			viewMatrix = glm::mat4(glm::mat3(viewMatrix));
+			s_Data.SkyboxShader->UploadMat4("u_ViewProjMat", camera->GetProjectionMatrix() * viewProjMatrix);
+			s_Data.SkyboxShader->disable();
+
 			s_Data.NumberOfDrawCalls = 0;
 			s_Data.QuadIndexCount = 0;
 			s_Data.QuadVertexBufferPtr = s_Data.QuadVertexBufferBase;
@@ -566,6 +377,22 @@ namespace AnorEngine
 			uint32_t dataSize = (uint8_t*)s_Data.QuadVertexBufferPtr - (uint8_t*)s_Data.QuadVertexBufferBase;
 			s_Data.QuadVertexBuffer->SetData(s_Data.QuadVertexBufferBase, dataSize);
 			Flush();
+		}
+		void Renderer2D::ClearColor(const glm::vec4& color)
+		{
+			glClearColor(color.r, color.g, color.b, color.a);
+		}
+		void Renderer2D::Clear()
+		{
+			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+		}
+		uint32_t Renderer2D::GetIndexCount()
+		{
+			return s_Data.QuadIndexCount;
+		}
+		uint32_t Renderer2D::GetNumberOfDrawCalls()
+		{
+			return s_Data.NumberOfDrawCalls;
 		}
 	}
 }

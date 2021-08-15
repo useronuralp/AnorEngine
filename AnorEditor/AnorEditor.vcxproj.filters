@@ -21,12 +21,18 @@
     <ClCompile Include="Source\Panels\SceneHierarchyPanel.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="ExampleLayer.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="imgui.ini" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Source\Panels\SceneHierarchyPanel.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ExampleLayer.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

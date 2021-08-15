@@ -13,7 +13,7 @@ namespace AnorEngine
 			EditorCamera() = default;
 			EditorCamera(float fov, float aspectRatio, float nearClip, float farClip);
 
-			void OnUpdate(float deltaTime);
+			void OnUpdate(float deltaTime, bool wantToCaptureEvents = true);
 			void OnEvent(Ref<Input::Event> ev);
 
 			inline float GetDistance() const { return m_Distance; }

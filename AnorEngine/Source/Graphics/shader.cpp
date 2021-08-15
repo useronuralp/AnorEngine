@@ -199,7 +199,7 @@ namespace AnorEngine {
 			enable();
 			glUniform3f(GetUniformLocation(name), vector.x, vector.y, vector.z);
 		}
-		void Shader::UploadFloat3(const std::string name, const Math::vec3& vector)
+		void Shader::UploadFloat3(const std::string name, const glm::vec3& vector)
 		{
 			enable();
 			glUniform3f(GetUniformLocation(name), vector.x, vector.y, vector.z);

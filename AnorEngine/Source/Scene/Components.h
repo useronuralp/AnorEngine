@@ -52,6 +52,10 @@ namespace AnorEngine
 		SpriteRendererComponent(const glm::vec4& color, Ref<Graphics::Texture> texture, const glm::vec2& textureSize, const glm::vec2& subTextureOffset, const glm::vec2& subTextureDimensions)
 			:Color(color), Texture(texture), TextureSize(textureSize),SubTextureOffset(subTextureOffset), SubTextureDimensions(subTextureDimensions) {}
 	};
+	struct ANOR_API MeshRendererComponent
+	{
+		glm::vec4 Color{ 1.0f, 1.0f, 1.0f, 1.0f };
+	};
 	struct ANOR_API TagComponent
 	{
 		std::string Tag;

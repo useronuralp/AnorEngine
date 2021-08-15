@@ -344,9 +344,6 @@
     <ClInclude Include="Vendor\stb_image\stb_image.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Assets\Models\cube.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="Source\Graphics\OrthographicCameraController.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -602,6 +599,8 @@
     <None Include="Assets\Models\ball\uploads_files_2222080_ball_obj.mtl" />
     <None Include="Assets\Shaders\2DShader.shader" />
     <None Include="Assets\Shaders\2DBackgroundShader.shader" />
+    <None Include="Assets\Shaders\CubemapShader.shader" />
+    <None Include="Assets\Shaders\CubeShader.shader" />
   </ItemGroup>
   <ItemGroup>
     <Image Include="vertexLayoutExample.PNG">

@@ -18,21 +18,24 @@ namespace AnorEngine
 		{
 			UpdateView();
 		}
-		void EditorCamera::OnUpdate(float deltaTime)
+		void EditorCamera::OnUpdate(float deltaTime, bool wantToCaptureEvents)
 		{
-			auto window = Application::Get().GetOpenGLWindow()->GetNativeWindow();
-			if (Input::EventHandler::IsKeyDown(ANOR_KEY_LEFT_CONTROL))
+			if (wantToCaptureEvents)
 			{
-				const glm::vec2& mouse{ Input::EventHandler::GetMouseXOffset(window), Input::EventHandler::GetMouseYOffset(window) };
-				glm::vec2 delta = (mouse - m_InitialMousePosition) * 0.003f;
-				m_InitialMousePosition = mouse;
+				auto window = Application::Get().GetOpenGLWindow()->GetNativeWindow();
+				if (Input::EventHandler::IsKeyDown(ANOR_KEY_LEFT_CONTROL))
+				{
+					const glm::vec2& mouse{ Input::EventHandler::GetMouseXOffset(window), Input::EventHandler::GetMouseYOffset(window) };
+					glm::vec2 delta = (mouse - m_InitialMousePosition) * 0.003f;
+					m_InitialMousePosition = mouse;
 
-				if (Input::EventHandler::IsMousePressed(ANOR_MOUSE_BUTTON_MIDDLE))
-					MousePan(delta);
-				else if (Input::EventHandler::IsMousePressed(ANOR_MOUSE_BUTTON_LEFT))
-					MouseRotate(delta);
-				else if (Input::EventHandler::IsMousePressed(ANOR_MOUSE_BUTTON_RIGHT))
-					MouseZoom(delta.y);
+					if (Input::EventHandler::IsMousePressed(ANOR_MOUSE_BUTTON_MIDDLE))
+						MousePan(delta);
+					else if (Input::EventHandler::IsMousePressed(ANOR_MOUSE_BUTTON_LEFT))
+						MouseRotate(delta);
+					else if (Input::EventHandler::IsMousePressed(ANOR_MOUSE_BUTTON_RIGHT))
+						MouseZoom(delta.y);
+				}
 			}
 			UpdateView();
 		}

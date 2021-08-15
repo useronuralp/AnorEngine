@@ -4,6 +4,7 @@ namespace AnorEngine
 {
 	namespace Graphics
 	{
+#ifdef INACTIVE
 		Particle::Particle()
 		{
 			m_IsDead = false;
@@ -85,5 +86,6 @@ namespace AnorEngine
 			m_EmissionPoint.x = x;
 			m_EmissionPoint.y = y;
 		}
+#endif 
 	}
 }

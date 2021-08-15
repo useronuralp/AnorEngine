@@ -29,7 +29,7 @@ namespace AnorEngine {
 			void UploadFloat2(const GLchar* name, const Math::vec2 &vector);
 			void UploadFloat2(const std::string name, const Math::vec2& vector);
 			void UploadFloat3(const GLchar* name, const Math::vec3 &vector);
-			void UploadFloat3(const std::string name, const Math::vec3& vector);
+			void UploadFloat3(const std::string name, const glm::vec3& vector);
 			void UploadFloat4(const GLchar* name, const glm::vec4& vector);
 			void UploadMat4(const char* name, const glm::mat4& matrix);
 			void UploadIntegerArray(const char* name, int* values, uint32_t count);
@@ -60,7 +60,9 @@ namespace AnorEngine {
 				if (m_Shaders.count(shaderName) > 0)
 					return m_Shaders[shaderName];
 				else
+				{
 					CRITICAL_ASSERT("The Shader you tried to load is invalid. (Either the name is incorrect or there is no shader with that name in the Shader Library.)");
+				}
 			}
 		private:
 			static std::unordered_map<std::string, Ref<Shader>> m_Shaders;

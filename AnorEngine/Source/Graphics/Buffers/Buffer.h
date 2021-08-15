@@ -122,7 +122,7 @@ namespace AnorEngine {
 			BufferLayout m_Layout;
 		public:
 			VertexBuffer(uint32_t sizeByte, BufferLayout& layout);
-			VertexBuffer(float* vertices, uint32_t sizeByte, BufferLayout& layout); // size = total component count * sizeof(passed variable)
+			VertexBuffer(float* vertices, uint32_t sizeByte, BufferLayout& layout); // size = total component count * sizeof(passed variable type)
 			~VertexBuffer();
 			void SetData(const void* data, uint32_t dataSize);
 			void Bind() const;

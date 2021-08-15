@@ -13,12 +13,25 @@ namespace AnorEngine
 	void Scene::OnUpdateEditor(float deltaTime, Ref<Graphics::EditorCamera> camera)
 	{
 		Graphics::Renderer2D::BeginScene(camera);
-		auto group = m_Registry.group<TransformComponent>(entt::get<SpriteRendererComponent>);
-		for (auto& entity : group)
+
+		auto quadGroup = m_Registry.group<TransformComponent>(entt::get<SpriteRendererComponent>);
+		for (auto& entity : quadGroup)
 		{
-			auto [transformComponent, spriteRendererComponent] = group.get<TransformComponent, SpriteRendererComponent>(entity);
+			auto [transformComponent, spriteRendererComponent] = quadGroup.get<TransformComponent, SpriteRendererComponent>(entity);
 			Graphics::Renderer2D::Submit(transformComponent, spriteRendererComponent, (int)entity);
 		}
+
+		int clearValue = -1;
+		//TODO: Hard coded the color attachment index as 4 because it is known at the moments.
+		glClearTexImage(4, 0, GL_RED_INTEGER, GL_INT, &clearValue);
+
+		auto view = m_Registry.view<TransformComponent, MeshRendererComponent>();
+		for (auto& entity : view)
+		{
+			auto [transformComponent, meshRendererComponent] = view.get<TransformComponent, MeshRendererComponent>(entity);
+			Graphics::Renderer2D::DrawCube(transformComponent, meshRendererComponent, (int)entity);
+		}
+
 		Graphics::Renderer2D::EndScene();
 	}
 	void Scene::OnUpdateRuntime(float deltaTime)

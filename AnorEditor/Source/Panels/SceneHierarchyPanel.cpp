@@ -123,6 +123,11 @@ namespace AnorEngine
 				m_SelectionContext.AddComponent<SpriteRendererComponent>();
 				ImGui::CloseCurrentPopup();
 			}
+			if (ImGui::MenuItem("Mesh Renderer"))
+			{
+				m_SelectionContext.AddComponent<MeshRendererComponent>();
+				ImGui::CloseCurrentPopup();
+			}
 			ImGui::EndPopup();
 		}
 		ImGui::PopItemWidth();
@@ -135,7 +140,11 @@ namespace AnorEngine
 			component.Rotation = glm::radians(rotationDegree);
 			DrawVec3Control("Scale", component.Scale, 0.1f, 1.0f);
 		});
+		DrawComponent<MeshRendererComponent>("Mesh Renderer", entity, [](auto& component)
+		{
+			ImGui::ColorEdit4("Color", glm::value_ptr(component.Color));
 
+		});
 		DrawComponent<CameraComponent>("Camera", entity, [](auto& component)
 		{
 			if (component.Camera.GetProjectionType() == ProjectionType::Perspective)
@@ -218,8 +227,6 @@ namespace AnorEngine
 
 		if (ImGui::ImageButton((void*)texID, ImVec2{ 50.0f, 50.0f }))
 			m_IsRuntime = !m_IsRuntime;
-
-
 
 		m_Context->m_Registry.each([&](auto entityID)
 		{

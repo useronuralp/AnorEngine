@@ -254,7 +254,6 @@
     <ClCompile Include="Vendor\yaml-cpp\src\tag.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Assets\Models\cube.h" />
     <ClInclude Include="Source\Core\Application.h" />
     <ClInclude Include="Source\Core\Core.h" />
     <ClInclude Include="Source\Core\Engine.h" />
@@ -381,6 +380,8 @@
     <None Include="Assets\shaders\3DShader.shader" />
     <None Include="Assets\shaders\3DLightSourceShader.shader" />
     <None Include="Assets\shaders\2DTextureShader.shader" />
+    <None Include="Assets\Shaders\CubemapShader.shader" />
+    <None Include="Assets\Shaders\CubeShader.shader" />
     <None Include="Vendor\ImGUI\.editorconfig" />
     <None Include="Vendor\ImGUI\.gitattributes" />
     <None Include="Vendor\ImGUI\.gitignore" />

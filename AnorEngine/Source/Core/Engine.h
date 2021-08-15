@@ -8,7 +8,6 @@
 #include "Graphics/shader.h"
 #include "Graphics/texture.h"
 #include "Graphics/simplerenderer3D.h"
-#include "../Assets/Models/cube.h"
 #include "imgui.h"
 #include "Graphics/Layers/ImGuiBase.h"
 #include "Utility/Logger.h"

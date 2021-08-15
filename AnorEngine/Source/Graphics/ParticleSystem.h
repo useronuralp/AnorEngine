@@ -7,6 +7,7 @@ namespace AnorEngine
 {
 	namespace Graphics
 	{
+#ifdef INACTIVE
 		struct ANOR_API ParticleProperties
 		{
 			float								  Speed;
@@ -49,5 +50,6 @@ namespace AnorEngine
 			void SetEmissionPoint(const float& x, const float& y);
 			//void OnImGui();
 		};
+#endif
 	}
 }

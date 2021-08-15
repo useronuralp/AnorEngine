@@ -1,8 +1,8 @@
 #include "pch.h"
 #include <GL/glew.h>
+#define STB_IMAGE_IMPLEMENTATION
 #include "../vendor/stb_image/stb_image.h"
 #include "texture.h"
-
 namespace AnorEngine {
 	namespace Graphics {
 		Texture::Texture(const std::string& path)
@@ -40,21 +40,61 @@ namespace AnorEngine {
 			if (data)
 				stbi_image_free(data);
 		}
-
 		Texture::~Texture()
 		{
 			glDeleteTextures(1, &m_RendererID);
 		}
-
 		void Texture::Bind(unsigned int slot) const
 		{
 			glActiveTexture(GL_TEXTURE0 + slot); //allows you to speicfy a texture slot, usually on pc there are 32 texture slots and theu count up one by one.
 			glBindTexture(GL_TEXTURE_2D, m_RendererID);
 		}
-
 		void Texture::Unbind() const
 		{
 			glBindTexture(GL_TEXTURE_2D, 0);
+		}
+		CubeMapTexture::CubeMapTexture(std::vector<std::string> faces)
+		{
+			unsigned int textureID;
+			glGenTextures(1, &textureID);
+			glBindTexture(GL_TEXTURE_CUBE_MAP, textureID);
+			int width, height, nrChannels;
+			for (unsigned int i = 0; i < faces.size(); i++)
+			{
+				//flipping images doesnt work!!
+				stbi_set_flip_vertically_on_load(true);
+				stbi_uc* data = stbi_load(faces[i].c_str(), &width, &height, &nrChannels, 0);
+				if (data)
+				{
+					glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i,
+						0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data
+					);
+					m_Faces[i].m_Channels = nrChannels;
+					m_Faces[i].m_FilePath = faces[i];
+					m_Faces[i].m_Height = height;
+					m_Faces[i].m_Width = width;		
+					stbi_image_free(data);
+				}
+				else
+				{
+					stbi_image_free(data);
+					CRITICAL_ASSERT("Cubemap tex failed to load at path: {0}", faces[i]);
+				}
+			}
+			glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+			glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+			glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+			glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+			glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
+			m_TextureID = textureID;
+		}
+		void CubeMapTexture::Bind(unsigned int slot) const
+		{
+			glBindTexture(GL_TEXTURE_CUBE_MAP, m_TextureID);
+		}
+		void CubeMapTexture::Unbind() const
+		{
+			glBindTexture(GL_TEXTURE_CUBE_MAP, 0);
 		}
 	}
 }
