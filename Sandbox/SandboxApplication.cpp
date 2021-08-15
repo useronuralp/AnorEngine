@@ -2,6 +2,7 @@
 #include <Core/EntryPoint.h>
 namespace Game
 {	
+#ifdef OUTDATED_CODE
 	using namespace AnorEngine;
 	using namespace Graphics;
 	using namespace Math;
@@ -304,9 +305,10 @@ namespace Game
 			return deltaTime;
 		}
 	};
+#endif 
 	AnorEngine::Application* CreateApplication()
 	{
-		return new SandboxApp2D();
+		return nullptr;
 	}
 }
 
