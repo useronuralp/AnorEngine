@@ -82,7 +82,7 @@ namespace AnorEngine
 		}
 		void EditorCamera::MouseZoom(float delta)
 		{
-			m_Distance -= delta * ZoomSpeed();
+			m_Distance -= delta * ZoomSpeed() * 4;
 			if (m_Distance < 1.0f)
 			{
 				m_FocalPoint += GetForwardDirection();

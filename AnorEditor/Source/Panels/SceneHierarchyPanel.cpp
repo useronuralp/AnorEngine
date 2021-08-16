@@ -123,11 +123,6 @@ namespace AnorEngine
 				m_SelectionContext.AddComponent<SpriteRendererComponent>();
 				ImGui::CloseCurrentPopup();
 			}
-			if (ImGui::MenuItem("Mesh Renderer"))
-			{
-				m_SelectionContext.AddComponent<MeshRendererComponent>();
-				ImGui::CloseCurrentPopup();
-			}
 			ImGui::EndPopup();
 		}
 		ImGui::PopItemWidth();
@@ -143,6 +138,12 @@ namespace AnorEngine
 		DrawComponent<MeshRendererComponent>("Mesh Renderer", entity, [](auto& component)
 		{
 			ImGui::ColorEdit4("Color", glm::value_ptr(component.Color));
+			ImGui::DragFloat("Ambient", &component.Material.Properties.Ambient, 0.01f, 0.0f, 1.0f);
+			ImGui::DragFloat("Diffuse", &component.Material.Properties.Diffuse, 0.01f, 0.0f, 1.0f);
+			ImGui::DragFloat("Specular", &component.Material.Properties.Specular, 0.01f, 0.0f, 1.0f);
+			ImGui::DragFloat("Shininess", &component.Material.Properties.Shininess);
+			ImGui::DragFloat("Metalness", &component.Material.Properties.Metalness, 0.01f, 0.0f, 1.0f);
+
 
 		});
 		DrawComponent<CameraComponent>("Camera", entity, [](auto& component)
@@ -241,6 +242,18 @@ namespace AnorEngine
 		{
 			if (ImGui::MenuItem("Create Entity"))
 				m_Context->CreateEntity();
+			if (ImGui::MenuItem("Cube"))
+			{
+				Graphics::Material defaultMaterial(Graphics::ShaderLibrary::GetShader("CubeShader"));
+				m_Context->CreateEntity().AddComponent<MeshRendererComponent>(defaultMaterial);
+			}
+			if (ImGui::MenuItem("Cube Light"))
+			{
+				Graphics::Material defaultMaterial (Graphics::ShaderLibrary::GetShader("LightCubeShader"));
+				auto entity = m_Context->CreateEntity();
+				entity.AddComponent<MeshRendererComponent>(defaultMaterial);
+				entity.GetComponent<TagComponent>().Tag = "Point Light";
+			}
 			ImGui::EndPopup();
 		}
 		ImGui::End();

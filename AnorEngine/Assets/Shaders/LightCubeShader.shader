@@ -40,7 +40,6 @@ struct Material {
 	vec3 diffuse;
 	vec3 specular;
 	float shininess;
-	float metalness;
 };
 
 struct LightIntensity {
@@ -71,37 +70,6 @@ uniform vec3 directionalLight;
 
 void main()
 {
-
-	//Refraction
-	float ratio = 1.00 / 1.52;
-	vec3 Irefract = normalize(Position - cameraPos);
-	vec3 Rrefract = refract(Irefract, normalize(Normal), ratio);
-	vec4 refraction = vec4(texture(skybox, Rrefract).rgb, 1.0);
-
-	//Reflection
-	vec3 Ireflect = normalize(Position - cameraPos);
-	vec3 Rreflect = reflect(Ireflect, normalize(Normal));
-	vec4 reflection = vec4(texture(skybox, Rreflect).rgb, 1.0);
-
-	// ambient    //intensity
-	vec3 ambient = lightIntensity.ambient * vec3(pointLightColor) * material.ambient;
-
-	// diffuse 
-	vec3 norm = normalize(Normal);
-	vec3 lightDir = normalize(pointLightPos - Position);
-	float diff = max(dot(norm, lightDir), 0.0);
-	vec3 diffuse = lightIntensity.diffuse * vec3(pointLightColor) * (diff * material.diffuse);
-
-	// specular
-	vec3 viewDir = normalize(cameraPos - Position);
-	vec3 reflectDir = reflect(-lightDir, norm);
-	float spec = pow(max(dot(viewDir, reflectDir), 0.0), material.shininess);
-	vec3 specular = lightIntensity.specular * vec3(pointLightColor) * (spec * material.specular);
-
-	vec3 result = (ambient + diffuse + specular) * vec3(u_Color) + (vec3(reflection) * material.metalness);
-	FragColor = vec4(result, 1.0);
-
-
-
+	FragColor = u_Color;
 	color2 = v_EntityID;
 }

@@ -8,7 +8,7 @@ namespace Game
 {
 	using namespace AnorEngine;
 	using namespace Graphics;
-	using namespace Math;
+	
 	class AnorEditor : public Application
 	{
 	private:

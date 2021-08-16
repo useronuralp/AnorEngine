@@ -171,6 +171,22 @@ namespace AnorEngine
 		
 			out << YAML::EndMap; // SpriteRendererComponent
 		}
+		if (entity.HasComponent<MeshRendererComponent>())
+		{
+			out << YAML::Key << "MeshRendererComponent";
+			out << YAML::BeginMap; // MeshRendererComponent
+		
+			auto& meshRendererComponent = entity.GetComponent<MeshRendererComponent>();
+			out << YAML::Key << "Color" << YAML::Value << meshRendererComponent.Color;
+			out << YAML::Key << "Shader" << YAML::Value << meshRendererComponent.Material.Shader->GetName();
+			out << YAML::Key << "Ambient" << YAML::Value << meshRendererComponent.Material.Properties.Ambient;
+			out << YAML::Key << "Diffuse" << YAML::Value << meshRendererComponent.Material.Properties.Diffuse;
+			out << YAML::Key << "Specular" << YAML::Value << meshRendererComponent.Material.Properties.Specular;
+			out << YAML::Key << "Shininess" << YAML::Value << meshRendererComponent.Material.Properties.Shininess;
+			out << YAML::Key << "Metalness" << YAML::Value << meshRendererComponent.Material.Properties.Metalness;
+
+			out << YAML::EndMap; // MeshRendererComponent
+		}
 		out << YAML::EndMap; // Entity
 	}
 	SceneSerializer::SceneSerializer(const Ref<Scene>& scene)
@@ -263,6 +279,19 @@ namespace AnorEngine
 					glm::vec2 subTextureOffset = spriteRendererComponent["SubTextureOffset"].as<glm::vec2>();
 					glm::vec2 subTextureDimensions = spriteRendererComponent["SubTextureDimensions"].as<glm::vec2>();
 					auto& src = deserializedEntity.AddComponent<SpriteRendererComponent>(color, Texture, textureSize, subTextureOffset, subTextureDimensions);
+				}
+				auto meshRendererComponent = entity["MeshRendererComponent"];
+				if (meshRendererComponent)
+				{
+					glm::vec4 color = meshRendererComponent["Color"].as<glm::vec4>();
+					Graphics::Material material;
+					material.Shader = Graphics::ShaderLibrary::GetShader(meshRendererComponent["Shader"].as<std::string>());
+					material.Properties.Ambient = meshRendererComponent["Ambient"].as<float>();
+					material.Properties.Diffuse =meshRendererComponent["Diffuse"].as<float>();
+					material.Properties.Specular =meshRendererComponent["Specular"].as<float>();
+					material.Properties.Shininess =meshRendererComponent["Shininess"].as<float>();
+					material.Properties.Metalness =meshRendererComponent["Metalness"].as<float>();
+					auto& src = deserializedEntity.AddComponent<MeshRendererComponent>(color, material);
 				}
 			}
 		}

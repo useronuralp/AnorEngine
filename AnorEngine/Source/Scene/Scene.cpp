@@ -22,14 +22,23 @@ namespace AnorEngine
 		}
 
 		int clearValue = -1;
-		//TODO: Hard coded the color attachment index as 4 because it is known at the moments.
+		//TODO: Hard coded the color attachment index as 4 because it is known at the moment.
 		glClearTexImage(4, 0, GL_RED_INTEGER, GL_INT, &clearValue);
 
-		auto view = m_Registry.view<TransformComponent, MeshRendererComponent>();
+		auto view = m_Registry.view<TransformComponent, MeshRendererComponent, TagComponent>();
 		for (auto& entity : view)
 		{
-			auto [transformComponent, meshRendererComponent] = view.get<TransformComponent, MeshRendererComponent>(entity);
-			Graphics::Renderer2D::DrawCube(transformComponent, meshRendererComponent, (int)entity);
+
+			auto [transformComponent, meshRendererComponent, tagComponent] = view.get<TransformComponent, MeshRendererComponent, TagComponent>(entity);
+			if (tagComponent.Tag == "Point Light" || tagComponent.Tag == "PointLight")
+			{
+				//WARNING : This could be buggy
+				//TODO : Send renderer a material object instead of this scuffed thing.
+				Graphics::Renderer2D::SetPointLightPosition(transformComponent.Translation);
+				Graphics::Renderer2D::SetPointLightColor(meshRendererComponent.Color);
+			}
+
+			Graphics::Renderer2D::DrawCube(transformComponent, meshRendererComponent);
 		}
 
 		Graphics::Renderer2D::EndScene();
@@ -108,8 +117,10 @@ namespace AnorEngine
 	}
 	Entity Scene::CreateEntity(const std::string& name)
 	{
-		Entity entity = { m_Registry.create(), this };
-		entity.AddComponent<TransformComponent>();
+		entt::entity ID = m_Registry.create();
+		Entity entity = { ID, this };
+		auto& tc = entity.AddComponent<TransformComponent>();
+		tc.EntityID = (int)ID;
 		auto& tag = entity.AddComponent<TagComponent>();
 		tag.Tag = name.empty() ? "Unnamed Entity" : name;
 		return entity;

@@ -3,6 +3,7 @@
 #include "Graphics/texture.h"
 #include "SceneCamera.h"
 #include "ScriptableEntity.h"
+#include "Graphics/Material.h"
 #define GLM_ENABLE_EXPERIMENTAL
 #include <gtx/quaternion.hpp>
 
@@ -13,6 +14,8 @@ namespace AnorEngine
 		glm::vec3 Translation { 0.0f, 0.0f, 0.0f };
 		glm::vec3 Scale       { 1.0f, 1.0f, 1.0f };
 		glm::vec3 Rotation    { 0.0f, 0.0f, 0.0f };
+
+		int EntityID = -1;
 
 		TransformComponent() = default;
 		TransformComponent(const TransformComponent&) = default;
@@ -55,6 +58,14 @@ namespace AnorEngine
 	struct ANOR_API MeshRendererComponent
 	{
 		glm::vec4 Color{ 1.0f, 1.0f, 1.0f, 1.0f };
+		Graphics::Material Material;
+		
+		MeshRendererComponent() = default;
+		MeshRendererComponent(Graphics::Material material)
+			:Material(material){}
+		MeshRendererComponent(glm::vec4 color, Graphics::Material material)
+			:Color(color), Material(material){}
+
 	};
 	struct ANOR_API TagComponent
 	{

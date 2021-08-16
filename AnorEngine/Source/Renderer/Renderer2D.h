@@ -25,8 +25,10 @@ namespace AnorEngine
 			static void ClearColor(const glm::vec4& color);
 			static void Clear();
 			static void Shutdown() {};
+			static void SetPointLightPosition(const glm::vec3& poisiton);
+			static void SetPointLightColor(const glm::vec4& color);
 			static void DrawPrimitive(const Ref<VertexArray> vertexArray, const Ref<Shader> shader, const glm::mat4& modelMatrix, const glm::vec4& color, const Ref<Texture> texture = nullptr);
-			static void DrawCube(const TransformComponent& tc, const MeshRendererComponent& mc, int entityID);
+			static void DrawCube(const TransformComponent& tc, const MeshRendererComponent& mc);
 			static void DrawSkybox();
 			//static void Submit(const glm::vec3& position, const glm::vec2& size, const Ref<Texture> texture, float rotationDegree = 0.0f, const glm::vec4& tintColor = { 1.0f, 1.0f, 1.0f, 1.0f } );
 			//static void Submit(const glm::vec3& position, const glm::vec2& size, const Ref<Texture> texture, const glm::vec2& subTextureOffset, const glm::vec2& subTextureDimensions, float rotationDegree = 0.0f, const glm::vec4& tintColor = { 1.0f, 1.0f, 1.0f, 1.0f });

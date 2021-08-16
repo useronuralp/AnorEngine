@@ -179,6 +179,7 @@
     <ClCompile Include="Source\Core\Application.cpp" />
     <ClCompile Include="Source\Graphics\EditorCamera.cpp" />
     <ClCompile Include="Source\Graphics\Framebuffer.cpp" />
+    <ClCompile Include="Source\Graphics\Material.cpp" />
     <ClCompile Include="Source\Scene\Scene.cpp" />
     <ClCompile Include="Source\Scene\SceneCamera.cpp" />
     <ClCompile Include="Source\Scene\SceneSerializer.cpp" />
@@ -263,6 +264,7 @@
     <ClInclude Include="Source\Core\MouseButtonCodes.h" />
     <ClInclude Include="Source\Graphics\EditorCamera.h" />
     <ClInclude Include="Source\Graphics\Framebuffer.h" />
+    <ClInclude Include="Source\Graphics\Material.h" />
     <ClInclude Include="Source\Scene\Components.h" />
     <ClInclude Include="Source\Scene\Entity.h" />
     <ClInclude Include="Source\Scene\SceneCamera.h" />
@@ -382,6 +384,7 @@
     <None Include="Assets\shaders\2DTextureShader.shader" />
     <None Include="Assets\Shaders\CubemapShader.shader" />
     <None Include="Assets\Shaders\CubeShader.shader" />
+    <None Include="Assets\Shaders\LightCubeShader.shader" />
     <None Include="Vendor\ImGUI\.editorconfig" />
     <None Include="Vendor\ImGUI\.gitattributes" />
     <None Include="Vendor\ImGUI\.gitignore" />

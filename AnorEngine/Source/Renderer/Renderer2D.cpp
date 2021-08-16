@@ -45,6 +45,8 @@ namespace AnorEngine
 			Ref<CubeMapTexture>						  SkyboxTexture;
 			Ref<Shader>								  SkyboxShader;
 			Ref<Shader>								  CubeShader;
+			Ref<Shader>								  LightCubeShader;
+
 		};
 
 		static Renderer2DData s_Data;
@@ -131,13 +133,14 @@ namespace AnorEngine
 			s_Data.SkyboxShader = ShaderLibrary::LoadShader("CubemapShader", solutionDir + "AnorEngine\\Assets\\Shaders\\CubemapShader.shader");
 			s_Data.QuadShader = ShaderLibrary::LoadShader("2DShader", solutionDir + "AnorEngine\\Assets\\Shaders\\2DShader.shader");
 			s_Data.CubeShader = ShaderLibrary::LoadShader("CubeShader", solutionDir + "AnorEngine\\Assets\\Shaders\\CubeShader.shader");
+			s_Data.LightCubeShader = ShaderLibrary::LoadShader("LightCubeShader", solutionDir + "AnorEngine\\Assets\\Shaders\\LightCubeShader.shader");
 
 			int samplers[s_Data.MaxTextureSlots];
 			for (uint32_t i = 0; i < s_Data.MaxTextureSlots; i++)
 			{
 				samplers[i] = i;
 			}
-			s_Data.QuadShader->UploadIntegerArray("u_Textures", samplers, s_Data.MaxTextureSlots);
+			s_Data.QuadShader->UploadIntegerArray(std::string("u_Textures"), samplers, s_Data.MaxTextureSlots);
 
 			uint32_t* QuadIndices = new uint32_t[Renderer2DData::MaxIndices];
 
@@ -183,6 +186,14 @@ namespace AnorEngine
 			s_Data.QuadVertexPositions[2] = {  0.5f,  0.5f, 0.0f, 1.0f };
 			s_Data.QuadVertexPositions[3] = { -0.5f,  0.5f, 0.0f, 1.0f };
 		}
+		void Renderer2D::SetPointLightPosition(const glm::vec3& position)
+		{
+			s_Data.CubeShader->UploadFloat3("pointLightPos", position);
+		}
+		void Renderer2D::SetPointLightColor(const glm::vec4& color)
+		{
+			s_Data.CubeShader->UploadFloat4("pointLightColor", color);
+		}
 		void Renderer2D::DrawPrimitive(const Ref<VertexArray> vertexArray, const Ref<Shader> shader, const glm::mat4& modelMatrix, const glm::vec4& color, const Ref<Texture> texture)
 		{
 			shader->enable();
@@ -204,21 +215,32 @@ namespace AnorEngine
 			vertexArray->Unbind();
 			shader->disable();
 		}
-		void Renderer2D::DrawCube(const TransformComponent& tc,  const MeshRendererComponent& mc, int entityID)
+		void Renderer2D::DrawCube(const TransformComponent& tc, const MeshRendererComponent& mc)
 		{
-			s_Data.CubeShader->enable();
+
+
+			mc.Material.Shader->enable();
+
+			mc.Material.Shader->UploadMat4("u_Transform", tc.GetTransform());
+			mc.Material.Shader->UploadMat4("u_ViewProjMat", s_EditorCamera->GetViewProjectionMatrix());
+			mc.Material.Shader->UploadFloat4("u_Color", mc.Color);
+			mc.Material.Shader->UploadInteger("u_EntityID", tc.EntityID);
+			mc.Material.Shader->UploadFloat3("cameraPos", s_EditorCamera->GetPosition());
+			mc.Material.Shader->UploadFloat3("material.ambient", { mc.Material.Properties.Ambient, mc.Material.Properties.Ambient, mc.Material.Properties.Ambient });
+			mc.Material.Shader->UploadFloat3("material.diffuse", { mc.Material.Properties.Diffuse, mc.Material.Properties.Diffuse, mc.Material.Properties.Diffuse });
+			mc.Material.Shader->UploadFloat3("material.specular", { mc.Material.Properties.Specular, mc.Material.Properties.Specular, mc.Material.Properties.Specular });
+			mc.Material.Shader->UploadFloat("material.shininess", mc.Material.Properties.Shininess);
+			mc.Material.Shader->UploadFloat("material.metalness", mc.Material.Properties.Metalness);
+			mc.Material.Shader->UploadFloat3("lightIntensity.ambient", { 0.2f, 0.2f, 0.2f });
+			mc.Material.Shader->UploadFloat3("lightIntensity.diffuse", { 0.5f, 0.5f, 0.5f }); // darken diffuse light a bit
+			mc.Material.Shader->UploadFloat3("lightIntensity.specular", { 1.0f, 1.0f, 1.0f });
+
+			//s_Data.CubeShader->enable();
 			s_Data.CubeVertexArray->Bind();
-
-			s_Data.CubeShader->UploadMat4("u_Transform", tc.GetTransform());
-			s_Data.CubeShader->UploadMat4("u_ViewProjMat", s_EditorCamera->GetViewProjectionMatrix());
-			s_Data.CubeShader->UploadFloat4("u_Color", mc.Color);
-			s_Data.CubeShader->UploadInteger("u_EntityID", entityID);
-			s_Data.CubeShader->UploadFloat3("cameraPos", s_EditorCamera->GetPosition());
-
 			glDrawArrays(GL_TRIANGLES, 0, 36);
 
 			s_Data.CubeVertexArray->Unbind();
-			s_Data.CubeShader->disable();
+			mc.Material.Shader->disable();
 		}
 		void Renderer2D::DrawSkybox()
 		{
