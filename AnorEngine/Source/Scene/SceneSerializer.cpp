@@ -184,6 +184,7 @@ namespace AnorEngine
 			out << YAML::Key << "Specular" << YAML::Value << meshRendererComponent.Material.Properties.Specular;
 			out << YAML::Key << "Shininess" << YAML::Value << meshRendererComponent.Material.Properties.Shininess;
 			out << YAML::Key << "Metalness" << YAML::Value << meshRendererComponent.Material.Properties.Metalness;
+			out << YAML::Key << "Intensity" << YAML::Value << meshRendererComponent.Material.Properties.Intensity;
 
 			out << YAML::EndMap; // MeshRendererComponent
 		}
@@ -291,6 +292,7 @@ namespace AnorEngine
 					material.Properties.Specular =meshRendererComponent["Specular"].as<float>();
 					material.Properties.Shininess =meshRendererComponent["Shininess"].as<float>();
 					material.Properties.Metalness =meshRendererComponent["Metalness"].as<float>();
+					material.Properties.Intensity = meshRendererComponent["Intensity"].as<float>();
 					auto& src = deserializedEntity.AddComponent<MeshRendererComponent>(color, material);
 				}
 			}

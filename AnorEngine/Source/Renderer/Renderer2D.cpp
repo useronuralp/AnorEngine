@@ -47,6 +47,8 @@ namespace AnorEngine
 			Ref<Shader>								  CubeShader;
 			Ref<Shader>								  LightCubeShader;
 
+			int										  PointLightCount = 0;
+
 		};
 
 		static Renderer2DData s_Data;
@@ -58,59 +60,60 @@ namespace AnorEngine
 			glEnable(GL_BLEND);
 			glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 			glEnable(GL_DEPTH_TEST);
-			std::string solutionDir = __SOLUTION_DIR;
+			
 
 			float skyboxVertices[] = {
 				// positions          
-					-0.5f, -0.5f, -0.5f,  0.0f,  0.0f, -1.0f,
-					 0.5f, -0.5f, -0.5f,  0.0f,  0.0f, -1.0f,
-					 0.5f,  0.5f, -0.5f,  0.0f,  0.0f, -1.0f,
-					 0.5f,  0.5f, -0.5f,  0.0f,  0.0f, -1.0f,
-					-0.5f,  0.5f, -0.5f,  0.0f,  0.0f, -1.0f,
-					-0.5f, -0.5f, -0.5f,  0.0f,  0.0f, -1.0f,
+				-0.5f, -0.5f, -0.5f,  0.0f,  0.0f, -1.0f,  0.0f,  0.0f,
+				 0.5f, -0.5f, -0.5f,  0.0f,  0.0f, -1.0f,  1.0f,  0.0f,
+				 0.5f,  0.5f, -0.5f,  0.0f,  0.0f, -1.0f,  1.0f,  1.0f,
+				 0.5f,  0.5f, -0.5f,  0.0f,  0.0f, -1.0f,  1.0f,  1.0f,
+				-0.5f,  0.5f, -0.5f,  0.0f,  0.0f, -1.0f,  0.0f,  1.0f,
+				-0.5f, -0.5f, -0.5f,  0.0f,  0.0f, -1.0f,  0.0f,  0.0f,
 
-					-0.5f, -0.5f,  0.5f,  0.0f,  0.0f, 1.0f,
-					 0.5f, -0.5f,  0.5f,  0.0f,  0.0f, 1.0f,
-					 0.5f,  0.5f,  0.5f,  0.0f,  0.0f, 1.0f,
-					 0.5f,  0.5f,  0.5f,  0.0f,  0.0f, 1.0f,
-					-0.5f,  0.5f,  0.5f,  0.0f,  0.0f, 1.0f,
-					-0.5f, -0.5f,  0.5f,  0.0f,  0.0f, 1.0f,
+				-0.5f, -0.5f,  0.5f,  0.0f,  0.0f,  1.0f,  0.0f,  0.0f,
+				 0.5f, -0.5f,  0.5f,  0.0f,  0.0f,  1.0f,  1.0f,  0.0f,
+				 0.5f,  0.5f,  0.5f,  0.0f,  0.0f,  1.0f,  1.0f,  1.0f,
+				 0.5f,  0.5f,  0.5f,  0.0f,  0.0f,  1.0f,  1.0f,  1.0f,
+				-0.5f,  0.5f,  0.5f,  0.0f,  0.0f,  1.0f,  0.0f,  1.0f,
+				-0.5f, -0.5f,  0.5f,  0.0f,  0.0f,  1.0f,  0.0f,  0.0f,
 
-					-0.5f,  0.5f,  0.5f, -1.0f,  0.0f,  0.0f,
-					-0.5f,  0.5f, -0.5f, -1.0f,  0.0f,  0.0f,
-					-0.5f, -0.5f, -0.5f, -1.0f,  0.0f,  0.0f,
-					-0.5f, -0.5f, -0.5f, -1.0f,  0.0f,  0.0f,
-					-0.5f, -0.5f,  0.5f, -1.0f,  0.0f,  0.0f,
-					-0.5f,  0.5f,  0.5f, -1.0f,  0.0f,  0.0f,
+				-0.5f,  0.5f,  0.5f, -1.0f,  0.0f,  0.0f,  1.0f,  0.0f,
+				-0.5f,  0.5f, -0.5f, -1.0f,  0.0f,  0.0f,  1.0f,  1.0f,
+				-0.5f, -0.5f, -0.5f, -1.0f,  0.0f,  0.0f,  0.0f,  1.0f,
+				-0.5f, -0.5f, -0.5f, -1.0f,  0.0f,  0.0f,  0.0f,  1.0f,
+				-0.5f, -0.5f,  0.5f, -1.0f,  0.0f,  0.0f,  0.0f,  0.0f,
+				-0.5f,  0.5f,  0.5f, -1.0f,  0.0f,  0.0f,  1.0f,  0.0f,
 
-					 0.5f,  0.5f,  0.5f,  1.0f,  0.0f,  0.0f,
-					 0.5f,  0.5f, -0.5f,  1.0f,  0.0f,  0.0f,
-					 0.5f, -0.5f, -0.5f,  1.0f,  0.0f,  0.0f,
-					 0.5f, -0.5f, -0.5f,  1.0f,  0.0f,  0.0f,
-					 0.5f, -0.5f,  0.5f,  1.0f,  0.0f,  0.0f,
-					 0.5f,  0.5f,  0.5f,  1.0f,  0.0f,  0.0f,
+				 0.5f,  0.5f,  0.5f,  1.0f,  0.0f,  0.0f,  1.0f,  0.0f,
+				 0.5f,  0.5f, -0.5f,  1.0f,  0.0f,  0.0f,  1.0f,  1.0f,
+				 0.5f, -0.5f, -0.5f,  1.0f,  0.0f,  0.0f,  0.0f,  1.0f,
+				 0.5f, -0.5f, -0.5f,  1.0f,  0.0f,  0.0f,  0.0f,  1.0f,
+				 0.5f, -0.5f,  0.5f,  1.0f,  0.0f,  0.0f,  0.0f,  0.0f,
+				 0.5f,  0.5f,  0.5f,  1.0f,  0.0f,  0.0f,  1.0f,  0.0f,
 
-					-0.5f, -0.5f, -0.5f,  0.0f, -1.0f,  0.0f,
-					 0.5f, -0.5f, -0.5f,  0.0f, -1.0f,  0.0f,
-					 0.5f, -0.5f,  0.5f,  0.0f, -1.0f,  0.0f,
-					 0.5f, -0.5f,  0.5f,  0.0f, -1.0f,  0.0f,
-					-0.5f, -0.5f,  0.5f,  0.0f, -1.0f,  0.0f,
-					-0.5f, -0.5f, -0.5f,  0.0f, -1.0f,  0.0f,
+				-0.5f, -0.5f, -0.5f,  0.0f, -1.0f,  0.0f,  0.0f,  1.0f,
+				 0.5f, -0.5f, -0.5f,  0.0f, -1.0f,  0.0f,  1.0f,  1.0f,
+				 0.5f, -0.5f,  0.5f,  0.0f, -1.0f,  0.0f,  1.0f,  0.0f,
+				 0.5f, -0.5f,  0.5f,  0.0f, -1.0f,  0.0f,  1.0f,  0.0f,
+				-0.5f, -0.5f,  0.5f,  0.0f, -1.0f,  0.0f,  0.0f,  0.0f,
+				-0.5f, -0.5f, -0.5f,  0.0f, -1.0f,  0.0f,  0.0f,  1.0f,
 
-					-0.5f,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f,
-					 0.5f,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f,
-					 0.5f,  0.5f,  0.5f,  0.0f,  1.0f,  0.0f,
-					 0.5f,  0.5f,  0.5f,  0.0f,  1.0f,  0.0f,
-					-0.5f,  0.5f,  0.5f,  0.0f,  1.0f,  0.0f,
-					-0.5f,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f
+				-0.5f,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f,  0.0f,  1.0f,
+				 0.5f,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f,  1.0f,  1.0f,
+				 0.5f,  0.5f,  0.5f,  0.0f,  1.0f,  0.0f,  1.0f,  0.0f,
+				 0.5f,  0.5f,  0.5f,  0.0f,  1.0f,  0.0f,  1.0f,  0.0f,
+				-0.5f,  0.5f,  0.5f,  0.0f,  1.0f,  0.0f,  0.0f,  0.0f,
+				-0.5f,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f,  0.0f,  1.0f
 			};
 			
 			BufferLayout CubeBufferLayout = {
 				{ShaderDataType::vec3, "a_Position", 0},
-				{ShaderDataType::vec3, "a_Normal", 1}
+				{ShaderDataType::vec3, "a_Normal", 1},
+				{ShaderDataType::vec2, "a_UV", 2}
 			};
 			s_Data.CubeVertexArray = std::make_shared<VertexArray>();
-			s_Data.CubeVertexBuffer = std::make_shared<VertexBuffer>(skyboxVertices, 216 * sizeof(float), CubeBufferLayout);
+			s_Data.CubeVertexBuffer = std::make_shared<VertexBuffer>(skyboxVertices, 288 * sizeof(float), CubeBufferLayout);
 			s_Data.CubeVertexArray->AddVertexBuffer(s_Data.CubeVertexBuffer);
 
 			BufferLayout QuadBufferLayout = {
@@ -128,12 +131,12 @@ namespace AnorEngine
 
 			
 			//Loading the shaders into the ShaderLibrary.
-			ShaderLibrary::LoadShader("2DBackgroundShader", solutionDir + "AnorEngine\\Assets\\Shaders\\2DBackgroundShader.shader");
-			ShaderLibrary::LoadShader("TextureShader", solutionDir + "AnorEngine\\Assets\\Shaders\\2DTextureShader.shader");
-			s_Data.SkyboxShader = ShaderLibrary::LoadShader("CubemapShader", solutionDir + "AnorEngine\\Assets\\Shaders\\CubemapShader.shader");
-			s_Data.QuadShader = ShaderLibrary::LoadShader("2DShader", solutionDir + "AnorEngine\\Assets\\Shaders\\2DShader.shader");
-			s_Data.CubeShader = ShaderLibrary::LoadShader("CubeShader", solutionDir + "AnorEngine\\Assets\\Shaders\\CubeShader.shader");
-			s_Data.LightCubeShader = ShaderLibrary::LoadShader("LightCubeShader", solutionDir + "AnorEngine\\Assets\\Shaders\\LightCubeShader.shader");
+			ShaderLibrary::LoadShader("2DBackgroundShader", std::string(__SOLUTION_DIR) + "AnorEngine\\Assets\\Shaders\\2DBackgroundShader.shader");
+			ShaderLibrary::LoadShader("TextureShader", std::string(__SOLUTION_DIR) + "AnorEngine\\Assets\\Shaders\\2DTextureShader.shader");
+			s_Data.SkyboxShader = ShaderLibrary::LoadShader("CubemapShader", std::string(__SOLUTION_DIR) + "AnorEngine\\Assets\\Shaders\\CubemapShader.shader");
+			s_Data.QuadShader = ShaderLibrary::LoadShader("2DShader", std::string(__SOLUTION_DIR) + "AnorEngine\\Assets\\Shaders\\2DShader.shader");
+			s_Data.CubeShader = ShaderLibrary::LoadShader("CubeShader", std::string(__SOLUTION_DIR) + "AnorEngine\\Assets\\Shaders\\CubeShader.shader");
+			s_Data.LightCubeShader = ShaderLibrary::LoadShader("LightCubeShader", std::string(__SOLUTION_DIR) + "AnorEngine\\Assets\\Shaders\\LightCubeShader.shader");
 
 			int samplers[s_Data.MaxTextureSlots];
 			for (uint32_t i = 0; i < s_Data.MaxTextureSlots; i++)
@@ -163,17 +166,17 @@ namespace AnorEngine
 
 			//Creating and adding a white texture. This is basically used when we only want to render a quad with its color. In that case, we multiply the color values with this white texture meaning 1. Therefore 
 			//getting the original colors on the screen.
-			s_Data.WhiteTexture = std::make_shared<Texture>(solutionDir + "AnorEngine\\Assets\\Textures\\WhiteTexture.PNG"); //TODO: Create this texture without a using a PNG.
+			s_Data.WhiteTexture = std::make_shared<Texture>(std::string(__SOLUTION_DIR) + "AnorEngine\\Assets\\Textures\\WhiteTexture.PNG"); //TODO: Create this texture without a using a PNG.
 			s_Data.TextureSlots[0] = s_Data.WhiteTexture;
 
 			std::vector<std::string> cubeMapFaces
 			{
-				solutionDir + "AnorEngine\\Assets\\Textures\\Skyboxes\\skybox\\left.jpg",
-				solutionDir + "AnorEngine\\Assets\\Textures\\Skyboxes\\skybox\\right.jpg",
-				solutionDir + "AnorEngine\\Assets\\Textures\\Skyboxes\\skybox\\top.jpg",
-				solutionDir + "AnorEngine\\Assets\\Textures\\Skyboxes\\skybox\\bottom.jpg",
-				solutionDir + "AnorEngine\\Assets\\Textures\\Skyboxes\\skybox\\front.jpg",
-				solutionDir + "AnorEngine\\Assets\\Textures\\Skyboxes\\skybox\\back.jpg"
+				std::string(__SOLUTION_DIR) + "AnorEngine\\Assets\\Textures\\Skyboxes\\skybox\\left.jpg",
+				std::string(__SOLUTION_DIR) + "AnorEngine\\Assets\\Textures\\Skyboxes\\skybox\\right.jpg",
+				std::string(__SOLUTION_DIR) + "AnorEngine\\Assets\\Textures\\Skyboxes\\skybox\\top.jpg",
+				std::string(__SOLUTION_DIR) + "AnorEngine\\Assets\\Textures\\Skyboxes\\skybox\\bottom.jpg",
+				std::string(__SOLUTION_DIR) + "AnorEngine\\Assets\\Textures\\Skyboxes\\skybox\\front.jpg",
+				std::string(__SOLUTION_DIR) + "AnorEngine\\Assets\\Textures\\Skyboxes\\skybox\\back.jpg"
 			};
 
 			
@@ -186,13 +189,23 @@ namespace AnorEngine
 			s_Data.QuadVertexPositions[2] = {  0.5f,  0.5f, 0.0f, 1.0f };
 			s_Data.QuadVertexPositions[3] = { -0.5f,  0.5f, 0.0f, 1.0f };
 		}
-		void Renderer2D::SetPointLightPosition(const glm::vec3& position)
+		void Renderer2D::SetPointLightCount(int count)
 		{
-			s_Data.CubeShader->UploadFloat3("pointLightPos", position);
+			s_Data.PointLightCount = count;
 		}
-		void Renderer2D::SetPointLightColor(const glm::vec4& color)
+		void Renderer2D::SetPointLightInShader(const TransformComponent& tc, const MeshRendererComponent& mc, int index)
 		{
-			s_Data.CubeShader->UploadFloat4("pointLightColor", color);
+			s_Data.CubeShader->enable();
+			s_Data.CubeShader->UploadFloat4("pointLights[" + std::to_string(index) + "].color", mc.Color);
+			s_Data.CubeShader->UploadFloat3("pointLights[" + std::to_string(index) + "].position", tc.Translation);
+			s_Data.CubeShader->UploadFloat("pointLights[" + std::to_string(index) + "].constant", 1.0f);
+			s_Data.CubeShader->UploadFloat("pointLights[" + std::to_string(index) + "].Linear", 0.09f);
+			s_Data.CubeShader->UploadFloat("pointLights[" + std::to_string(index) + "].quadratic", 0.032f);
+			s_Data.CubeShader->UploadFloat("pointLights[" + std::to_string(index) + "].intensity", mc.Material.Properties.Intensity);
+			s_Data.CubeShader->UploadFloat3("pointLights[" + std::to_string(index) + "].ambient", { 0.2f, 0.2f, 0.2f });
+			s_Data.CubeShader->UploadFloat3("pointLights[" + std::to_string(index) + "].diffuse", { 0.5f, 0.5f, 0.5f }); // darken diffuse light a bit
+			s_Data.CubeShader->UploadFloat3("pointLights[" + std::to_string(index) + "].specular", glm::vec3(mc.Material.Properties.Specular));
+			s_Data.CubeShader->disable();
 		}
 		void Renderer2D::DrawPrimitive(const Ref<VertexArray> vertexArray, const Ref<Shader> shader, const glm::mat4& modelMatrix, const glm::vec4& color, const Ref<Texture> texture)
 		{
@@ -215,32 +228,34 @@ namespace AnorEngine
 			vertexArray->Unbind();
 			shader->disable();
 		}
-		void Renderer2D::DrawCube(const TransformComponent& tc, const MeshRendererComponent& mc)
+		void Renderer2D::DrawCube(const TransformComponent& tc, const MeshRendererComponent& mc, const TagComponent& tagc)
 		{
-
-
+			mc.Texture->Bind(s_Data.TextureSlotIndex);
 			mc.Material.Shader->enable();
+			mc.Material.Shader->UploadInteger("u_Sampler", s_Data.TextureSlotIndex);
 
 			mc.Material.Shader->UploadMat4("u_Transform", tc.GetTransform());
 			mc.Material.Shader->UploadMat4("u_ViewProjMat", s_EditorCamera->GetViewProjectionMatrix());
+
 			mc.Material.Shader->UploadFloat4("u_Color", mc.Color);
 			mc.Material.Shader->UploadInteger("u_EntityID", tc.EntityID);
 			mc.Material.Shader->UploadFloat3("cameraPos", s_EditorCamera->GetPosition());
-			mc.Material.Shader->UploadFloat3("material.ambient", { mc.Material.Properties.Ambient, mc.Material.Properties.Ambient, mc.Material.Properties.Ambient });
-			mc.Material.Shader->UploadFloat3("material.diffuse", { mc.Material.Properties.Diffuse, mc.Material.Properties.Diffuse, mc.Material.Properties.Diffuse });
-			mc.Material.Shader->UploadFloat3("material.specular", { mc.Material.Properties.Specular, mc.Material.Properties.Specular, mc.Material.Properties.Specular });
+
+			mc.Material.Shader->UploadInteger("pointLightCount", s_Data.PointLightCount);
+
+			mc.Material.Shader->UploadFloat3("material.ambient", glm::vec3(mc.Material.Properties.Ambient));
+			mc.Material.Shader->UploadFloat3("material.diffuse", glm::vec3(mc.Material.Properties.Diffuse));
+			mc.Material.Shader->UploadFloat3("material.specular", glm::vec3(mc.Material.Properties.Specular));
 			mc.Material.Shader->UploadFloat("material.shininess", mc.Material.Properties.Shininess);
 			mc.Material.Shader->UploadFloat("material.metalness", mc.Material.Properties.Metalness);
-			mc.Material.Shader->UploadFloat3("lightIntensity.ambient", { 0.2f, 0.2f, 0.2f });
-			mc.Material.Shader->UploadFloat3("lightIntensity.diffuse", { 0.5f, 0.5f, 0.5f }); // darken diffuse light a bit
-			mc.Material.Shader->UploadFloat3("lightIntensity.specular", { 1.0f, 1.0f, 1.0f });
+			
 
-			//s_Data.CubeShader->enable();
 			s_Data.CubeVertexArray->Bind();
 			glDrawArrays(GL_TRIANGLES, 0, 36);
 
 			s_Data.CubeVertexArray->Unbind();
 			mc.Material.Shader->disable();
+			mc.Texture->Unbind();
 		}
 		void Renderer2D::DrawSkybox()
 		{

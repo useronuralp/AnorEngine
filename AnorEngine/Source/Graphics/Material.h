@@ -11,6 +11,7 @@ namespace AnorEngine
 			float		Specular = 1.0f;
 			float		Shininess = 100.0f;
 			float		Metalness = 0.0f;
+			float		Intensity = 1.0f;
 		};
 		struct ANOR_API Material
 		{

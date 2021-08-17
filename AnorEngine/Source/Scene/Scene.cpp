@@ -26,19 +26,22 @@ namespace AnorEngine
 		glClearTexImage(4, 0, GL_RED_INTEGER, GL_INT, &clearValue);
 
 		auto view = m_Registry.view<TransformComponent, MeshRendererComponent, TagComponent>();
+		int PointLightCount = 0;
 		for (auto& entity : view)
 		{
-
 			auto [transformComponent, meshRendererComponent, tagComponent] = view.get<TransformComponent, MeshRendererComponent, TagComponent>(entity);
-			if (tagComponent.Tag == "Point Light" || tagComponent.Tag == "PointLight")
+			if (tagComponent.Tag == "PointLight" || tagComponent.Tag == "Point Light")
 			{
-				//WARNING : This could be buggy
-				//TODO : Send renderer a material object instead of this scuffed thing.
-				Graphics::Renderer2D::SetPointLightPosition(transformComponent.Translation);
-				Graphics::Renderer2D::SetPointLightColor(meshRendererComponent.Color);
+				Graphics::Renderer2D::SetPointLightInShader(transformComponent, meshRendererComponent, PointLightCount);
+				PointLightCount++;
 			}
+		}
+		Graphics::Renderer2D::SetPointLightCount(PointLightCount);
 
-			Graphics::Renderer2D::DrawCube(transformComponent, meshRendererComponent);
+		for (auto& entity : view)
+		{
+			auto [transformComponent, meshRendererComponent, tagComponent] = view.get<TransformComponent, MeshRendererComponent, TagComponent>(entity);
+			Graphics::Renderer2D::DrawCube(transformComponent, meshRendererComponent, tagComponent);
 		}
 
 		Graphics::Renderer2D::EndScene();

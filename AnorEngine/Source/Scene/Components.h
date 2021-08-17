@@ -38,8 +38,7 @@ namespace AnorEngine
 	struct ANOR_API SpriteRendererComponent
 	{
 		glm::vec4 Color { 1.0f, 1.0f, 1.0f, 1.0f };
-		std::string solutionDir = __SOLUTION_DIR;
-		Ref<Graphics::Texture> Texture = std::make_shared<Graphics::Texture>(solutionDir + "AnorEngine\\Assets\\Textures\\WhiteTexture.PNG");
+		Ref<Graphics::Texture> Texture = std::make_shared<Graphics::Texture>(std::string(__SOLUTION_DIR) + "AnorEngine\\Assets\\Textures\\WhiteTexture.PNG"); //default texture
 		glm::vec2 TextureSize = {1.0f, 1.0f};
 		glm::vec2 SubTextureOffset = { 1.0f, 1.0f };
 		glm::vec2 SubTextureDimensions = { Texture->GetHeight(), Texture->GetWidth() }; //default
@@ -59,10 +58,13 @@ namespace AnorEngine
 	{
 		glm::vec4 Color{ 1.0f, 1.0f, 1.0f, 1.0f };
 		Graphics::Material Material;
-		
+		Ref<Graphics::Texture> Texture = std::make_shared<Graphics::Texture>(std::string(__SOLUTION_DIR) + "AnorEngine\\Assets\\Textures\\WhiteTexture.PNG"); //default texture
+
 		MeshRendererComponent() = default;
 		MeshRendererComponent(Graphics::Material material)
 			:Material(material){}
+		MeshRendererComponent(Graphics::Material material, const Ref<Graphics::Texture>& texture)
+			:Material(material), Texture(texture) {}
 		MeshRendererComponent(glm::vec4 color, Graphics::Material material)
 			:Color(color), Material(material){}
 

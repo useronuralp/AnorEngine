@@ -69,9 +69,8 @@ namespace AnorEngine
 	}
 	SceneHierarchyPanel::SceneHierarchyPanel(const Ref<Scene>& scene)
 	{
-		std::string solutionDir = __SOLUTION_DIR;
-		m_PlayButtonTexture = std::make_shared<Graphics::Texture>(solutionDir + "AnorEngine\\Assets\\Textures\\play.png");
-		m_PauseButtonTexture = std::make_shared<Graphics::Texture>(solutionDir + "AnorEngine\\Assets\\Textures\\pause.png");
+		m_PlayButtonTexture = std::make_shared<Graphics::Texture>(std::string(__SOLUTION_DIR) + "AnorEngine\\Assets\\Textures\\play.png");
+		m_PauseButtonTexture = std::make_shared<Graphics::Texture>(std::string(__SOLUTION_DIR) + "AnorEngine\\Assets\\Textures\\pause.png");
 		SetContext(scene);
 	}
 	void SceneHierarchyPanel::SetContext(const Ref<Scene>& scene)
@@ -135,14 +134,25 @@ namespace AnorEngine
 			component.Rotation = glm::radians(rotationDegree);
 			DrawVec3Control("Scale", component.Scale, 0.1f, 1.0f);
 		});
-		DrawComponent<MeshRendererComponent>("Mesh Renderer", entity, [](auto& component)
+		DrawComponent<MeshRendererComponent>("Mesh Renderer", entity, [&entity](auto& component)
 		{
-			ImGui::ColorEdit4("Color", glm::value_ptr(component.Color));
-			ImGui::DragFloat("Ambient", &component.Material.Properties.Ambient, 0.01f, 0.0f, 1.0f);
-			ImGui::DragFloat("Diffuse", &component.Material.Properties.Diffuse, 0.01f, 0.0f, 1.0f);
-			ImGui::DragFloat("Specular", &component.Material.Properties.Specular, 0.01f, 0.0f, 1.0f);
-			ImGui::DragFloat("Shininess", &component.Material.Properties.Shininess);
-			ImGui::DragFloat("Metalness", &component.Material.Properties.Metalness, 0.01f, 0.0f, 1.0f);
+
+			auto& tagComponent = entity.GetComponent<TagComponent>();
+			if (tagComponent.Tag == "Point Light" || tagComponent.Tag == "PointLight")
+			{
+				ImGui::ColorEdit4("Color", glm::value_ptr(component.Color));
+				ImGui::DragFloat("Intensity", &component.Material.Properties.Intensity, 0.05f, 0.0f, 1.0f);
+				ImGui::DragFloat("Specular", &component.Material.Properties.Specular, 0.01f, 0.0f, 1.0f);
+			}
+			else
+			{
+				ImGui::ColorEdit4("Color", glm::value_ptr(component.Color));
+				ImGui::DragFloat("Ambient", &component.Material.Properties.Ambient, 0.01f, 0.0f, 1.0f);
+				ImGui::DragFloat("Diffuse", &component.Material.Properties.Diffuse, 0.01f, 0.0f, 1.0f);
+				ImGui::DragFloat("Specular", &component.Material.Properties.Specular, 0.01f, 0.0f, 1.0f);
+				ImGui::DragFloat("Shininess", &component.Material.Properties.Shininess, 1.0f, 1.0f, 100.0f);
+				ImGui::DragFloat("Metalness", &component.Material.Properties.Metalness, 0.01f, 0.0f, 1.0f);
+			}
 
 
 		});
@@ -245,12 +255,16 @@ namespace AnorEngine
 			if (ImGui::MenuItem("Cube"))
 			{
 				Graphics::Material defaultMaterial(Graphics::ShaderLibrary::GetShader("CubeShader"));
-				m_Context->CreateEntity().AddComponent<MeshRendererComponent>(defaultMaterial);
+				auto entity = m_Context->CreateEntity();
+				Ref<Graphics::Texture> texture = std::make_shared<Graphics::Texture>(std::string(__SOLUTION_DIR) + "AnorEngine\\Assets\\Textures\\381f5a63791945.5abc4ccf1297d.png");
+				entity.AddComponent<MeshRendererComponent>(defaultMaterial, texture);
+				entity.GetComponent<TagComponent>().Tag = "Cube";
 			}
 			if (ImGui::MenuItem("Cube Light"))
 			{
 				Graphics::Material defaultMaterial (Graphics::ShaderLibrary::GetShader("LightCubeShader"));
 				auto entity = m_Context->CreateEntity();
+				entity.GetComponent<TransformComponent>().Scale = { 0.1f, 0.1f, 0.1f };
 				entity.AddComponent<MeshRendererComponent>(defaultMaterial);
 				entity.GetComponent<TagComponent>().Tag = "Point Light";
 			}

@@ -36,6 +36,5 @@ namespace AnorEngine {
             void Draw(const Ref<Shader> shader, const Ref<PerspectiveCamera> camera);
             inline glm::mat4& getModelMatrix() { return modelMatrix; }
         };
-
     }
 }

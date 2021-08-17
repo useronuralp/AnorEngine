@@ -8,17 +8,16 @@ namespace AnorEngine
 		bool			    m_IsRuntime = false;
 		Ref<EditorCamera>   m_EditorCamera;
 		glm::vec4			m_Color = { 1,1,1,1 };
-		std::string			solutionDir = __SOLUTION_DIR;
 		Ref<Scene>			m_Scene = std::make_shared<Scene>();
 		//Entity1----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 		Ref<Entity>			m_Entity1 = std::make_shared<Entity>(m_Scene->CreateEntity("Diamonds"));
-		Ref<Texture>		m_Entity1TextureAtlas = std::make_shared<Texture>(solutionDir + "AnorEngine\\Assets\\Textures\\PlatformerTextures\\Tilesheet\\platformPack_tilesheet@2.png");
+		Ref<Texture>		m_Entity1TextureAtlas = std::make_shared<Texture>(std::string(__SOLUTION_DIR) + "AnorEngine\\Assets\\Textures\\PlatformerTextures\\Tilesheet\\platformPack_tilesheet@2.png");
 		//Entity2----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 		Ref<Entity>			m_Entity2 = std::make_shared<Entity>(m_Scene->CreateEntity("Block"));
-		Ref<Texture>		m_Entity2_Texture = std::make_shared<Texture>(solutionDir + "AnorEngine\\Assets\\Textures\\381f5a63791945.5abc4ccf1297d.png");
+		Ref<Texture>		m_Entity2_Texture = std::make_shared<Texture>(std::string(__SOLUTION_DIR) + "AnorEngine\\Assets\\Textures\\381f5a63791945.5abc4ccf1297d.png");
 		//Entity3----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 		Ref<Entity>			m_Entity3 = std::make_shared<Entity>(m_Scene->CreateEntity("Player"));
-		Ref<Texture>		m_Entity3TextureAtlas = std::make_shared<Texture>(solutionDir + "AnorEngine\\Assets\\Textures\\PlatformerTextures\\Tilesheet\\platformerPack_character@2.png");
+		Ref<Texture>		m_Entity3TextureAtlas = std::make_shared<Texture>(std::string(__SOLUTION_DIR) + "AnorEngine\\Assets\\Textures\\PlatformerTextures\\Tilesheet\\platformerPack_character@2.png");
 		//-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 		Ref<Entity>			m_CameraEntity = std::make_shared<Entity>(m_Scene->CreateEntity("Camera"));
 	public:

@@ -26,9 +26,8 @@ namespace AnorEngine
 			style.Colors[ImGuiCol_WindowBg].w = 1.0f;
 		}
 
-		std::string solutionDir = __SOLUTION_DIR;
-		io.Fonts->AddFontFromFileTTF((solutionDir + "AnorEngine\\Assets\\Fonts\\OpenSans\\OpenSans-ExtraBold.ttf").c_str(), 21.0f);
-		io.FontDefault = io.Fonts->AddFontFromFileTTF((solutionDir + "AnorEngine\\Assets\\Fonts\\OpenSans\\OpenSans-Regular.ttf").c_str(), 21.0f);
+		io.Fonts->AddFontFromFileTTF((std::string(__SOLUTION_DIR) + "AnorEngine\\Assets\\Fonts\\OpenSans\\OpenSans-ExtraBold.ttf").c_str(), 21.0f);
+		io.FontDefault = io.Fonts->AddFontFromFileTTF((std::string(__SOLUTION_DIR) + "AnorEngine\\Assets\\Fonts\\OpenSans\\OpenSans-Regular.ttf").c_str(), 21.0f);
 
 		Application& app = Application::Get();
 		GLFWwindow* window = static_cast<GLFWwindow*>(app.GetOpenGLWindow()->GetNativeWindow());

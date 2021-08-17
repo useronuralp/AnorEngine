@@ -30,7 +30,6 @@ namespace Game
 		bool							  m_IsRuntime = false; 
 		int								  m_HoveredPixel = -1;
 		std::vector<ProfileResult>		  m_ProfileResults;
-		std::string					      solutionDir = __SOLUTION_DIR;
 	public:
 		AnorEditor(const char* appName)
 			:Application(appName), m_OrthoCamera(std::make_shared<OrthographicCamera>(-1280.0f / 720.0f * (5), 1280.0f / 720.0f * (5), -1 * (5), 1 * (5))), m_PersCamera(std::make_shared<PerspectiveCamera>(1280, 720))

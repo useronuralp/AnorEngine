@@ -10,8 +10,7 @@ namespace Game
 	class ExampleLayer : public Layer
 	{
 		glm::vec4 m_Color = { 0,1,1,1 };
-		std::string solutionDir = __SOLUTION_DIR;
-		Ref<Texture> m_TextureAtlas = std::make_shared<Texture>(solutionDir + "AnorEngine\\Assets\\Textures\\PlatformerTextures\\Tilesheet\\platformPack_tilesheet@2.png");;
+		Ref<Texture> m_TextureAtlas = std::make_shared<Texture>(std::string(__SOLUTION_DIR) + "AnorEngine\\Assets\\Textures\\PlatformerTextures\\Tilesheet\\platformPack_tilesheet@2.png");;
 	public:
 		virtual void OnUpdate(float deltaTime) override
 		{	
@@ -34,8 +33,7 @@ namespace Game
 	{
 	private:
 		glm::vec4 m_Color = { 0,1,0,1 };
-		std::string solutionDir = __SOLUTION_DIR;
-		Ref<Texture> m_Texture = std::make_shared<Texture>(solutionDir + "AnorEngine\\Assets\\Textures\\381f5a63791945.5abc4ccf1297d.png");
+		Ref<Texture> m_Texture = std::make_shared<Texture>(std::string(__SOLUTION_DIR) + "AnorEngine\\Assets\\Textures\\381f5a63791945.5abc4ccf1297d.png");
 	public:
 		virtual void OnUpdate(float deltaTime) override
 		{	
@@ -60,8 +58,7 @@ namespace Game
 		glm::vec4		 m_QuadColor = { 1,0,0,1 };
 		glm::vec3		 m_QuadPosition = { 2.0f, 3.0f, 0.0f };
 		float			 m_QuadMoveSpeed = 5.0f;
-		std::string solutionDir = __SOLUTION_DIR;
-		Ref<Texture> m_CharacterTextureAtlas = std::make_shared<Texture>(solutionDir + "AnorEngine\\Assets\\Textures\\PlatformerTextures\\Tilesheet\\platformerPack_character@2.png");;
+		Ref<Texture> m_CharacterTextureAtlas = std::make_shared<Texture>(std::string(__SOLUTION_DIR) + "AnorEngine\\Assets\\Textures\\PlatformerTextures\\Tilesheet\\platformerPack_character@2.png");;
 	public:
 		virtual void OnUpdate(float deltaTime) override
 		{
@@ -111,11 +108,10 @@ namespace Game
 	public:
 		Background()
 		{
-			std::string solutionDir = __SOLUTION_DIR;
 			m_BgModelMatrix = glm::scale(m_BgModelMatrix, {12.0f, 12.0f , 1.0f });
 			m_BgVAO = std::make_shared<VertexArray>();
 			m_BgShader = ShaderLibrary::GetShader("2DBackgroundShader");
-			m_BgTexture = std::make_shared<Texture>(solutionDir + "AnorEngine\\Assets\\Textures\\retro.png");
+			m_BgTexture = std::make_shared<Texture>(std::string(__SOLUTION_DIR) + "AnorEngine\\Assets\\Textures\\retro.png");
 		}
 		virtual void OnAttach() override
 		{
@@ -151,12 +147,11 @@ namespace Game
 		bool							  dockspaceOpen  = true;
 		std::vector<ProfileResult>		  m_ProfileResults;
 		//--------------------------------------------------------------------
-		std::string solutionDir = __SOLUTION_DIR;
 	public:
 		SandboxApp2D()
 			:m_OrthoCamera(std::make_shared<OrthographicCamera>(-1280.0f / 720.0f * (5), 1280.0f / 720.0f * (5), -1 * (5), 1 * (5))), m_PersCamera(std::make_shared<PerspectiveCamera>(1280, 720))
 		{	
-			m_CheckerboardTexture = std::make_shared<Texture>(solutionDir + "AnorEngine\\Assets\\Textures\\checkerboard.jpg");
+			m_CheckerboardTexture = std::make_shared<Texture>(std::string(__SOLUTION_DIR) + "AnorEngine\\Assets\\Textures\\checkerboard.jpg");
 			Input::EventHandler::SetTargetApplication(this); //Important to set this to the active Application else, you won't get your input processed.		
 			m_ImGuiBase->Init(); // Need to call the initialization code for imgui here.
 			m_OrthoGraphicCameraController = std::make_shared<OrthographicCameraController>(m_OrthoCamera, (1280.0f / 720.0f));	

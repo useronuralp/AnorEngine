@@ -1,0 +1,66 @@
+Scene: Untitled
+Entities:
+  - Entity: 12837192831273
+    TagComponent:
+      Tag: Point Light
+    TransformComponent:
+      Translation: [-0.620000005, -0.0399999991, 0.529999971]
+      Rotation: [0, 0, 0]
+      Scale: [0.0500000007, 0.0500000007, 0.0500000007]
+    MeshRendererComponent:
+      Color: [1, 1, 1, 1]
+      Shader: LightCubeShader
+      Ambient: 1
+      Diffuse: 1
+      Specular: 1
+      Shininess: 100
+      Metalness: 0
+      Intensity: 1
+  - Entity: 12837192831273
+    TagComponent:
+      Tag: Point Light
+    TransformComponent:
+      Translation: [-0.949999988, 0.949999988, 0]
+      Rotation: [0, 0, 0]
+      Scale: [0.100000001, 0.100000001, 0.100000001]
+    MeshRendererComponent:
+      Color: [1, 1, 1, 1]
+      Shader: LightCubeShader
+      Ambient: 1
+      Diffuse: 1
+      Specular: 1
+      Shininess: 100
+      Metalness: 0
+      Intensity: 1
+  - Entity: 12837192831273
+    TagComponent:
+      Tag: Unnamed Entity
+    TransformComponent:
+      Translation: [-0.899999976, 0, 0]
+      Rotation: [0.314159274, -0.191986218, 1.55334306]
+      Scale: [1, 1, 1]
+    MeshRendererComponent:
+      Color: [1, 1, 1, 1]
+      Shader: CubeShader
+      Ambient: 0
+      Diffuse: 1
+      Specular: 1
+      Shininess: 100
+      Metalness: 0
+      Intensity: 1
+  - Entity: 12837192831273
+    TagComponent:
+      Tag: Point Light
+    TransformComponent:
+      Translation: [-0.310000002, 0, 0]
+      Rotation: [0, 0, 0]
+      Scale: [0.0500000007, 0.0500000007, 0.0500000007]
+    MeshRendererComponent:
+      Color: [1, 1, 1, 1]
+      Shader: LightCubeShader
+      Ambient: 1
+      Diffuse: 1
+      Specular: 0.800000012
+      Shininess: 100
+      Metalness: 0
+      Intensity: 0.5

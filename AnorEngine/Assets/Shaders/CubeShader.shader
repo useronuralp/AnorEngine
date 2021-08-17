@@ -4,6 +4,7 @@
 //Attributes
 layout(location = 0) in vec3 a_Position;
 layout(location = 1) in vec3 a_Normal;
+layout(location = 2) in vec2 a_UV;
 
 //Custom variables
 
@@ -12,6 +13,7 @@ layout(location = 1) in vec3 a_Normal;
 out vec3 Normal;
 out vec3 Position;
 out flat int v_EntityID;
+out vec2 v_UV;
 
 //Uniforms
 uniform mat4 u_Transform = mat4(1.0);
@@ -20,6 +22,7 @@ uniform int u_EntityID;
 
 void main()
 {
+	v_UV = a_UV;
 	Normal = mat3(transpose(inverse(u_Transform))) * a_Normal;
 	Position = vec3(u_Transform * vec4(a_Position, 1.0));
 	gl_Position = (u_ViewProjMat * u_Transform) * vec4(a_Position, 1.0);
@@ -28,6 +31,8 @@ void main()
 
 #type fragment
 #version 450 core
+//There is a limit to this define number in glsl.
+#define MAX_POINT_LIGHT_NUMBER 100 
 
 
 //Attributes
@@ -43,9 +48,16 @@ struct Material {
 	float metalness;
 };
 
-struct LightIntensity {
-	vec3 position;
+struct PointLight {
 
+	float constant;
+	float Linear;
+	float quadratic;
+
+	float intensity;
+
+	vec4 color;
+	vec3 position;
 	vec3 ambient;
 	vec3 diffuse;
 	vec3 specular;
@@ -56,17 +68,47 @@ struct LightIntensity {
 in flat int v_EntityID;
 in vec3 Normal;
 in vec3 Position;
+in vec2 v_UV;
 
 //Uniforms
 uniform vec3 cameraPos;
 uniform samplerCube skybox;
 uniform vec4 u_Color;
-uniform LightIntensity lightIntensity;
+uniform PointLight pointLights[MAX_POINT_LIGHT_NUMBER];
+uniform int pointLightCount;
 uniform Material material;
-uniform vec3 pointLightPos;
-uniform vec4 pointLightColor;
 uniform vec3 directionalLightColor;
 uniform vec3 directionalLight;
+uniform sampler2D u_Sampler;
+
+vec3 CalcPointLight(PointLight light, vec3 Normal, vec3 FragPosition, vec3 viewDir)
+{
+
+	// ambient    //intensity
+	vec3 ambient = light.ambient * vec3(light.color) * material.ambient;
+
+	// diffuse 
+	vec3 norm = normalize(Normal);
+	vec3 lightDir = normalize(light.position - FragPosition);
+	float diff = max(dot(norm, lightDir), 0.0);
+	vec3 diffuse = light.diffuse * vec3(light.color) * diff * material.diffuse;
+
+	// specular
+	vec3 reflectDir = reflect(-lightDir, norm);
+	float spec = pow(max(dot(viewDir, reflectDir), 0.0), material.shininess);
+	vec3 specular = light.specular * vec3(light.color) * spec * material.specular;
+
+
+	// attenuation
+	float distance = length(light.position - FragPosition);
+	float attenuation = 1.0 / (light.constant + light.Linear * distance + light.quadratic * (distance * distance));
+
+	ambient *= attenuation;
+	diffuse *= attenuation;
+	specular *= attenuation;
+
+	return (ambient + diffuse + specular) * light.intensity;
+}
 
 
 void main()
@@ -83,22 +125,14 @@ void main()
 	vec3 Rreflect = reflect(Ireflect, normalize(Normal));
 	vec4 reflection = vec4(texture(skybox, Rreflect).rgb, 1.0);
 
-	// ambient    //intensity
-	vec3 ambient = lightIntensity.ambient * vec3(pointLightColor) * material.ambient;
-
-	// diffuse 
-	vec3 norm = normalize(Normal);
-	vec3 lightDir = normalize(pointLightPos - Position);
-	float diff = max(dot(norm, lightDir), 0.0);
-	vec3 diffuse = lightIntensity.diffuse * vec3(pointLightColor) * (diff * material.diffuse);
-
-	// specular
 	vec3 viewDir = normalize(cameraPos - Position);
-	vec3 reflectDir = reflect(-lightDir, norm);
-	float spec = pow(max(dot(viewDir, reflectDir), 0.0), material.shininess);
-	vec3 specular = lightIntensity.specular * vec3(pointLightColor) * (spec * material.specular);
+	vec3 result = vec3(0.0f, 0.0f, 0.0f);
 
-	vec3 result = (ambient + diffuse + specular) * vec3(u_Color) + (vec3(reflection) * material.metalness);
+	vec4 texColor = texture(u_Sampler, v_UV);
+	for (int i = 0; i < pointLightCount; i++)
+		result += CalcPointLight(pointLights[i], Normal, Position, viewDir) * vec3(texColor) * vec3(u_Color) + (vec3(reflection) * material.metalness);
+
+	
 	FragColor = vec4(result, 1.0);
 
 
