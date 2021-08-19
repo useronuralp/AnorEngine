@@ -14,6 +14,7 @@ namespace AnorEngine
 	{
 		Graphics::Renderer2D::BeginScene(camera);
 
+
 		auto quadGroup = m_Registry.group<TransformComponent>(entt::get<SpriteRendererComponent>);
 		for (auto& entity : quadGroup)
 		{
@@ -21,26 +22,22 @@ namespace AnorEngine
 			Graphics::Renderer2D::Submit(transformComponent, spriteRendererComponent, (int)entity);
 		}
 
-		int clearValue = -1;
-		//TODO: Hard coded the color attachment index as 4 because it is known at the moment.
-		glClearTexImage(4, 0, GL_RED_INTEGER, GL_INT, &clearValue);
 
-		auto view = m_Registry.view<TransformComponent, MeshRendererComponent, TagComponent>();
+		//Loop through point lights.
+		auto pointLightView = m_Registry.view<TransformComponent, MeshRendererComponent, TagComponent, PointLightComponent>();
 		int PointLightCount = 0;
-		for (auto& entity : view)
+		for (auto& entity : pointLightView)
 		{
-			auto [transformComponent, meshRendererComponent, tagComponent] = view.get<TransformComponent, MeshRendererComponent, TagComponent>(entity);
-			if (tagComponent.Tag == "PointLight" || tagComponent.Tag == "Point Light")
-			{
-				Graphics::Renderer2D::SetPointLightInShader(transformComponent, meshRendererComponent, PointLightCount);
-				PointLightCount++;
-			}
+			auto [transformComponent, meshRendererComponent, tagComponent, pointLightComponent] = pointLightView.get<TransformComponent, MeshRendererComponent, TagComponent, PointLightComponent>(entity);
+			Graphics::Renderer2D::SetPointLightInShader(transformComponent, meshRendererComponent, pointLightComponent, PointLightCount);
+			PointLightCount++;
 		}
 		Graphics::Renderer2D::SetPointLightCount(PointLightCount);
 
-		for (auto& entity : view)
+		auto viewCube = m_Registry.view<TransformComponent, MeshRendererComponent, TagComponent>();
+		for (auto& entity : viewCube)
 		{
-			auto [transformComponent, meshRendererComponent, tagComponent] = view.get<TransformComponent, MeshRendererComponent, TagComponent>(entity);
+			auto [transformComponent, meshRendererComponent, tagComponent] = viewCube.get<TransformComponent, MeshRendererComponent, TagComponent>(entity);
 			Graphics::Renderer2D::DrawCube(transformComponent, meshRendererComponent, tagComponent);
 		}
 

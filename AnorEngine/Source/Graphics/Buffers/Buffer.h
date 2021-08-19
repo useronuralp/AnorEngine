@@ -50,30 +50,30 @@ namespace AnorEngine {
 
 		struct ANOR_API BufferElement
 		{
-			std::string m_Name;
-			ShaderDataType m_Type;
-			uint32_t m_SizeByte;
-			uint32_t m_Offset;
-			uint32_t m_ComponentCount = 0;
-			uint32_t m_ShaderLayoutLocation; // used to match the shader layout (location = ?) value.
-			bool m_Normalized;
-		public:
+			std::string Name;
+			ShaderDataType Type;
+			uint32_t SizeByte;
+			uint32_t Offset;
+			uint32_t ComponentCount = 0;
+			uint32_t ShaderLayoutLocation; // used to match the shader layout (location = ?) value.
+			bool Normalized;
+
 			BufferElement(ShaderDataType type, std::string name, int shaderLocation, bool normalized = false)
-				:m_Name(name), m_Type(type), m_SizeByte(ShaderDataTypeConverter(type)), m_Offset(0), m_ShaderLayoutLocation(shaderLocation), m_Normalized(normalized)
+				:Name(name), Type(type), SizeByte(ShaderDataTypeConverter(type)), Offset(0), ShaderLayoutLocation(shaderLocation), Normalized(normalized)
 			{
 				switch (type)
 				{
-					case ShaderDataType::vec:	m_ComponentCount = 1;		break;
-					case ShaderDataType::vec2:	m_ComponentCount = 2;		break;
-					case ShaderDataType::vec3:	m_ComponentCount = 3;		break;
-					case ShaderDataType::vec4:	m_ComponentCount = 4;		break;
-					case ShaderDataType::mat3:	m_ComponentCount = 3 * 3;	break;
-					case ShaderDataType::mat4:	m_ComponentCount = 4 * 4;	break;
-					case ShaderDataType::Int:	m_ComponentCount = 1;		break;
-					case ShaderDataType::Int2:	m_ComponentCount = 2;		break;
-					case ShaderDataType::Int3:	m_ComponentCount = 3;		break;
-					case ShaderDataType::Int4:	m_ComponentCount = 4;		break;
-					case ShaderDataType::Bool:	m_ComponentCount = 1;		break;
+					case ShaderDataType::vec:	ComponentCount = 1;		break;
+					case ShaderDataType::vec2:	ComponentCount = 2;		break;
+					case ShaderDataType::vec3:	ComponentCount = 3;		break;
+					case ShaderDataType::vec4:	ComponentCount = 4;		break;
+					case ShaderDataType::mat3:	ComponentCount = 3 * 3;	break;
+					case ShaderDataType::mat4:	ComponentCount = 4 * 4;	break;
+					case ShaderDataType::Int:	ComponentCount = 1;		break;
+					case ShaderDataType::Int2:	ComponentCount = 2;		break;
+					case ShaderDataType::Int3:	ComponentCount = 3;		break;
+					case ShaderDataType::Int4:	ComponentCount = 4;		break;
+					case ShaderDataType::Bool:	ComponentCount = 1;		break;
 				}
 			}
 		};
@@ -102,10 +102,10 @@ namespace AnorEngine {
 				m_StrideByte = 0;
 				for (auto& element : m_Elements)
 				{
-					element.m_Offset = offset;
-					offset += element.m_SizeByte;
-					m_TotalComponentCount += element.m_ComponentCount;
-					m_StrideByte += element.m_SizeByte;
+					element.Offset = offset;
+					offset += element.SizeByte;
+					m_TotalComponentCount += element.ComponentCount;
+					m_StrideByte += element.SizeByte;
 				}
 			}		
 		public:	

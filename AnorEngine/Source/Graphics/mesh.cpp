@@ -14,7 +14,7 @@ namespace AnorEngine {
         {       
             unsigned int diffuseNr = 1;
             unsigned int specularNr = 1;
-            shader->enable();
+            shader->Enable();
             for (unsigned int i = 0; i < textures.size(); i++)
             {
                 glActiveTexture(GL_TEXTURE0 + textures[i].id); // activate proper texture unit before binding
@@ -33,7 +33,7 @@ namespace AnorEngine {
             //glDrawArrays(GL_TRIANGLES, 0, vertices.size()); // switch to this if you wanna draw with arrays.
             glDrawElements(GL_TRIANGLES, (GLsizei)indices.size(), GL_UNSIGNED_INT, 0);
             glBindVertexArray(0);
-            shader->disable();
+            shader->Disable();
         }
 
         void Mesh::setupMesh()

@@ -17,6 +17,9 @@ namespace AnorEngine
 
 		int EntityID = -1;
 
+	private:
+		mutable glm::mat4 Transform = glm::mat4(1.0f);
+	public:
 		TransformComponent() = default;
 		TransformComponent(const TransformComponent&) = default;
 
@@ -27,12 +30,12 @@ namespace AnorEngine
 			transform = glm::translate(transform, Translation) * rotation * glm::scale(transform, { Scale.x, Scale.y, Scale.z });
 			return transform;
 		}
-		const glm::mat4 GetTransform() const
+		const glm::mat4& GetTransform() const
 		{
-			glm::mat4 transform(1.0f);
+			Transform = glm::mat4(1.0f);
 			glm::mat4 rotation = glm::toMat4(glm::quat(Rotation));
-			transform = glm::translate(transform, Translation) * rotation * glm::scale(transform, { Scale.x, Scale.y, Scale.z });
-			return transform;
+			Transform = glm::translate(Transform, Translation) * rotation * glm::scale(Transform, { Scale.x, Scale.y, Scale.z });
+			return Transform;
 		}
 	};
 	struct ANOR_API SpriteRendererComponent
@@ -58,17 +61,26 @@ namespace AnorEngine
 	{
 		glm::vec4 Color{ 1.0f, 1.0f, 1.0f, 1.0f };
 		Graphics::Material Material;
-		Ref<Graphics::Texture> Texture = std::make_shared<Graphics::Texture>(std::string(__SOLUTION_DIR) + "AnorEngine\\Assets\\Textures\\WhiteTexture.PNG"); //default texture
 
 		MeshRendererComponent() = default;
 		MeshRendererComponent(Graphics::Material material)
-			:Material(material){}
-		MeshRendererComponent(Graphics::Material material, const Ref<Graphics::Texture>& texture)
-			:Material(material), Texture(texture) {}
+			:Material(material) {}
 		MeshRendererComponent(glm::vec4 color, Graphics::Material material)
 			:Color(color), Material(material){}
 
 	};
+	//TODO: Make the serialization / deserialization code work and display this component in the UI.
+	struct ANOR_API PointLightComponent
+	{
+		float Linear = 0.09f;
+		float Constant = 1.0f;
+		float Quadratic = 0.32f;
+		float Intensity = 1.0f;
+		PointLightComponent() = default;
+		PointLightComponent(float Lin, float Con, float Quad, float In)
+			:Linear(Lin), Constant(Con), Quadratic(Quad), Intensity(In){}
+	};
+
 	struct ANOR_API TagComponent
 	{
 		std::string Tag;

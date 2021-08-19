@@ -21,7 +21,6 @@ namespace AnorEngine
 		}
 		else
 			WARN("APP::{0}", "OpenGLWindow was successfuly created");
-		Graphics::Renderer::Init(); //Enables Blending for now.
 		Graphics::Renderer2D::Init(); //Initializes 2DRenderer for now.
 		LogInfoDebug();
 	}

@@ -101,8 +101,6 @@ namespace AnorEngine
 			//If the buffer was modified we change the tag component of the entity with the newly typed in tag.
 			component.Tag = std::string(buffer);
 		}
-
-
 		ImGui::SameLine();
 		ImGui::PushItemWidth(-1);
 
@@ -136,25 +134,12 @@ namespace AnorEngine
 		});
 		DrawComponent<MeshRendererComponent>("Mesh Renderer", entity, [&entity](auto& component)
 		{
-
-			auto& tagComponent = entity.GetComponent<TagComponent>();
-			if (tagComponent.Tag == "Point Light" || tagComponent.Tag == "PointLight")
-			{
-				ImGui::ColorEdit4("Color", glm::value_ptr(component.Color));
-				ImGui::DragFloat("Intensity", &component.Material.Properties.Intensity, 0.05f, 0.0f, 1.0f);
-				ImGui::DragFloat("Specular", &component.Material.Properties.Specular, 0.01f, 0.0f, 1.0f);
-			}
-			else
-			{
-				ImGui::ColorEdit4("Color", glm::value_ptr(component.Color));
-				ImGui::DragFloat("Ambient", &component.Material.Properties.Ambient, 0.01f, 0.0f, 1.0f);
-				ImGui::DragFloat("Diffuse", &component.Material.Properties.Diffuse, 0.01f, 0.0f, 1.0f);
-				ImGui::DragFloat("Specular", &component.Material.Properties.Specular, 0.01f, 0.0f, 1.0f);
-				ImGui::DragFloat("Shininess", &component.Material.Properties.Shininess, 1.0f, 1.0f, 100.0f);
-				ImGui::DragFloat("Metalness", &component.Material.Properties.Metalness, 0.01f, 0.0f, 1.0f);
-			}
-
-
+			ImGui::ColorEdit4("Color", glm::value_ptr(component.Color));
+			ImGui::DragFloat("Ambient", &component.Material.Properties.Ambient, 0.01f, 0.0f, 1.0f);
+			ImGui::DragFloat("Diffuse", &component.Material.Properties.Diffuse, 0.01f, 0.0f, 1.0f);
+			ImGui::DragFloat("Specular", &component.Material.Properties.Specular, 0.01f, 0.0f, 1.0f);
+			ImGui::DragFloat("Shininess", &component.Material.Properties.Shininess, 1.0f, 1.0f, 100.0f);
+			ImGui::DragFloat("Metalness", &component.Material.Properties.Metalness, 0.01f, 0.0f, 1.0f);
 		});
 		DrawComponent<CameraComponent>("Camera", entity, [](auto& component)
 		{
@@ -188,7 +173,6 @@ namespace AnorEngine
 			}
 			else
 			{
-
 				float orthoSize = component.Camera.GetOrhographicSize();
 				if (ImGui::DragFloat("Size", &orthoSize))
 					component.Camera.SetOrthoGraphicSize(orthoSize);
@@ -218,10 +202,16 @@ namespace AnorEngine
 
 		DrawComponent<SpriteRendererComponent>("Sprite Renderer", entity, [](auto& component)
 		{
-				ImGui::Separator();
-				ImGui::ColorEdit4("Color", glm::value_ptr(component.Color));
-				ImGui::DragFloat2("Repeat Textures", glm::value_ptr(component.TextureSize));
-				ImGui::Separator();
+			ImGui::Separator();
+			ImGui::ColorEdit4("Color", glm::value_ptr(component.Color));
+			ImGui::DragFloat2("Repeat Textures", glm::value_ptr(component.TextureSize));
+			ImGui::Separator();
+		});
+		DrawComponent<PointLightComponent>("Point Light", entity, [](auto& component)
+		{
+			ImGui::Separator();
+			ImGui::DragFloat("Intensity", &component.Intensity, 0.3f, 0.0f, 30.0f);
+			ImGui::Separator();
 		});
 		DrawComponent<NativeScriptComponent>("Script", entity, [](auto& component)
 		{
@@ -254,18 +244,22 @@ namespace AnorEngine
 				m_Context->CreateEntity();
 			if (ImGui::MenuItem("Cube"))
 			{
-				Graphics::Material defaultMaterial(Graphics::ShaderLibrary::GetShader("CubeShader"));
-				auto entity = m_Context->CreateEntity();
 				Ref<Graphics::Texture> texture = std::make_shared<Graphics::Texture>(std::string(__SOLUTION_DIR) + "AnorEngine\\Assets\\Textures\\381f5a63791945.5abc4ccf1297d.png");
-				entity.AddComponent<MeshRendererComponent>(defaultMaterial, texture);
+				Graphics::Material defaultMaterial(Graphics::ShaderLibrary::GetShader("CubeShader"), texture);
+				auto entity = m_Context->CreateEntity();
+				entity.AddComponent<MeshRendererComponent>(defaultMaterial);
 				entity.GetComponent<TagComponent>().Tag = "Cube";
 			}
 			if (ImGui::MenuItem("Cube Light"))
 			{
 				Graphics::Material defaultMaterial (Graphics::ShaderLibrary::GetShader("LightCubeShader"));
+				defaultMaterial.Properties.Ambient = 0.2f;
+				defaultMaterial.Properties.Diffuse = 0.3f;
+				defaultMaterial.Properties.Specular = 1.0f;
 				auto entity = m_Context->CreateEntity();
 				entity.GetComponent<TransformComponent>().Scale = { 0.1f, 0.1f, 0.1f };
 				entity.AddComponent<MeshRendererComponent>(defaultMaterial);
+				entity.AddComponent<PointLightComponent>();
 				entity.GetComponent<TagComponent>().Tag = "Point Light";
 			}
 			ImGui::EndPopup();

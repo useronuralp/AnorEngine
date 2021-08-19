@@ -18,7 +18,7 @@ namespace AnorEngine {
 			auto& layout = buffer->GetBufferLayout();
 			for (const auto& element : layout) //This is a vector.
 			{
-				switch (element.m_Type)
+				switch (element.Type)
 				{
 					//Multiple cases use the same body.
 					case ShaderDataType::Int:
@@ -27,9 +27,9 @@ namespace AnorEngine {
 					case ShaderDataType::Int4:
 					case ShaderDataType::Bool:
 					{
-						glEnableVertexAttribArray(element.m_ShaderLayoutLocation);
-						glVertexAttribIPointer(element.m_ShaderLayoutLocation, element.m_ComponentCount, ShaderDataTypeToOpenGLBaseType(element.m_Type),
-							buffer->GetBufferLayout().GetStride(), (void*)element.m_Offset);
+						glEnableVertexAttribArray(element.ShaderLayoutLocation);
+						glVertexAttribIPointer(element.ShaderLayoutLocation, element.ComponentCount, ShaderDataTypeToOpenGLBaseType(element.Type),
+							buffer->GetBufferLayout().GetStride(), (void*)element.Offset);
 						break;
 					}
 					case ShaderDataType::vec:
@@ -37,9 +37,9 @@ namespace AnorEngine {
 					case ShaderDataType::vec3:
 					case ShaderDataType::vec4:
 					{
-						glEnableVertexAttribArray(element.m_ShaderLayoutLocation);
-						glVertexAttribPointer(element.m_ShaderLayoutLocation, element.m_ComponentCount, 
-							ShaderDataTypeToOpenGLBaseType(element.m_Type), element.m_Normalized ? GL_TRUE : GL_FALSE, buffer->GetBufferLayout().GetStride(), (void*)element.m_Offset);
+						glEnableVertexAttribArray(element.ShaderLayoutLocation);
+						glVertexAttribPointer(element.ShaderLayoutLocation, element.ComponentCount, 
+							ShaderDataTypeToOpenGLBaseType(element.Type), element.Normalized ? GL_TRUE : GL_FALSE, buffer->GetBufferLayout().GetStride(), (void*)element.Offset);
 						break;
 					}
 				}

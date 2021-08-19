@@ -4,6 +4,12 @@
 #include "../vendor/stb_image/stb_image.h"
 #include "texture.h"
 namespace AnorEngine {
+
+	//!!!! DEFAULT GLFW FRAMEBUFFER TEXTURE ID IS 0 !!!!!
+	//!!!! WHITE TEXTURE ID IS 1 !!!!!!
+	//!!!! SKYBOX TEXTURE ID IS 2 !!!!!
+	//!!!! A SINGLE FRAMEBUFFER WILL ALLOCATE 3 TEXTURE IDs (2 FOR COLOR, 1 FOR DEPTH) !!!!!
+	//!!!! THEN WILL COME THE TEXTURES YOU LOAD !!!!
 	namespace Graphics {
 		Texture::Texture(const std::string& path)
 			:m_FilePath(path)
@@ -27,27 +33,27 @@ namespace AnorEngine {
 				dataFormat = GL_RGB;
 			}
 
+			//Texture IDs start from number 1. Number 0 means that the texture is either invalid or it was deleted.
+			glCreateTextures(GL_TEXTURE_2D, 1, &m_TextureID);
+			glTextureStorage2D(m_TextureID, 1, internalFormat, m_Width, m_Height);
 
-			glCreateTextures(GL_TEXTURE_2D, 1, &m_RendererID);
-			glTextureStorage2D(m_RendererID, 1, internalFormat, m_Width, m_Height);
+			glTextureParameteri(m_TextureID, GL_TEXTURE_MIN_FILTER, GL_LINEAR );//minify scaling
+			glTextureParameteri(m_TextureID, GL_TEXTURE_MAG_FILTER, GL_NEAREST);//magnify scaling
+			glTextureParameteri(m_TextureID, GL_TEXTURE_WRAP_S, GL_REPEAT);
+			glTextureParameteri(m_TextureID, GL_TEXTURE_WRAP_T, GL_REPEAT);
 
-			glTextureParameteri(m_RendererID, GL_TEXTURE_MIN_FILTER, GL_LINEAR );//minify scaling
-			glTextureParameteri(m_RendererID, GL_TEXTURE_MAG_FILTER, GL_NEAREST);//magnify scaling
-			glTextureParameteri(m_RendererID, GL_TEXTURE_WRAP_S, GL_REPEAT);
-			glTextureParameteri(m_RendererID, GL_TEXTURE_WRAP_T, GL_REPEAT);
-
-			glTextureSubImage2D(m_RendererID, 0, 0, 0, m_Width, m_Height, dataFormat, GL_UNSIGNED_BYTE, data);
+			glTextureSubImage2D(m_TextureID, 0, 0, 0, m_Width, m_Height, dataFormat, GL_UNSIGNED_BYTE, data);
 			if (data)
 				stbi_image_free(data);
 		}
 		Texture::~Texture()
 		{
-			glDeleteTextures(1, &m_RendererID);
+			glDeleteTextures(1, &m_TextureID);
 		}
 		void Texture::Bind(unsigned int slot) const
 		{
-			glActiveTexture(GL_TEXTURE0 + slot); //allows you to speicfy a texture slot, usually on pc there are 32 texture slots and theu count up one by one.
-			glBindTexture(GL_TEXTURE_2D, m_RendererID);
+			glActiveTexture(GL_TEXTURE0 + slot); //allows you to speicfy a texture slot, usually on pc there are 32 texture.
+			glBindTexture(GL_TEXTURE_2D, m_TextureID);
 		}
 		void Texture::Unbind() const
 		{

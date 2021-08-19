@@ -184,9 +184,21 @@ namespace AnorEngine
 			out << YAML::Key << "Specular" << YAML::Value << meshRendererComponent.Material.Properties.Specular;
 			out << YAML::Key << "Shininess" << YAML::Value << meshRendererComponent.Material.Properties.Shininess;
 			out << YAML::Key << "Metalness" << YAML::Value << meshRendererComponent.Material.Properties.Metalness;
-			out << YAML::Key << "Intensity" << YAML::Value << meshRendererComponent.Material.Properties.Intensity;
 
 			out << YAML::EndMap; // MeshRendererComponent
+		}
+		if (entity.HasComponent<PointLightComponent>())
+		{
+			out << YAML::Key << "PointLightComponent";
+			out << YAML::BeginMap; // PointLightComponent
+
+			auto& pointLightComponent = entity.GetComponent<PointLightComponent>();
+			out << YAML::Key << "Linear" << YAML::Value << pointLightComponent.Linear;
+			out << YAML::Key << "Constant" << YAML::Value << pointLightComponent.Constant;
+			out << YAML::Key << "Quadratic" << YAML::Value << pointLightComponent.Quadratic;
+			out << YAML::Key << "Intensity" << YAML::Value << pointLightComponent.Intensity;
+
+			out << YAML::EndMap; // PointLightComponent
 		}
 		out << YAML::EndMap; // Entity
 	}
@@ -292,8 +304,16 @@ namespace AnorEngine
 					material.Properties.Specular =meshRendererComponent["Specular"].as<float>();
 					material.Properties.Shininess =meshRendererComponent["Shininess"].as<float>();
 					material.Properties.Metalness =meshRendererComponent["Metalness"].as<float>();
-					material.Properties.Intensity = meshRendererComponent["Intensity"].as<float>();
 					auto& src = deserializedEntity.AddComponent<MeshRendererComponent>(color, material);
+				}
+				auto pointLightComponent = entity["PointLightComponent"];
+				if (pointLightComponent)
+				{
+					float linear = pointLightComponent["Linear"].as<float>();
+					float constant = pointLightComponent["Constant"].as<float>();
+					float quadratic = pointLightComponent["Quadratic"].as<float>();
+					float intensity = pointLightComponent["Intensity"].as<float>();
+					auto& src = deserializedEntity.AddComponent<PointLightComponent>(linear, constant, quadratic, intensity);
 				}
 			}
 		}

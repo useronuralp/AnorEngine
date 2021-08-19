@@ -38,22 +38,21 @@ namespace AnorEngine
 			glm::vec4								  QuadVertexPositions[4] = {};
 			uint32_t								  NumberOfDrawCalls = 0;
 
+			//Global cameras
+			Ref<EditorCamera>						  EditorCamera;
+			Ref<OrthographicCamera>					  OrthographicCamera;
+			Camera*									  RuntimeCamera;
 
 			//Experimenatal 3D stuff
 			Ref<VertexArray>						  CubeVertexArray;
 			Ref<VertexBuffer>						  CubeVertexBuffer;
 			Ref<CubeMapTexture>						  SkyboxTexture;
-			Ref<Shader>								  SkyboxShader;
-			Ref<Shader>								  CubeShader;
-			Ref<Shader>								  LightCubeShader;
-
 			int										  PointLightCount = 0;
 
 		};
 
+		//Instance the s_Data here for only once.
 		static Renderer2DData s_Data;
-		Ref<OrthographicCamera> Renderer2D::s_OrthoCamera;
-		Ref<EditorCamera> Renderer2D::s_EditorCamera;
 
 		void Renderer2D::Init()
 		{
@@ -130,23 +129,20 @@ namespace AnorEngine
 			s_Data.QuadVertexBufferBase = new QuadVertex[Renderer2DData::MaxVertices]; // Set the address of the base when initializing the renderer.
 
 			
-			//Loading the shaders into the ShaderLibrary.
-			ShaderLibrary::LoadShader("2DBackgroundShader", std::string(__SOLUTION_DIR) + "AnorEngine\\Assets\\Shaders\\2DBackgroundShader.shader");
-			ShaderLibrary::LoadShader("TextureShader", std::string(__SOLUTION_DIR) + "AnorEngine\\Assets\\Shaders\\2DTextureShader.shader");
-			s_Data.SkyboxShader = ShaderLibrary::LoadShader("CubemapShader", std::string(__SOLUTION_DIR) + "AnorEngine\\Assets\\Shaders\\CubemapShader.shader");
-			s_Data.QuadShader = ShaderLibrary::LoadShader("2DShader", std::string(__SOLUTION_DIR) + "AnorEngine\\Assets\\Shaders\\2DShader.shader");
-			s_Data.CubeShader = ShaderLibrary::LoadShader("CubeShader", std::string(__SOLUTION_DIR) + "AnorEngine\\Assets\\Shaders\\CubeShader.shader");
-			s_Data.LightCubeShader = ShaderLibrary::LoadShader("LightCubeShader", std::string(__SOLUTION_DIR) + "AnorEngine\\Assets\\Shaders\\LightCubeShader.shader");
+			//Loading the shaders into the ShaderLibrary. You can access all of the shaders with an iterator in a for loop.
+			ShaderLibrary::LoadShader("SkyboxShader", std::string(__SOLUTION_DIR) + "AnorEngine\\Assets\\Shaders\\CubemapShader.shader");
+			ShaderLibrary::LoadShader("CubeShader", std::string(__SOLUTION_DIR) + "AnorEngine\\Assets\\Shaders\\CubeShader.shader");
+			ShaderLibrary::LoadShader("LightCubeShader", std::string(__SOLUTION_DIR) + "AnorEngine\\Assets\\Shaders\\LightCubeShader.shader");
+			ShaderLibrary::LoadShader("2DShader", std::string(__SOLUTION_DIR) + "AnorEngine\\Assets\\Shaders\\2DShader.shader");
 
 			int samplers[s_Data.MaxTextureSlots];
 			for (uint32_t i = 0; i < s_Data.MaxTextureSlots; i++)
 			{
 				samplers[i] = i;
-			}
-			s_Data.QuadShader->UploadIntegerArray(std::string("u_Textures"), samplers, s_Data.MaxTextureSlots);
+			}		
+			ShaderLibrary::GetShader("2DShader")->UploadUniform("u_Textures[0]", sizeof(float) * s_Data.MaxTextureSlots, &samplers);
 
 			uint32_t* QuadIndices = new uint32_t[Renderer2DData::MaxIndices];
-
 			uint32_t offset = 0;
 			for (uint32_t i = 0; i < Renderer2DData::MaxIndices; i += 6)
 			{
@@ -193,85 +189,59 @@ namespace AnorEngine
 		{
 			s_Data.PointLightCount = count;
 		}
-		void Renderer2D::SetPointLightInShader(const TransformComponent& tc, const MeshRendererComponent& mc, int index)
+		void Renderer2D::SetPointLightInShader(const TransformComponent& tc, const MeshRendererComponent& mc, const PointLightComponent& plc, int index)
 		{
-			s_Data.CubeShader->enable();
-			s_Data.CubeShader->UploadFloat4("pointLights[" + std::to_string(index) + "].color", mc.Color);
-			s_Data.CubeShader->UploadFloat3("pointLights[" + std::to_string(index) + "].position", tc.Translation);
-			s_Data.CubeShader->UploadFloat("pointLights[" + std::to_string(index) + "].constant", 1.0f);
-			s_Data.CubeShader->UploadFloat("pointLights[" + std::to_string(index) + "].Linear", 0.09f);
-			s_Data.CubeShader->UploadFloat("pointLights[" + std::to_string(index) + "].quadratic", 0.032f);
-			s_Data.CubeShader->UploadFloat("pointLights[" + std::to_string(index) + "].intensity", mc.Material.Properties.Intensity);
-			s_Data.CubeShader->UploadFloat3("pointLights[" + std::to_string(index) + "].ambient", { 0.2f, 0.2f, 0.2f });
-			s_Data.CubeShader->UploadFloat3("pointLights[" + std::to_string(index) + "].diffuse", { 0.5f, 0.5f, 0.5f }); // darken diffuse light a bit
-			s_Data.CubeShader->UploadFloat3("pointLights[" + std::to_string(index) + "].specular", glm::vec3(mc.Material.Properties.Specular));
-			s_Data.CubeShader->disable();
-		}
-		void Renderer2D::DrawPrimitive(const Ref<VertexArray> vertexArray, const Ref<Shader> shader, const glm::mat4& modelMatrix, const glm::vec4& color, const Ref<Texture> texture)
-		{
-			shader->enable();
-			vertexArray->Bind();
-
-			if (shader->GetName() == "2DBackgroundShader")
-				shader->UploadMat4("u_ViewProjMat", s_OrthoCamera->GetBackgroundViewProjectionMatrix());
-			else
-				shader->UploadMat4("u_ViewProjMat", s_OrthoCamera->GetViewProjectionMatrix());
-
-			shader->UploadMat4("u_ModelMatrix", modelMatrix);
-			shader->UploadFloat4("u_Color", color);
-			if(texture != nullptr)
-				texture->Bind(0); //Binding the white texture.
-			//glDrawElements(GL_TRIANGLES, vertexArray->GetIndexBuffer()->GetCount(), GL_UNSIGNED_INT, NULL);
-			glDrawArrays(GL_TRIANGLES, 0, 36);
-			if(texture != nullptr)
-				texture->Unbind();
-			vertexArray->Unbind();
-			shader->disable();
+			ShaderLibrary::GetShader("CubeShader")->UploadUniform("u_PointLights[" + std::to_string(index) + "].color", sizeof(mc.Color), &mc.Color);
+			ShaderLibrary::GetShader("CubeShader")->UploadUniform("u_PointLights[" + std::to_string(index) + "].position", sizeof(tc.Translation), &tc.Translation);
+			ShaderLibrary::GetShader("CubeShader")->UploadUniform("u_PointLights[" + std::to_string(index) + "].constant", sizeof(float), &plc.Constant);
+			ShaderLibrary::GetShader("CubeShader")->UploadUniform("u_PointLights[" + std::to_string(index) + "].Linear", sizeof(plc.Linear), &plc.Linear);
+			ShaderLibrary::GetShader("CubeShader")->UploadUniform("u_PointLights[" + std::to_string(index) + "].quadratic", sizeof(plc.Quadratic), &plc.Quadratic);
+			ShaderLibrary::GetShader("CubeShader")->UploadUniform("u_PointLights[" + std::to_string(index) + "].intensity", sizeof(plc.Intensity), &plc.Intensity);		
+			ShaderLibrary::GetShader("CubeShader")->UploadUniform("u_PointLights[" + std::to_string(index) + "].ambient", sizeof(mc.Material.Properties.Ambient), &mc.Material.Properties.Ambient);
+			ShaderLibrary::GetShader("CubeShader")->UploadUniform("u_PointLights[" + std::to_string(index) + "].diffuse", sizeof(mc.Material.Properties.Diffuse), &mc.Material.Properties.Diffuse); // darken diffuse light a bit
+			ShaderLibrary::GetShader("CubeShader")->UploadUniform("u_PointLights[" + std::to_string(index) + "].specular", sizeof(mc.Material.Properties.Specular), &mc.Material.Properties.Specular);
 		}
 		void Renderer2D::DrawCube(const TransformComponent& tc, const MeshRendererComponent& mc, const TagComponent& tagc)
 		{
-			mc.Texture->Bind(s_Data.TextureSlotIndex);
-			mc.Material.Shader->enable();
-			mc.Material.Shader->UploadInteger("u_Sampler", s_Data.TextureSlotIndex);
-
-			mc.Material.Shader->UploadMat4("u_Transform", tc.GetTransform());
-			mc.Material.Shader->UploadMat4("u_ViewProjMat", s_EditorCamera->GetViewProjectionMatrix());
-
-			mc.Material.Shader->UploadFloat4("u_Color", mc.Color);
-			mc.Material.Shader->UploadInteger("u_EntityID", tc.EntityID);
-			mc.Material.Shader->UploadFloat3("cameraPos", s_EditorCamera->GetPosition());
-
-			mc.Material.Shader->UploadInteger("pointLightCount", s_Data.PointLightCount);
-
-			mc.Material.Shader->UploadFloat3("material.ambient", glm::vec3(mc.Material.Properties.Ambient));
-			mc.Material.Shader->UploadFloat3("material.diffuse", glm::vec3(mc.Material.Properties.Diffuse));
-			mc.Material.Shader->UploadFloat3("material.specular", glm::vec3(mc.Material.Properties.Specular));
-			mc.Material.Shader->UploadFloat("material.shininess", mc.Material.Properties.Shininess);
-			mc.Material.Shader->UploadFloat("material.metalness", mc.Material.Properties.Metalness);
+			mc.Material.Shader->UploadUniform("u_Sampler", sizeof(mc.Material.Texture->GetTextureID()), &mc.Material.Texture->GetTextureID());
 			
+			mc.Material.Shader->UploadUniform("u_Transform", sizeof(tc.GetTransform()), &tc.GetTransform());
 
+			mc.Material.Shader->UploadUniform("u_Color", sizeof(mc.Color), &mc.Color);
+			mc.Material.Shader->UploadUniform("u_EntityID", sizeof(tc.EntityID), &tc.EntityID);
+
+			mc.Material.Shader->UploadUniform("u_EntityID", sizeof(tc.EntityID), &tc.EntityID);
+			mc.Material.Shader->UploadUniform("u_Material.ambient", sizeof(mc.Material.Properties.Ambient), &mc.Material.Properties.Ambient);
+			mc.Material.Shader->UploadUniform("u_Material.diffuse", sizeof(mc.Material.Properties.Diffuse), &mc.Material.Properties.Diffuse);
+			mc.Material.Shader->UploadUniform("u_Material.specular", sizeof(mc.Material.Properties.Specular), &mc.Material.Properties.Specular);
+			mc.Material.Shader->UploadUniform("u_Material.shininess", sizeof(mc.Material.Properties.Shininess), &mc.Material.Properties.Shininess);
+			mc.Material.Shader->UploadUniform("u_Material.metalness", sizeof(mc.Material.Properties.Metalness), &mc.Material.Properties.Metalness);
+
+			mc.Material.Texture->Bind(mc.Material.Texture->GetTextureID());
+			mc.Material.Shader->Enable();
 			s_Data.CubeVertexArray->Bind();
+
 			glDrawArrays(GL_TRIANGLES, 0, 36);
 
 			s_Data.CubeVertexArray->Unbind();
-			mc.Material.Shader->disable();
-			mc.Texture->Unbind();
+			mc.Material.Shader->Disable();
+			mc.Material.Texture->Unbind();
 		}
 		void Renderer2D::DrawSkybox()
 		{
 			glDepthMask(GL_FALSE);
 
 			glBindTexture(GL_TEXTURE_CUBE_MAP, s_Data.SkyboxTexture->GetTextureID());
-			s_Data.SkyboxShader->enable();
+			ShaderLibrary::GetShader("SkyboxShader")->Enable();
 			s_Data.CubeVertexArray->Bind();
 
 			glDrawArrays(GL_TRIANGLES, 0, 36);
 			glDepthMask(GL_TRUE);
 
 			s_Data.CubeVertexArray->Unbind();
-			s_Data.SkyboxShader->disable();
+			ShaderLibrary::GetShader("SkyboxShader")->Disable();
 		}
-		void Renderer2D::Submit(const TransformComponent& tc, const SpriteRendererComponent& sc, int entityID)
+		void Renderer2D::Submit(const TransformComponent& tc, SpriteRendererComponent& sc, int entityID)
 		{
 			if ((uint8_t*)s_Data.QuadVertexBufferPtr - (uint8_t*)s_Data.QuadVertexBufferBase == Renderer2DData::MaxQuads * sizeof(QuadVertex))
 			{
@@ -280,7 +250,6 @@ namespace AnorEngine
 				s_Data.QuadVertexBufferPtr = s_Data.QuadVertexBufferBase;
 				s_Data.TextureSlotIndex = 1;
 			}
-
 			float textureIndex = 0.0f;
 			for (uint32_t i = 1; i < s_Data.TextureSlotIndex; i++)
 			{
@@ -332,10 +301,6 @@ namespace AnorEngine
 		}
 		void Renderer2D::Flush()
 		{
-			//int clearValue = -1;
-			////TODO: Hard coded the color attachment index as 4 because it is known at the moments.
-			//glClearTexImage(4, 0, GL_RED_INTEGER, GL_INT, &clearValue);
-
 			uint32_t count = s_Data.QuadIndexCount ? s_Data.QuadIndexCount : 0;
 			for (uint32_t i = 0; i < s_Data.TextureSlotIndex; i++)
 			{
@@ -343,48 +308,34 @@ namespace AnorEngine
 			}
 			s_Data.NumberOfDrawCalls++;
 			s_Data.QuadVertexArray->Bind();
-			s_Data.QuadShader->enable();
+			ShaderLibrary::GetShader("2DShader")->Enable();
 			glDrawElements(GL_TRIANGLES, count, GL_UNSIGNED_INT, nullptr);
 			s_Data.QuadVertexArray->Unbind();
-			s_Data.QuadShader->disable();
-			
-		}
-		void Renderer2D::BeginScene(const Ref<OrthographicCamera> camera)
-		{
-			s_OrthoCamera = camera;
-			s_Data.QuadShader->enable();
-			s_Data.QuadShader->UploadMat4("u_ViewProjMat", s_OrthoCamera->GetViewProjectionMatrix());
-			s_Data.QuadShader->disable();
-
-
-			s_Data.SkyboxShader->enable();
-			glm::mat4 projectionMatrix = s_OrthoCamera->GetProjectionMatrix();
-			glm::mat4 viewMatrix = s_OrthoCamera->GetViewMatrix();
-			viewMatrix = glm::mat4(glm::mat3(viewMatrix));
-			s_Data.SkyboxShader->UploadMat4("u_ViewProjMat", projectionMatrix * viewMatrix);
-			s_Data.SkyboxShader->disable();
-
-			s_Data.NumberOfDrawCalls = 0;
-			s_Data.QuadIndexCount = 0;
-			s_Data.QuadVertexBufferPtr = s_Data.QuadVertexBufferBase;
-			s_Data.TextureSlotIndex = 1;
+			ShaderLibrary::GetShader("2DShader")->Disable();
 		}
 		void Renderer2D::BeginScene(const Ref<EditorCamera>& camera)
 		{
 			DrawSkybox();
+			s_Data.EditorCamera = camera;
 
-			s_EditorCamera = camera;
-			s_Data.QuadShader->enable();
-			s_Data.QuadShader->UploadMat4("u_ViewProjMat", s_EditorCamera->GetViewProjectionMatrix());
-			s_Data.QuadShader->disable();
+			int clearValue = -1;
+			//TODO: Hard coded the color attachment index as 4 because it is known at the moment.
+			glClearTexImage(4, 0, GL_RED_INTEGER, GL_INT, &clearValue);
 
-			s_Data.SkyboxShader->enable();
-			glm::mat4 projectionMatrix = s_EditorCamera->GetProjectionMatrix();
-			glm::mat4 viewMatrix = s_EditorCamera->GetViewMatrix();
+			for (auto& element : ShaderLibrary::GetLibrary())
+			{			
+				auto matrix = s_Data.EditorCamera->GetViewProjectionMatrix();
+				auto position = s_Data.EditorCamera->GetPosition();
+				element.second->UploadUniform("u_ViewProjMat", sizeof(matrix), &matrix);
+				element.second->UploadUniform("u_CameraPos", sizeof(position), &position);
+				element.second->UploadUniform("u_PointLightCount", sizeof(s_Data.PointLightCount), &s_Data.PointLightCount);
+			}
+
+			glm::mat4 projectionMatrix = s_Data.EditorCamera->GetProjectionMatrix();
+			glm::mat4 viewMatrix = s_Data.EditorCamera->GetViewMatrix();
 			viewMatrix = glm::mat4(glm::mat3(viewMatrix));
-			s_Data.SkyboxShader->UploadMat4("u_ViewProjMat", projectionMatrix * viewMatrix);
-			s_Data.SkyboxShader->disable();
-
+			auto viewProjMatrix = projectionMatrix * viewMatrix;
+			ShaderLibrary::GetShader("SkyboxShader")->UploadUniform("u_ViewProjMat", sizeof(viewProjMatrix), &(viewProjMatrix));
 
 			s_Data.NumberOfDrawCalls = 0;
 			s_Data.QuadIndexCount = 0;
@@ -393,16 +344,16 @@ namespace AnorEngine
 		}
 		void Renderer2D::BeginScene(Camera* camera, const glm::mat4& transform)
 		{
-			glm::mat4 viewProjMatrix = camera->GetProjectionMatrix() * glm::inverse(transform);
-			s_Data.QuadShader->enable();
-			s_Data.QuadShader->UploadMat4("u_ViewProjMat", viewProjMatrix);
-			s_Data.QuadShader->disable();
+			s_Data.RuntimeCamera = camera;
 
-			s_Data.SkyboxShader->enable();
+			glm::mat4 viewProjMatrix = s_Data.RuntimeCamera->GetProjectionMatrix() * glm::inverse(transform);
+
+			ShaderLibrary::GetShader("2Shader")->UploadUniform("u_ViewProjMat", sizeof(viewProjMatrix), &viewProjMatrix);
+
 			glm::mat4 viewMatrix = transform;
 			viewMatrix = glm::mat4(glm::mat3(viewMatrix));
-			s_Data.SkyboxShader->UploadMat4("u_ViewProjMat", camera->GetProjectionMatrix() * viewProjMatrix);
-			s_Data.SkyboxShader->disable();
+			auto viewProj = camera->GetProjectionMatrix() * viewMatrix;
+			ShaderLibrary::GetShader("SkyboxShader")->UploadUniform("u_ViewProjMat", sizeof(viewProj), &viewProj);
 
 			s_Data.NumberOfDrawCalls = 0;
 			s_Data.QuadIndexCount = 0;
@@ -422,6 +373,14 @@ namespace AnorEngine
 		void Renderer2D::Clear()
 		{
 			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+		}
+		void Renderer2D::SetOrthographicCamera(const Ref<OrthographicCamera> camera)
+		{
+			s_Data.OrthographicCamera = camera;
+		}
+		void Renderer2D::SetEditorCamera(const Ref<EditorCamera> camera)
+		{
+			s_Data.EditorCamera = camera;
 		}
 		uint32_t Renderer2D::GetIndexCount()
 		{

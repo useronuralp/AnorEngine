@@ -3,6 +3,55 @@
 namespace AnorEngine {
 	namespace Graphics {
 
+		// TODO: !!!WARNING!!! DATA SIZES MAY BE INCORRECT DOUBLE CHECK THEM LATER.
+		static size_t GetSizeInBytesFromGLDataType(GLenum type)
+		{
+			switch (type)
+			{
+				case GL_BOOL:			   return 1;	     break;
+				case GL_SAMPLER:
+				case GL_SAMPLER_2D:
+				case GL_SAMPLER_CUBE:
+				case GL_INT:
+				case GL_UNSIGNED_BYTE:
+				case GL_UNSIGNED_INT:
+				case GL_FLOAT:			   return 4;		 break;
+				case GL_DOUBLE:			   return 8;         break;
+				case GL_BOOL_VEC2:		   return 2;		 break;
+				case GL_BOOL_VEC3:		   return 3;		 break;
+				case GL_BOOL_VEC4:		   return 4;		 break;
+				case GL_INT_VEC2:		   return 2 * 4;	 break;
+				case GL_INT_VEC3:		   return 3 * 4;	 break;
+				case GL_INT_VEC4:		   return 4 * 4;	 break;
+				case GL_UNSIGNED_INT_VEC2: return 2 * 4;	 break;
+				case GL_UNSIGNED_INT_VEC3: return 3 * 4;	 break;
+				case GL_UNSIGNED_INT_VEC4: return 4 * 4;	 break;
+				case GL_FLOAT_VEC2:		   return 2 * 4;	 break;
+				case GL_FLOAT_VEC3:		   return 3 * 4;	 break;
+				case GL_FLOAT_VEC4:		   return 4 * 4;	 break;
+				case GL_DOUBLE_VEC2:	   return 2 * 8;	 break;
+				case GL_DOUBLE_VEC3:	   return 3 * 8;	 break;
+				case GL_DOUBLE_VEC4:	   return 4 * 8;	 break;
+				case GL_FLOAT_MAT2:		   return 2 * 2 * 4; break;
+				case GL_FLOAT_MAT2x3:	   return 2 * 3 * 4; break;
+				case GL_FLOAT_MAT2x4:	   return 2 * 4 * 4; break;
+				case GL_FLOAT_MAT3:		   return 3 * 3 * 4; break;
+				case GL_FLOAT_MAT3x2:      return 3 * 2 * 4; break;
+				case GL_FLOAT_MAT3x4:      return 3 * 4 * 4; break;
+				case GL_FLOAT_MAT4:		   return 4 * 4 * 4; break;
+				case GL_FLOAT_MAT4x3:	   return 4 * 3 * 4; break;
+				case GL_FLOAT_MAT4x2:	   return 4 * 2 * 4; break;
+				case GL_DOUBLE_MAT2:	   return 2 * 2 * 8; break;
+				case GL_DOUBLE_MAT2x3:	   return 2 * 3 * 8; break;
+				case GL_DOUBLE_MAT2x4:	   return 2 * 4 * 8; break;
+				case GL_DOUBLE_MAT3:	   return 3 * 3 * 8; break;
+				case GL_DOUBLE_MAT3x2:	   return 3 * 2 * 8; break;
+				case GL_DOUBLE_MAT3x4:	   return 3 * 4 * 8; break;
+				case GL_DOUBLE_MAT4:	   return 4 * 4 * 8; break;
+				case GL_DOUBLE_MAT4x3:	   return 4 * 3 * 8; break;
+				case GL_DOUBLE_MAT4x2:	   return 4 * 2 * 8; break;
+			}
+		}
 		static GLenum ShaderTypeFromString(std::string type)
 		{
 			if (type == "vertex")
@@ -28,12 +77,38 @@ namespace AnorEngine {
 			std::string source = ReadFile(filepath);
 			std::unordered_map<GLenum, std::string> shaderSources = PreProcess(source);
 			Compile(shaderSources);
+
+			//Reads the shader and retrieves all of the active uniforms.
+			FillUniformBuffer();		
 		}
-		void Shader::enable() const
+		void Shader::FillUniformBuffer()
+		{
+			GLint i;
+			GLint count;
+
+			GLint size; // size of the variable
+			GLenum type; // type of the variable (float, vec3 or mat4, etc)
+
+			const GLsizei bufferSize = 64; // maximum name length
+			GLchar uniformName[bufferSize]; // variable name in GLSL
+			GLsizei length; // name length
+
+
+			glGetProgramiv(m_ShaderID, GL_ACTIVE_UNIFORMS, &count);
+			printf("Shader Name: %s, Active Attributes: %d\n", m_Name.c_str(), count);
+			for (i = 0; i < count; i++)
+			{
+				glGetActiveUniform(m_ShaderID, (GLuint)i, bufferSize, &length, &size, &type, uniformName);
+				m_UniformBuffer.insert(std::make_pair<std::string, UniformData>(uniformName, UniformData{ uniformName, type, size }));
+				//m_UniformBuffer.push_back(UniformData{ uniformName, type, size, malloc(GetSizeInBytesFromGLDataType(type) * size) });
+				//printf("Uniform #%d Type: %u Name: %s Size: %d\n", i, type, uniformName, size);
+			}
+		}
+		void Shader::Enable()
 		{
 			glUseProgram(m_ShaderID);
 		}
-		void Shader::disable() const
+		void Shader::Disable() const
 		{
 			glUseProgram(0);
 		}
@@ -41,7 +116,6 @@ namespace AnorEngine {
 		{
 			glDeleteProgram(m_ShaderID);
 		}
-
 		void Shader::Compile(const std::unordered_map<GLenum, std::string>& shaderSources)
 		{
 			GLuint program = glCreateProgram();
@@ -102,7 +176,6 @@ namespace AnorEngine {
 			{
 				glDetachShader(program, shaderID);
 			}
-
 			m_ShaderID = program;
 		}
 		std::string Shader::ReadFile(std::string filepath)
@@ -153,64 +226,119 @@ namespace AnorEngine {
 			}
 			return shaderSources;
 		}
-
-		GLint Shader::GetUniformLocation(const GLchar* name)
-		{
-			return glGetUniformLocation(m_ShaderID, name);
-		}
 		GLint Shader::GetUniformLocation(std::string name)
 		{
-			char* arr;
-			arr = &name[0];
-			return glGetUniformLocation(m_ShaderID, arr);
+			if (m_UniformLocationCache.find(name) != m_UniformLocationCache.end())
+				return m_UniformLocationCache[name];
+
+			GLint location = glGetUniformLocation(m_ShaderID, name.c_str());
+			m_UniformLocationCache[name] = location;
+			return location;
+		}
+		void Shader::UploadUniform(std::string uniformName, size_t size, const void* data)
+		{
+			if (m_UniformBuffer.find(uniformName) != m_UniformBuffer.end())
+			{
+				auto iterator = m_UniformBuffer.find(uniformName);
+				if ((GetSizeInBytesFromGLDataType(iterator->second.Type) * iterator->second.Count) != size)
+				{
+					CRITICAL_ASSERT("Memory size you tried to set is not valid.");
+				}
+				else
+				{
+					switch (iterator->second.Type)
+					{
+						case GL_FLOAT:		  UploadFloat(iterator->first, *(float*)data);break;
+						case GL_SAMPLER:
+						case GL_SAMPLER_2D:
+						case GL_SAMPLER_3D:
+						case GL_SAMPLER_1D:
+						case GL_SAMPLER_CUBE:
+						case GL_INT:
+						case GL_UNSIGNED_BYTE:
+						case GL_UNSIGNED_INT: UploadIntegerArray(iterator->first, (int*)data, iterator->second.Count); break;
+						case GL_FLOAT_VEC2:   UploadFloat2(iterator->first, *(glm::vec2*)data); break;
+						case GL_FLOAT_VEC3:	  UploadFloat3(iterator->first, *(glm::vec3*)data); break;
+						case GL_FLOAT_VEC4:	  UploadFloat4(iterator->first, *(glm::vec4*)data); break;
+						case GL_FLOAT_MAT4:	  UploadMat4(iterator->first, *(glm::mat4*)data); break;
+					}
+				}
+			}
+#ifdef OLD_SLOW_PATH
+			std::vector<UniformData>::iterator it;
+			for (it = m_UniformBuffer.begin(); it != m_UniformBuffer.end(); it++)
+			{
+				if (it->Name == uniformName)
+				{
+					//This is enormously dangerous. You need a safe_check here before you do this assignment.
+					if ((GetSizeInBytesFromGLDataType(it->Type) * it->Count) != size)
+					{
+						CRITICAL_ASSERT("Memory size you tried to set is not valid.");
+					}
+					else
+					{
+						memcpy_s(it->Data, GetSizeInBytesFromGLDataType(it->Type) * it->Count, data, size);
+						switch (it->Type)
+						{
+							case GL_FLOAT:		  UploadFloat(it->Name, *(float*)it->Data);                 break;
+							case GL_SAMPLER:
+							case GL_SAMPLER_2D:
+							case GL_SAMPLER_3D:
+							case GL_SAMPLER_1D:
+							case GL_SAMPLER_CUBE:
+							case GL_INT:
+							case GL_UNSIGNED_BYTE:
+							case GL_UNSIGNED_INT: UploadIntegerArray(it->Name, (int*)it->Data, it->Count);  break;
+							case GL_FLOAT_VEC2:   UploadFloat2(it->Name, *(glm::vec2*)it->Data);			break;
+							case GL_FLOAT_VEC3:	  UploadFloat3(it->Name, *(glm::vec3*)it->Data);			break;
+							case GL_FLOAT_VEC4:	  UploadFloat4(it->Name, *(glm::vec4*)it->Data);			break;
+							case GL_FLOAT_MAT4:	  UploadMat4  (it->Name, *(glm::mat4*)it->Data);			break;
+						}
+					}
+				}
+			}
+#endif
 		}
 		void Shader::UploadFloat(const std::string name, const float value)
 		{
-			enable();
+			Enable();
 			glUniform1f(GetUniformLocation(name), value);
 		}
 		void Shader::UploadFloatArray(const std::string name, float* value, int count)
 		{
-			enable();
+			Enable();
 			glUniform1fv(GetUniformLocation(name), count, value);
 		}
 		void Shader::UploadInteger(const std::string name, const int value)
 		{
-			enable();
+			Enable();
 			glUniform1i(GetUniformLocation(name), value);
-		}
-		void Shader::UploadIntegerArray(const GLchar* name, int* value, int count)
-		{
-			enable();
-			glUniform1iv(GetUniformLocation(name), count, value);
 		}
 		void Shader::UploadFloat2(const std::string name, const glm::vec2& vector)
 		{
-			enable();
+			Enable();
 			glUniform2f(GetUniformLocation(name), vector.x, vector.y);
 		}
 		void Shader::UploadFloat3(const std::string name, const glm::vec3& vector)
 		{
-			enable();
+			Enable();
 			glUniform3f(GetUniformLocation(name), vector.x, vector.y, vector.z);
 		}
 		void Shader::UploadFloat4(const std::string name, const glm::vec4& vector)
 		{
-			enable();
+			Enable();
 			glUniform4f(GetUniformLocation(name), vector.x, vector.y, vector.z, vector.w);
 		}
 		void Shader::UploadMat4(const std::string name, const glm::mat4& matrix)
 		{
-			enable();
+			Enable();
 			glUniformMatrix4fv(GetUniformLocation(name), 1, GL_FALSE, glm::value_ptr(matrix));
 		}
-
 		void Shader::UploadIntegerArray(const std::string name, int* values, uint32_t count)
 		{
-			enable();
+			Enable();
 			glUniform1iv(GetUniformLocation(name), count, values);
 		}
-
 		std::unordered_map<std::string, Ref<Shader>> ShaderLibrary::m_Shaders;
 		Ref<Shader> ShaderLibrary::AddShader(const Ref<Shader>& shader)
 		{
