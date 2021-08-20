@@ -23,24 +23,26 @@ namespace AnorEngine
 		}
 
 
-		//Loop through point lights.
+		//----- Point Lights
 		auto pointLightView = m_Registry.view<TransformComponent, MeshRendererComponent, TagComponent, PointLightComponent>();
 		int PointLightCount = 0;
 		for (auto& entity : pointLightView)
 		{
 			auto [transformComponent, meshRendererComponent, tagComponent, pointLightComponent] = pointLightView.get<TransformComponent, MeshRendererComponent, TagComponent, PointLightComponent>(entity);
-			Graphics::Renderer2D::SetPointLightInShader(transformComponent, meshRendererComponent, pointLightComponent, PointLightCount);
+			Graphics::Renderer2D::SetPointLightInAllShaders(transformComponent, meshRendererComponent, pointLightComponent, PointLightCount);
 			PointLightCount++;
 		}
 		Graphics::Renderer2D::SetPointLightCount(PointLightCount);
+		//----- Point Lights
 
+		//----- Cubes
 		auto viewCube = m_Registry.view<TransformComponent, MeshRendererComponent, TagComponent>();
 		for (auto& entity : viewCube)
 		{
 			auto [transformComponent, meshRendererComponent, tagComponent] = viewCube.get<TransformComponent, MeshRendererComponent, TagComponent>(entity);
 			Graphics::Renderer2D::DrawCube(transformComponent, meshRendererComponent, tagComponent);
 		}
-
+		//----- Cubes
 		Graphics::Renderer2D::EndScene();
 	}
 	void Scene::OnUpdateRuntime(float deltaTime)

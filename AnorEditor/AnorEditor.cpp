@@ -4,15 +4,16 @@
 #include "Scene/SceneSerializer.h"
 #include "Utility/WindowsUtils.h"
 #include "ExampleLayer.h"
+#include "Panels/ContentBrowserPanel.h"
 namespace Game
 {
 	using namespace AnorEngine;
 	using namespace Graphics;
-	
 	class AnorEditor : public Application
 	{
 	private:
 		Ref<SceneHierarchyPanel>          m_SceneHierarchyPanel;
+		ContentBrowserPanel               m_ContentBrowserPanel;
 		LayerStack						  m_LayerStack;
 		Ref<OrthographicCamera>			  m_OrthoCamera;
 		Ref<EditorCamera>				  m_EditorCamera;
@@ -46,11 +47,6 @@ namespace Game
 			//Layer insertion----------------------------------------------------------------------------------------
 			PushLayer(m_Layer);
 		}
-	protected:
-		virtual ~AnorEditor()
-		{
-			WARN("SandboxApp destructor completed!!!");
-		}
 	public:
 		virtual void Run() override
 		{
@@ -73,7 +69,7 @@ namespace Game
 
 				ImGuiDockspaceSetup();
 				m_IsRuntime = m_SceneHierarchyPanel->OnImGuiRender();
-
+				m_ContentBrowserPanel.OnImGuiRender();
 				//Frames of the scene will be rendered to this panel. Every frame will be rendered to a framebuffer and ImGui will read that data in here and render it to one of its viewport window objects as a texture. 
 				ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0, 0));
 				ImGui::Begin("Viewport");
@@ -283,6 +279,11 @@ namespace Game
 			deltaTime = currentFrameRenderTime - m_LastFrameRenderTime;
 			m_LastFrameRenderTime = currentFrameRenderTime;
 			return deltaTime;
+		}
+	protected:
+		virtual ~AnorEditor()
+		{
+			WARN("SandboxApp destructor completed!!!");
 		}
 	};
 	AnorEngine::Application* CreateApplication()

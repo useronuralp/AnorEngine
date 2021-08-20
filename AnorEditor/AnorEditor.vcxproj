@@ -164,6 +164,7 @@
   <ItemGroup>
     <ClCompile Include="AnorEditor.cpp" />
     <ClCompile Include="ExampleLayer.cpp" />
+    <ClCompile Include="Source\Panels\ContentBrowserPanel.cpp" />
     <ClCompile Include="Source\Panels\SceneHierarchyPanel.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -176,6 +177,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ExampleLayer.h" />
+    <ClInclude Include="Source\Panels\ContentBrowserPanel.h" />
     <ClInclude Include="Source\Panels\SceneHierarchyPanel.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

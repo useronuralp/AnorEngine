@@ -189,17 +189,20 @@ namespace AnorEngine
 		{
 			s_Data.PointLightCount = count;
 		}
-		void Renderer2D::SetPointLightInShader(const TransformComponent& tc, const MeshRendererComponent& mc, const PointLightComponent& plc, int index)
+		void Renderer2D::SetPointLightInAllShaders(const TransformComponent& tc, const MeshRendererComponent& mc, const PointLightComponent& plc, int index)
 		{
-			ShaderLibrary::GetShader("CubeShader")->UploadUniform("u_PointLights[" + std::to_string(index) + "].color", sizeof(mc.Color), &mc.Color);
-			ShaderLibrary::GetShader("CubeShader")->UploadUniform("u_PointLights[" + std::to_string(index) + "].position", sizeof(tc.Translation), &tc.Translation);
-			ShaderLibrary::GetShader("CubeShader")->UploadUniform("u_PointLights[" + std::to_string(index) + "].constant", sizeof(float), &plc.Constant);
-			ShaderLibrary::GetShader("CubeShader")->UploadUniform("u_PointLights[" + std::to_string(index) + "].Linear", sizeof(plc.Linear), &plc.Linear);
-			ShaderLibrary::GetShader("CubeShader")->UploadUniform("u_PointLights[" + std::to_string(index) + "].quadratic", sizeof(plc.Quadratic), &plc.Quadratic);
-			ShaderLibrary::GetShader("CubeShader")->UploadUniform("u_PointLights[" + std::to_string(index) + "].intensity", sizeof(plc.Intensity), &plc.Intensity);		
-			ShaderLibrary::GetShader("CubeShader")->UploadUniform("u_PointLights[" + std::to_string(index) + "].ambient", sizeof(mc.Material.Properties.Ambient), &mc.Material.Properties.Ambient);
-			ShaderLibrary::GetShader("CubeShader")->UploadUniform("u_PointLights[" + std::to_string(index) + "].diffuse", sizeof(mc.Material.Properties.Diffuse), &mc.Material.Properties.Diffuse); // darken diffuse light a bit
-			ShaderLibrary::GetShader("CubeShader")->UploadUniform("u_PointLights[" + std::to_string(index) + "].specular", sizeof(mc.Material.Properties.Specular), &mc.Material.Properties.Specular);
+			for (auto& [shaderName, shader] : ShaderLibrary::GetLibrary())
+			{
+				shader->UploadUniform("u_PointLights[" + std::to_string(index) + "].color", sizeof(mc.Color), &mc.Color);
+				shader->UploadUniform("u_PointLights[" + std::to_string(index) + "].position", sizeof(tc.Translation), &tc.Translation);
+				shader->UploadUniform("u_PointLights[" + std::to_string(index) + "].constant", sizeof(float), &plc.Constant);
+				shader->UploadUniform("u_PointLights[" + std::to_string(index) + "].Linear", sizeof(plc.Linear), &plc.Linear);
+				shader->UploadUniform("u_PointLights[" + std::to_string(index) + "].quadratic", sizeof(plc.Quadratic), &plc.Quadratic);
+				shader->UploadUniform("u_PointLights[" + std::to_string(index) + "].intensity", sizeof(plc.Intensity), &plc.Intensity);		
+				shader->UploadUniform("u_PointLights[" + std::to_string(index) + "].ambient", sizeof(mc.Material.Properties.Ambient), &mc.Material.Properties.Ambient);
+				shader->UploadUniform("u_PointLights[" + std::to_string(index) + "].diffuse", sizeof(mc.Material.Properties.Diffuse), &mc.Material.Properties.Diffuse); // darken diffuse light a bit
+				shader->UploadUniform("u_PointLights[" + std::to_string(index) + "].specular", sizeof(mc.Material.Properties.Specular), &mc.Material.Properties.Specular);
+			}
 		}
 		void Renderer2D::DrawCube(const TransformComponent& tc, const MeshRendererComponent& mc, const TagComponent& tagc)
 		{
@@ -322,20 +325,20 @@ namespace AnorEngine
 			//TODO: Hard coded the color attachment index as 4 because it is known at the moment.
 			glClearTexImage(4, 0, GL_RED_INTEGER, GL_INT, &clearValue);
 
-			for (auto& element : ShaderLibrary::GetLibrary())
-			{			
-				auto matrix = s_Data.EditorCamera->GetViewProjectionMatrix();
-				auto position = s_Data.EditorCamera->GetPosition();
-				element.second->UploadUniform("u_ViewProjMat", sizeof(matrix), &matrix);
-				element.second->UploadUniform("u_CameraPos", sizeof(position), &position);
-				element.second->UploadUniform("u_PointLightCount", sizeof(s_Data.PointLightCount), &s_Data.PointLightCount);
+			for (auto& [shaderName, shader] : ShaderLibrary::GetLibrary())
+			{	
+				if (shaderName == "SkyboxShader")
+				{
+					auto viewProjMatrix = s_Data.EditorCamera->GetProjectionMatrix() * glm::mat4(glm::mat3(s_Data.EditorCamera->GetViewMatrix()));
+					shader->UploadUniform("u_ViewProjMat", sizeof(viewProjMatrix), &(viewProjMatrix));
+				}
+				else
+				{
+					shader->UploadUniform("u_ViewProjMat", sizeof(s_Data.EditorCamera->GetViewProjectionMatrix()), &s_Data.EditorCamera->GetViewProjectionMatrix());
+					shader->UploadUniform("u_CameraPos", sizeof(s_Data.EditorCamera->GetPosition()), &s_Data.EditorCamera->GetPosition());
+					shader->UploadUniform("u_PointLightCount", sizeof(s_Data.PointLightCount), &s_Data.PointLightCount);
+				}
 			}
-
-			glm::mat4 projectionMatrix = s_Data.EditorCamera->GetProjectionMatrix();
-			glm::mat4 viewMatrix = s_Data.EditorCamera->GetViewMatrix();
-			viewMatrix = glm::mat4(glm::mat3(viewMatrix));
-			auto viewProjMatrix = projectionMatrix * viewMatrix;
-			ShaderLibrary::GetShader("SkyboxShader")->UploadUniform("u_ViewProjMat", sizeof(viewProjMatrix), &(viewProjMatrix));
 
 			s_Data.NumberOfDrawCalls = 0;
 			s_Data.QuadIndexCount = 0;
@@ -347,7 +350,6 @@ namespace AnorEngine
 			s_Data.RuntimeCamera = camera;
 
 			glm::mat4 viewProjMatrix = s_Data.RuntimeCamera->GetProjectionMatrix() * glm::inverse(transform);
-
 			ShaderLibrary::GetShader("2Shader")->UploadUniform("u_ViewProjMat", sizeof(viewProjMatrix), &viewProjMatrix);
 
 			glm::mat4 viewMatrix = transform;

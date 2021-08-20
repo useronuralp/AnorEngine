@@ -29,7 +29,7 @@ namespace AnorEngine
 			//Will become deprecated soon.
 			static void SetOrthographicCamera(const Ref<OrthographicCamera> camera);
 			static void SetPointLightCount(int count);
-			static void SetPointLightInShader(const TransformComponent& tc, const MeshRendererComponent& mc, const PointLightComponent& plc, int index);
+			static void SetPointLightInAllShaders(const TransformComponent& tc, const MeshRendererComponent& mc, const PointLightComponent& plc, int index);
 			static void DrawCube(const TransformComponent& tc, const MeshRendererComponent& mc, const TagComponent& tagc);
 			static void DrawSkybox();
 			//static void Submit(const glm::vec3& position, const glm::vec2& size, const Ref<Texture> texture, float rotationDegree = 0.0f, const glm::vec4& tintColor = { 1.0f, 1.0f, 1.0f, 1.0f } );

@@ -18,10 +18,13 @@ namespace AnorEngine
 			virtual ~Camera() = default;
 		public:
 			void SetProjectionMatrix(float left, float right, float bottom, float top);
-			glm::mat4& GetProjectionMatrix() { return m_ProjectionMatrix; }
+			const glm::mat4& GetProjectionMatrix() { return m_ProjectionMatrix; }
+			const glm::mat4& GetViewMatrix() const { return m_ViewMatrix; }
+			const glm::mat4& GetViewProjectionMatrix() const { return m_ViewProjectionMatrix; }
 		protected:
 			glm::mat4 m_ProjectionMatrix{ 1.0f };
 			glm::mat4 m_ViewMatrix{ 1.0f };
+			glm::mat4 m_ViewProjectionMatrix{ 1.0f }; //Combination of the upper two matrices.
 		};
 
 		class ANOR_API PerspectiveCamera
