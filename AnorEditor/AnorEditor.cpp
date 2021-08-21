@@ -13,7 +13,7 @@ namespace Game
 	{
 	private:
 		Ref<SceneHierarchyPanel>          m_SceneHierarchyPanel;
-		ContentBrowserPanel               m_ContentBrowserPanel;
+		Ref<ContentBrowserPanel>          m_ContentBrowserPanel;
 		LayerStack						  m_LayerStack;
 		Ref<OrthographicCamera>			  m_OrthoCamera;
 		Ref<EditorCamera>				  m_EditorCamera;
@@ -35,16 +35,19 @@ namespace Game
 		AnorEditor(const char* appName)
 			:Application(appName), m_OrthoCamera(std::make_shared<OrthographicCamera>(-1280.0f / 720.0f * (5), 1280.0f / 720.0f * (5), -1 * (5), 1 * (5))), m_PersCamera(std::make_shared<PerspectiveCamera>(1280, 720))
 		{
-			m_EditorCamera = std::make_shared<EditorCamera>();
 			Input::EventHandler::SetTargetApplication(this); //Important to set this to the active Application else, you won't get your input processed.	
-			//Framebuffer Settings --------------------------------------------------------------------------------------------
+			//Framebuffer////////////////////////////////////////
 			FramebufferSpecifications fbSpecs;
 			fbSpecs.Attachments = { {FramebufferTextureFormat::RGBA8}, {FramebufferTextureFormat::RED_INTEGER}, {FramebufferTextureFormat::DEPTH24STENCIL8} };
 			m_Framebuffer = std::make_shared<Framebuffer>(fbSpecs);
-			//Layer Creation--------------------------------------------------------------------------------------------
+			//Camera////////////////////////////////////////
+			m_EditorCamera = std::make_shared<EditorCamera>();
+			//Layer Creation////////////////////////////////
 			m_Layer = std::make_shared<ExampleLayer>(m_EditorCamera);
+			//Panels////////////////////////////////
+			m_ContentBrowserPanel = std::make_shared<ContentBrowserPanel>();
 			m_SceneHierarchyPanel = std::make_shared<SceneHierarchyPanel>(m_Layer->GetScene());
-			//Layer insertion----------------------------------------------------------------------------------------
+			//Layer insertion/////////////////////////////////
 			PushLayer(m_Layer);
 		}
 	public:
@@ -69,7 +72,7 @@ namespace Game
 
 				ImGuiDockspaceSetup();
 				m_IsRuntime = m_SceneHierarchyPanel->OnImGuiRender();
-				m_ContentBrowserPanel.OnImGuiRender();
+				m_ContentBrowserPanel->OnImGuiRender();
 				//Frames of the scene will be rendered to this panel. Every frame will be rendered to a framebuffer and ImGui will read that data in here and render it to one of its viewport window objects as a texture. 
 				ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0, 0));
 				ImGui::Begin("Viewport");
@@ -85,6 +88,18 @@ namespace Game
 
 				uint32_t texture = m_Framebuffer->GetColorAttachmentID();
 				ImGui::Image((void*)texture, { m_Framebuffer->GetDimensions().x, m_Framebuffer->GetDimensions().y }, { 0,1 }, { 1,0 });
+
+				if (ImGui::BeginDragDropTarget())
+				{
+					
+					if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("CONTENT_BROWSER_ITEM"))
+					{
+						const wchar_t* path = (const wchar_t*)payload->Data;
+						OpenScene(std::filesystem::path((std::string(__SOLUTION_DIR) + "AnorEngine/Assets")) / path);
+					}
+					ImGui::EndDragDropTarget();
+				}
+
 				ImGui::End();
 				ImGui::PopStyleVar();
 
@@ -179,33 +194,11 @@ namespace Game
 				if (ImGui::BeginMenu("File"))
 				{
 					if (ImGui::MenuItem("New"))
-					{
-						auto& activeScene = m_Layer->GetScene();
-						activeScene = std::make_shared<Scene>();
-						m_SceneHierarchyPanel->SetContext(m_Layer->GetScene());
-					}
+						CreateScene();
 					if (ImGui::MenuItem("Open..."))
-					{
-						std::string filepath = FileDialogs::OpenFile("Anor Scene (*.anor)\0*.anor\0");
-						if (!filepath.empty())
-						{
-							auto& activeScene = m_Layer->GetScene();
-							activeScene = std::make_shared<Scene>();
-							m_SceneHierarchyPanel->SetContext(m_Layer->GetScene());
-							SceneSerializer serializer(activeScene);
-							serializer.Deserialize(filepath);
-							activeScene->OnResizeViewport(m_ViewportSize.x, m_ViewportSize.y);
-						}
-					}
+						OpenScene();
 					if (ImGui::MenuItem("Save As..."))
-					{
-						std::string filepath = FileDialogs::SaveFile("Anor Scene (*.anor)\0*.anor\0");
-						if (!filepath.empty())
-						{
-							SceneSerializer serializer(m_Layer->GetScene());
-							serializer.Serialize(filepath);
-						}
-					}
+						SaveSceneAs();
 					ImGui::EndMenu();
 				}
 				ImGui::EndMenuBar();
@@ -279,6 +272,42 @@ namespace Game
 			deltaTime = currentFrameRenderTime - m_LastFrameRenderTime;
 			m_LastFrameRenderTime = currentFrameRenderTime;
 			return deltaTime;
+		}
+		void OpenScene(const std::filesystem::path& filePath )
+		{
+			if (!filePath.empty())
+			{
+				auto& activeScene = m_Layer->GetScene();
+				activeScene = std::make_shared<Scene>();
+				m_SceneHierarchyPanel->SetContext(m_Layer->GetScene());
+
+				SceneSerializer serializer(activeScene);
+				serializer.Deserialize(filePath.string());
+				activeScene->OnResizeViewport(m_ViewportSize.x, m_ViewportSize.y);
+			}
+		}
+		void OpenScene()
+		{
+			std::string filepath = FileDialogs::OpenFile("Anor Scene (*.anor)\0*.anor\0");
+			if (!filepath.empty())
+			{
+				OpenScene(filepath);
+			}
+		}
+		void CreateScene()
+		{
+			auto& activeScene = m_Layer->GetScene();
+			activeScene = std::make_shared<Scene>();
+			m_SceneHierarchyPanel->SetContext(m_Layer->GetScene());
+		}
+		void SaveSceneAs()
+		{
+			std::string filepath = FileDialogs::SaveFile("Anor Scene (*.anor)\0*.anor\0");
+			if (!filepath.empty())
+			{
+				SceneSerializer serializer(m_Layer->GetScene());
+				serializer.Serialize(filepath);
+			}
 		}
 	protected:
 		virtual ~AnorEditor()

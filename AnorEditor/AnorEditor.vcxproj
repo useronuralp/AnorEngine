@@ -140,7 +140,7 @@
       <Profile>true</Profile>
     </Link>
     <PostBuildEvent>
-      <Command>XCOPY "$(SolutionDir)\AnorEditor\imgui.ini" "$(SolutionDir)\bin\AnorEditor_Debug_x64"</Command>
+      <Command>XCOPY "$(SolutionDir)\AnorEditor\imgui.ini" "$(SolutionDir)\bin\AnorEditor_Debug_x64" /y</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -164,7 +164,7 @@
       <Profile>true</Profile>
     </Link>
     <PostBuildEvent>
-      <Command>XCOPY "$(SolutionDir)\AnorEditor\imgui.ini" "$(SolutionDir)\bin\AnorEditor_Debug_x64"</Command>
+      <Command>XCOPY "$(SolutionDir)\AnorEditor\imgui.ini" "$(SolutionDir)\bin\AnorEditor_Debug_x64" /y</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>

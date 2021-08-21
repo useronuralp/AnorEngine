@@ -7,6 +7,7 @@ namespace AnorEngine
 {
 	class ANOR_API ImGuiBase
 	{
+		
 	public:
 		ImGuiBase() {};
 	public:

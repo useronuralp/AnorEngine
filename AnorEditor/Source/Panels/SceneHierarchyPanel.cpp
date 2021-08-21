@@ -69,8 +69,6 @@ namespace AnorEngine
 	}
 	SceneHierarchyPanel::SceneHierarchyPanel(const Ref<Scene>& scene)
 	{
-		m_PlayButtonTexture = std::make_shared<Graphics::Texture>(std::string(__SOLUTION_DIR) + "AnorEngine\\Assets\\Textures\\play.png");
-		m_PauseButtonTexture = std::make_shared<Graphics::Texture>(std::string(__SOLUTION_DIR) + "AnorEngine\\Assets\\Textures\\pause.png");
 		SetContext(scene);
 	}
 	void SceneHierarchyPanel::SetContext(const Ref<Scene>& scene)
@@ -223,11 +221,7 @@ namespace AnorEngine
 	}
 	bool SceneHierarchyPanel::OnImGuiRender()
 	{
-		int texID = m_IsRuntime ? m_PauseButtonTexture->GetTextureID() : m_PlayButtonTexture->GetTextureID();
 		ImGui::Begin("Scene Hierarchy");
-
-		if (ImGui::ImageButton((void*)texID, ImVec2{ 50.0f, 50.0f }))
-			m_IsRuntime = !m_IsRuntime;
 
 		m_Context->m_Registry.each([&](auto entityID)
 		{

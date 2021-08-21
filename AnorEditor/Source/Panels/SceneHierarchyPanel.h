@@ -56,8 +56,6 @@ namespace AnorEngine
 		}
 	private:
 		bool m_IsRuntime = false;
-		Ref<Graphics::Texture> m_PlayButtonTexture;
-		Ref<Graphics::Texture> m_PauseButtonTexture;
 		Ref<Scene> m_Context;
 		Entity m_SelectionContext;
 	};
