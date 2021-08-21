@@ -7,3 +7,6 @@
 [submodule "AnorEngine/Vendor/yaml-cpp"]
 	path = AnorEngine/Vendor/yaml-cpp
 	url = https://github.com/useronuralp/yaml-cpp.git
+[submodule "ImGui"]
+	path = AnorEngine/Vendor/ImGui
+	url = https://github.com/useronuralp/imgui.git
