@@ -4,19 +4,37 @@
 #include "../vendor/stb_image/stb_image.h"
 #include "texture.h"
 namespace AnorEngine {
-
+	extern const std::filesystem::path g_AssetPath = (std::string(__SOLUTION_DIR) + "AnorEngine\\Assets\\");
+	extern const std::filesystem::path g_ResourcesPath = (std::string(__SOLUTION_DIR) + "AnorEditor\\");
 	//!!!! DEFAULT GLFW FRAMEBUFFER TEXTURE ID IS 0 !!!!!
+	//! 
 	//!!!! WHITE TEXTURE ID IS 1 !!!!!!
 	//!!!! SKYBOX TEXTURE ID IS 2 !!!!!
 	//!!!! A SINGLE FRAMEBUFFER WILL ALLOCATE 3 TEXTURE IDs (2 FOR COLOR, 1 FOR DEPTH) !!!!!
 	//!!!! THEN WILL COME THE TEXTURES YOU LOAD !!!!
 	namespace Graphics {
-		Texture::Texture(const std::string& path)
-			:m_FilePath(path)
+		Texture::Texture(const std::filesystem::path& relativePath, const char* fileType)
+		{
+			m_RelativeFilePath = relativePath.string();
+			if (fileType == "Asset")
+				m_AbsoluteFilePath = g_AssetPath.string() + relativePath.string();
+			else if(fileType == "Resource")
+				m_AbsoluteFilePath = g_ResourcesPath.string() + relativePath.string();
+			SetupTexture();
+		}
+		void Texture::CreateTextureWithRelativePath(std::filesystem::path relativePath)
+		{
+			m_RelativeFilePath = relativePath.string();
+			m_AbsoluteFilePath = g_AssetPath.string() + relativePath.string();
+			if (m_TextureID) //If the ID is not 0, then it means this framebuffer was already in use and we want to delete it and start the recreation fresh.
+				glDeleteTextures(1, &m_TextureID);
+			SetupTexture();
+		}
+		void Texture::SetupTexture()
 		{
 			int width, height, channels;
 			stbi_set_flip_vertically_on_load(1); //in OpenGL the texture (0,0) starts at bottom left. Regular images you load need to be flipped in order to alignh with that rule.
-			stbi_uc* data = stbi_load(path.c_str(), &width, &height, &channels, 0);
+			stbi_uc* data = stbi_load(m_AbsoluteFilePath.c_str(), &width, &height, &channels, 0);
 			m_Width = width;
 			m_Channels = channels;
 			m_Height = height;
@@ -32,12 +50,11 @@ namespace AnorEngine {
 				internalFormat = GL_RGB8;
 				dataFormat = GL_RGB;
 			}
-
 			//Texture IDs start from number 1. Number 0 means that the texture is either invalid or it was deleted.
 			glCreateTextures(GL_TEXTURE_2D, 1, &m_TextureID);
 			glTextureStorage2D(m_TextureID, 1, internalFormat, m_Width, m_Height);
 
-			glTextureParameteri(m_TextureID, GL_TEXTURE_MIN_FILTER, GL_LINEAR );//minify scaling
+			glTextureParameteri(m_TextureID, GL_TEXTURE_MIN_FILTER, GL_LINEAR);//minify scaling
 			glTextureParameteri(m_TextureID, GL_TEXTURE_MAG_FILTER, GL_NEAREST);//magnify scaling
 			glTextureParameteri(m_TextureID, GL_TEXTURE_WRAP_S, GL_REPEAT);
 			glTextureParameteri(m_TextureID, GL_TEXTURE_WRAP_T, GL_REPEAT);
@@ -69,14 +86,14 @@ namespace AnorEngine {
 			{
 				//flipping images doesnt work!!
 				stbi_set_flip_vertically_on_load(true);
-				stbi_uc* data = stbi_load(faces[i].c_str(), &width, &height, &nrChannels, 0);
+				stbi_uc* data = stbi_load((g_AssetPath.string() + faces[i]).c_str(), &width, &height, &nrChannels, 0);
 				if (data)
 				{
 					glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i,
 						0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data
 					);
 					m_Faces[i].m_Channels = nrChannels;
-					m_Faces[i].m_FilePath = faces[i];
+					m_Faces[i].m_AbsoluteFilePath = g_AssetPath.string() + faces[i];
 					m_Faces[i].m_Height = height;
 					m_Faces[i].m_Width = width;		
 					stbi_image_free(data);

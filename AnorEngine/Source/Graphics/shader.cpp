@@ -1,6 +1,10 @@
 #include "pch.h"
 #include "shader.h"
 namespace AnorEngine {
+	//Globals, defined in texture.h
+	extern const std::filesystem::path g_AssetPath;
+	extern const std::filesystem::path g_ResourcesPath;
+
 	namespace Graphics {
 
 		// TODO: !!!WARNING!!! DATA SIZES MAY BE INCORRECT DOUBLE CHECK THEM LATER.
@@ -70,11 +74,11 @@ namespace AnorEngine {
 			m_FragPath = fragPath;
 			Compile(shaderSources);
 		}
-		Shader::Shader(std::string name, std::string filepath)
+		Shader::Shader(std::string name, std::string relativeFilePath)
 			:m_Name(name)
 		{
-			m_FilePath = filepath;
-			std::string source = ReadFile(filepath);
+			m_AbsoluteFilePath = g_AssetPath.string() + relativeFilePath;
+			std::string source = ReadFile(m_AbsoluteFilePath);
 			std::unordered_map<GLenum, std::string> shaderSources = PreProcess(source);
 			Compile(shaderSources);
 
@@ -178,10 +182,10 @@ namespace AnorEngine {
 			}
 			m_ShaderID = program;
 		}
-		std::string Shader::ReadFile(std::string filepath)
+		std::string Shader::ReadFile(std::string absoluteFilePath)
 		{
 			std::string result;
-			std::ifstream in(filepath, std::ios::in | std::ios::binary);
+			std::ifstream in(absoluteFilePath, std::ios::in | std::ios::binary);
 			if (in)
 			{
 				in.seekg(0, std::ios::end);

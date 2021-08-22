@@ -5,6 +5,35 @@
 #include <imgui_internal.h>
 namespace AnorEngine
 {
+	static void DrawDragFloatControl(const char* label, float& value, float dragSensetivity = 0.01f, float minValue = 0.1f, float maxValue = 1.0f, float columnWidth = 200.0f)
+	{
+		ImGui::PushID(label);
+		ImGui::BeginColumns("Columns", 2);
+		ImGui::SetColumnWidth(0, 100);
+		//ImGui::SetColumnWidth(1, columnWidth);
+		ImGui::TextUnformatted(label);
+		ImGui::NextColumn();
+		ImGui::SetNextItemWidth(-1);
+		ImGui::DragFloat("", &value, dragSensetivity, minValue, maxValue);
+		ImGui::NextColumn();
+		ImGui::EndColumns();
+		ImGui::Separator();
+		ImGui::PopID();
+	}
+	static void DrawColorEdit4Control(const char* label, glm::vec4& color, float columnWidth = 200.0f)
+	{
+		ImGui::PushID(label);
+		ImGui::BeginColumns("Columns", 2);
+		//ImGui::SetColumnWidth(1, columnWidth);
+		ImGui::TextUnformatted(label);
+		ImGui::NextColumn();
+		ImGui::SetNextItemWidth(-1);
+		ImGui::ColorEdit4("", glm::value_ptr(color));
+		ImGui::NextColumn();
+		ImGui::EndColumns();
+		ImGui::Separator();
+		ImGui::PopID();
+	}
 	static void DrawVec3Control(const std::string& label, glm::vec3& values, float dragSensetivity = 0.01f, float resetValue = 0.0f, float columnWidth = 100.0f)
 	{
 		ImGui::PushID(label.c_str());
@@ -130,14 +159,40 @@ namespace AnorEngine
 			component.Rotation = glm::radians(rotationDegree);
 			DrawVec3Control("Scale", component.Scale, 0.1f, 1.0f);
 		});
-		DrawComponent<MeshRendererComponent>("Mesh Renderer", entity, [&entity](auto& component)
+
+		DrawComponent<MeshRendererComponent>("Mesh Renderer", entity, [](auto& component)
 		{
-			ImGui::ColorEdit4("Color", glm::value_ptr(component.Color));
-			ImGui::DragFloat("Ambient", &component.Material.Properties.Ambient, 0.01f, 0.0f, 1.0f);
-			ImGui::DragFloat("Diffuse", &component.Material.Properties.Diffuse, 0.01f, 0.0f, 1.0f);
-			ImGui::DragFloat("Specular", &component.Material.Properties.Specular, 0.01f, 0.0f, 1.0f);
-			ImGui::DragFloat("Shininess", &component.Material.Properties.Shininess, 1.0f, 1.0f, 100.0f);
-			ImGui::DragFloat("Metalness", &component.Material.Properties.Metalness, 0.01f, 0.0f, 1.0f);
+			DrawColorEdit4Control("Color", component.Color);
+			DrawDragFloatControl("Ambient", component.Material->Properties.Ambient, 0.01f, 0.0f, 1.0f);
+			DrawDragFloatControl("Diffuse", component.Material->Properties.Diffuse, 0.01f, 0.0f, 1.0f);
+			DrawDragFloatControl("Specular", component.Material->Properties.Specular, 0.01f, 0.0f, 1.0f);
+			DrawDragFloatControl("Shininess", component.Material->Properties.Shininess, 1.0f, 1.0f, 100.0f);
+			DrawDragFloatControl("Metalness", component.Material->Properties.Metalness, 0.01f, 0.0f, 1.0f);
+
+
+			ImGui::BeginColumns("Columns", 2);
+			ImGui::SetColumnWidth(0, 100);
+			ImGui::TextUnformatted("Texture");
+			ImGui::NextColumn();
+			ImGui::SetNextItemWidth(-1);
+			ImGui::Button(component.Material->Texture->GetPath().c_str());
+
+			
+			if (ImGui::BeginDragDropTarget())
+			{
+				if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("CONTENT_BROWSER_ITEM"))
+				{
+					const wchar_t* path = (const wchar_t*)payload->Data;
+					if (std::wstring(path).find(L"Textures\\") != std::wstring::npos)
+					{
+						component.Material->Texture->CreateTextureWithRelativePath(path);
+					}
+				}
+				ImGui::EndDragDropTarget();
+			}
+			ImGui::NextColumn();
+			ImGui::EndColumns();
+			ImGui::Separator();
 		});
 		DrawComponent<CameraComponent>("Camera", entity, [](auto& component)
 		{
@@ -238,18 +293,18 @@ namespace AnorEngine
 				m_Context->CreateEntity();
 			if (ImGui::MenuItem("Cube"))
 			{
-				Ref<Graphics::Texture> texture = std::make_shared<Graphics::Texture>(std::string(__SOLUTION_DIR) + "AnorEngine\\Assets\\Textures\\381f5a63791945.5abc4ccf1297d.png");
-				Graphics::Material defaultMaterial(Graphics::ShaderLibrary::GetShader("CubeShader"), texture);
+				Ref<Graphics::Texture> texture = std::make_shared<Graphics::Texture>("Textures\\381f5a63791945.5abc4ccf1297d.png");
+				Ref<Graphics::Material> defaultMaterial = std::make_shared<Graphics::Material>(Graphics::ShaderLibrary::GetShader("CubeShader"), texture);
 				auto entity = m_Context->CreateEntity();
 				entity.AddComponent<MeshRendererComponent>(defaultMaterial);
 				entity.GetComponent<TagComponent>().Tag = "Cube";
 			}
 			if (ImGui::MenuItem("Cube Light"))
 			{
-				Graphics::Material defaultMaterial (Graphics::ShaderLibrary::GetShader("LightCubeShader"));
-				defaultMaterial.Properties.Ambient = 0.2f;
-				defaultMaterial.Properties.Diffuse = 0.3f;
-				defaultMaterial.Properties.Specular = 1.0f;
+				Ref<Graphics::Material> defaultMaterial = std::make_shared<Graphics::Material>(Graphics::ShaderLibrary::GetShader("LightCubeShader"));
+				defaultMaterial->Properties.Ambient = 0.2f;
+				defaultMaterial->Properties.Diffuse = 0.3f;
+				defaultMaterial->Properties.Specular = 1.0f;
 				auto entity = m_Context->CreateEntity();
 				entity.GetComponent<TransformComponent>().Scale = { 0.1f, 0.1f, 0.1f };
 				entity.AddComponent<MeshRendererComponent>(defaultMaterial);

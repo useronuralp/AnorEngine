@@ -26,7 +26,7 @@ namespace AnorEngine
 			//Need deault shader.
 			Ref<Shader> Shader;
 			MaterialProperties Properties;
-			Ref<Graphics::Texture> Texture = std::make_shared<Graphics::Texture>(std::string(__SOLUTION_DIR) + "AnorEngine\\Assets\\Textures\\WhiteTexture.PNG"); //default texture
+			Ref<Graphics::Texture> Texture = std::make_shared<Graphics::Texture>("Textures\\WhiteTexture.PNG"); //default texture
 		};
 	}
 }

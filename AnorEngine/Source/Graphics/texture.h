@@ -5,21 +5,26 @@ namespace AnorEngine {
 		class ANOR_API Texture
 		{
 		private:
-			
-			std::string m_FilePath;
-			uint32_t m_TextureID, m_Width, m_Height, m_Channels;
+			std::string m_RelativeFilePath = "Not initialized";
+			std::string m_AbsoluteFilePath;
+			uint32_t m_TextureID;
+			uint32_t m_Width;
+			uint32_t m_Height;
+			uint32_t m_Channels;
+		private:
+			void SetupTexture();
 		public:
-			Texture(const std::string& path);
+			Texture(const std::filesystem::path& relativePath, const char* fileType = "Asset");
 			~Texture();
 
+			void CreateTextureWithRelativePath(std::filesystem::path relativePath);
 			void Bind(unsigned int slot) const;
 			void Unbind() const;
 			inline int GetWidth() const { return m_Width; }
 			inline int GetHeight() const { return m_Height; }
 			inline const unsigned int& GetTextureID() const { return m_TextureID; }
 
-
-			inline std::string GetPath() { return m_FilePath; }
+			inline std::string GetPath() { return m_RelativeFilePath == "Not initialized" ? m_AbsoluteFilePath : m_RelativeFilePath; }
 			bool operator == (const Texture& other) const
 			{
 				return m_TextureID == other.m_TextureID;
@@ -27,7 +32,7 @@ namespace AnorEngine {
 		};
 		struct CubeMapTextureFace
 		{
-			std::string m_FilePath;
+			std::string m_AbsoluteFilePath;
 			uint32_t m_Width;
 			uint32_t m_Height;
 			uint32_t m_Channels;

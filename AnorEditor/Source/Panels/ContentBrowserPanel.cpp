@@ -5,14 +5,16 @@
 #include <imgui.h>
 namespace AnorEngine
 {
-	static const std::filesystem::path s_AssetPath = (std::string(__SOLUTION_DIR) + "AnorEngine\\Assets");
+	//Initialized in texture.h 
+	extern const std::filesystem::path g_AssetPath;
+	extern const std::filesystem::path g_ResourcesPath;
 
 	ContentBrowserPanel::ContentBrowserPanel()
-		: m_CurrentDirectory(s_AssetPath)
+		: m_CurrentDirectory(g_AssetPath)
 	{
-		m_DirectoryIcon = std::make_shared<Graphics::Texture>(std::string(__SOLUTION_DIR) + "AnorEditor\\Resources\\Icons\\DirectoryIcon.jpg");
-		m_FileIcon = std::make_shared<Graphics::Texture>(std::string(__SOLUTION_DIR) + "AnorEditor\\Resources\\Icons\\FileIcon.png");
-		m_BackIcon = std::make_shared<Graphics::Texture>(std::string(__SOLUTION_DIR) + "AnorEditor\\Resources\\Icons\\BackIcon.png");
+		m_DirectoryIcon = std::make_shared<Graphics::Texture>("Resources\\Icons\\DirectoryIcon.jpg", "Resource");
+		m_FileIcon = std::make_shared<Graphics::Texture>("Resources\\Icons\\FileIcon.png", "Resource");
+		m_BackIcon = std::make_shared<Graphics::Texture>("Resources\\Icons\\BackIcon.png", "Resource");
 	}
 	
 	void ContentBrowserPanel::OnImGuiRender()
@@ -20,21 +22,16 @@ namespace AnorEngine
 		ImGui::Begin("Content Browser");
 		auto& colors = ImGui::GetStyle().Colors;
 		
-		if (m_CurrentDirectory != std::filesystem::path(s_AssetPath))
+		if (m_CurrentDirectory != std::filesystem::path(g_AssetPath))
 		{
 			if (ImGui::ImageButton((void*)m_BackIcon->GetTextureID(), { 20.0f,20.0f }, {0,1}, {1,0}))
 			{
 				m_CurrentDirectory = m_CurrentDirectory.parent_path();
 			}
 		}
-
-
 		static float padding = 16.0f;
 		static float thumbnailSisze = 80.0f;
 		float cellSize = thumbnailSisze + padding;
-
-
-
 		float panelWidth = ImGui::GetContentRegionAvail().x;
 		int columnCount = (int)(panelWidth / cellSize);
 		if (columnCount < 1)
@@ -46,7 +43,7 @@ namespace AnorEngine
 		{
 			ImGui::PushID(i++);
 			const auto& path = directoryEntry.path();
-			auto relativePath = std::filesystem::relative(path, s_AssetPath);
+			auto relativePath = std::filesystem::relative(path, g_AssetPath);
 			std::string filenameString = relativePath.string();
 
 			auto textureID = directoryEntry.is_directory() ? m_DirectoryIcon->GetTextureID() : m_FileIcon->GetTextureID();

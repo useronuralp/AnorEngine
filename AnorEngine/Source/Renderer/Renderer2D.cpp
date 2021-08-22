@@ -130,10 +130,10 @@ namespace AnorEngine
 
 			
 			//Loading the shaders into the ShaderLibrary. You can access all of the shaders with an iterator in a for loop.
-			ShaderLibrary::LoadShader("SkyboxShader", std::string(__SOLUTION_DIR) + "AnorEngine\\Assets\\Shaders\\CubemapShader.shader");
-			ShaderLibrary::LoadShader("CubeShader", std::string(__SOLUTION_DIR) + "AnorEngine\\Assets\\Shaders\\CubeShader.shader");
-			ShaderLibrary::LoadShader("LightCubeShader", std::string(__SOLUTION_DIR) + "AnorEngine\\Assets\\Shaders\\LightCubeShader.shader");
-			ShaderLibrary::LoadShader("2DShader", std::string(__SOLUTION_DIR) + "AnorEngine\\Assets\\Shaders\\2DShader.shader");
+			ShaderLibrary::LoadShader("SkyboxShader", "Shaders\\CubemapShader.shader");
+			ShaderLibrary::LoadShader("CubeShader", "Shaders\\CubeShader.shader");
+			ShaderLibrary::LoadShader("LightCubeShader", "Shaders\\LightCubeShader.shader");
+			ShaderLibrary::LoadShader("2DShader", "Shaders\\2DShader.shader");
 
 			int samplers[s_Data.MaxTextureSlots];
 			for (uint32_t i = 0; i < s_Data.MaxTextureSlots; i++)
@@ -162,17 +162,17 @@ namespace AnorEngine
 
 			//Creating and adding a white texture. This is basically used when we only want to render a quad with its color. In that case, we multiply the color values with this white texture meaning 1. Therefore 
 			//getting the original colors on the screen.
-			s_Data.WhiteTexture = std::make_shared<Texture>(std::string(__SOLUTION_DIR) + "AnorEngine\\Assets\\Textures\\WhiteTexture.PNG"); //TODO: Create this texture without a using a PNG.
+			s_Data.WhiteTexture = std::make_shared<Texture>("Textures\\WhiteTexture.PNG"); //TODO: Create this texture without a using a PNG.
 			s_Data.TextureSlots[0] = s_Data.WhiteTexture;
 
 			std::vector<std::string> cubeMapFaces
 			{
-				std::string(__SOLUTION_DIR) + "AnorEngine\\Assets\\Textures\\Skyboxes\\skybox\\left.jpg",
-				std::string(__SOLUTION_DIR) + "AnorEngine\\Assets\\Textures\\Skyboxes\\skybox\\right.jpg",
-				std::string(__SOLUTION_DIR) + "AnorEngine\\Assets\\Textures\\Skyboxes\\skybox\\top.jpg",
-				std::string(__SOLUTION_DIR) + "AnorEngine\\Assets\\Textures\\Skyboxes\\skybox\\bottom.jpg",
-				std::string(__SOLUTION_DIR) + "AnorEngine\\Assets\\Textures\\Skyboxes\\skybox\\front.jpg",
-				std::string(__SOLUTION_DIR) + "AnorEngine\\Assets\\Textures\\Skyboxes\\skybox\\back.jpg"
+				"Textures\\Skyboxes\\skybox\\left.jpg",
+				"Textures\\Skyboxes\\skybox\\right.jpg",
+				"Textures\\Skyboxes\\skybox\\top.jpg",
+				"Textures\\Skyboxes\\skybox\\bottom.jpg",
+				"Textures\\Skyboxes\\skybox\\front.jpg",
+				"Textures\\Skyboxes\\skybox\\back.jpg"
 			};
 
 			
@@ -199,36 +199,36 @@ namespace AnorEngine
 				shader->UploadUniform("u_PointLights[" + std::to_string(index) + "].Linear", sizeof(plc.Linear), &plc.Linear);
 				shader->UploadUniform("u_PointLights[" + std::to_string(index) + "].quadratic", sizeof(plc.Quadratic), &plc.Quadratic);
 				shader->UploadUniform("u_PointLights[" + std::to_string(index) + "].intensity", sizeof(plc.Intensity), &plc.Intensity);		
-				shader->UploadUniform("u_PointLights[" + std::to_string(index) + "].ambient", sizeof(mc.Material.Properties.Ambient), &mc.Material.Properties.Ambient);
-				shader->UploadUniform("u_PointLights[" + std::to_string(index) + "].diffuse", sizeof(mc.Material.Properties.Diffuse), &mc.Material.Properties.Diffuse); // darken diffuse light a bit
-				shader->UploadUniform("u_PointLights[" + std::to_string(index) + "].specular", sizeof(mc.Material.Properties.Specular), &mc.Material.Properties.Specular);
+				shader->UploadUniform("u_PointLights[" + std::to_string(index) + "].ambient", sizeof(mc.Material->Properties.Ambient), &mc.Material->Properties.Ambient);
+				shader->UploadUniform("u_PointLights[" + std::to_string(index) + "].diffuse", sizeof(mc.Material->Properties.Diffuse), &mc.Material->Properties.Diffuse); // darken diffuse light a bit
+				shader->UploadUniform("u_PointLights[" + std::to_string(index) + "].specular", sizeof(mc.Material->Properties.Specular), &mc.Material->Properties.Specular);
 			}
 		}
 		void Renderer2D::DrawCube(const TransformComponent& tc, const MeshRendererComponent& mc, const TagComponent& tagc)
 		{
-			mc.Material.Shader->UploadUniform("u_Sampler", sizeof(mc.Material.Texture->GetTextureID()), &mc.Material.Texture->GetTextureID());
+			mc.Material->Shader->UploadUniform("u_Sampler", sizeof(mc.Material->Texture->GetTextureID()), &mc.Material->Texture->GetTextureID());
 			
-			mc.Material.Shader->UploadUniform("u_Transform", sizeof(tc.GetTransform()), &tc.GetTransform());
+			mc.Material->Shader->UploadUniform("u_Transform", sizeof(tc.GetTransform()), &tc.GetTransform());
 
-			mc.Material.Shader->UploadUniform("u_Color", sizeof(mc.Color), &mc.Color);
-			mc.Material.Shader->UploadUniform("u_EntityID", sizeof(tc.EntityID), &tc.EntityID);
+			mc.Material->Shader->UploadUniform("u_Color", sizeof(mc.Color), &mc.Color);
+			mc.Material->Shader->UploadUniform("u_EntityID", sizeof(tc.EntityID), &tc.EntityID);
 
-			mc.Material.Shader->UploadUniform("u_EntityID", sizeof(tc.EntityID), &tc.EntityID);
-			mc.Material.Shader->UploadUniform("u_Material.ambient", sizeof(mc.Material.Properties.Ambient), &mc.Material.Properties.Ambient);
-			mc.Material.Shader->UploadUniform("u_Material.diffuse", sizeof(mc.Material.Properties.Diffuse), &mc.Material.Properties.Diffuse);
-			mc.Material.Shader->UploadUniform("u_Material.specular", sizeof(mc.Material.Properties.Specular), &mc.Material.Properties.Specular);
-			mc.Material.Shader->UploadUniform("u_Material.shininess", sizeof(mc.Material.Properties.Shininess), &mc.Material.Properties.Shininess);
-			mc.Material.Shader->UploadUniform("u_Material.metalness", sizeof(mc.Material.Properties.Metalness), &mc.Material.Properties.Metalness);
+			mc.Material->Shader->UploadUniform("u_Material.diffuse", sizeof(mc.Material->Properties.Diffuse), &mc.Material->Properties.Diffuse);
+			mc.Material->Shader->UploadUniform("u_Material.ambient", sizeof(mc.Material->Properties.Ambient), &mc.Material->Properties.Ambient);
+			mc.Material->Shader->UploadUniform("u_EntityID", sizeof(tc.EntityID), &tc.EntityID);
+			mc.Material->Shader->UploadUniform("u_Material.specular", sizeof(mc.Material->Properties.Specular), &mc.Material->Properties.Specular);
+			mc.Material->Shader->UploadUniform("u_Material.shininess", sizeof(mc.Material->Properties.Shininess), &mc.Material->Properties.Shininess);
+			mc.Material->Shader->UploadUniform("u_Material.metalness", sizeof(mc.Material->Properties.Metalness), &mc.Material->Properties.Metalness);
 
-			mc.Material.Texture->Bind(mc.Material.Texture->GetTextureID());
-			mc.Material.Shader->Enable();
+			mc.Material->Texture->Bind(mc.Material->Texture->GetTextureID());
+			mc.Material->Shader->Enable();
 			s_Data.CubeVertexArray->Bind();
 
 			glDrawArrays(GL_TRIANGLES, 0, 36);
 
 			s_Data.CubeVertexArray->Unbind();
-			mc.Material.Shader->Disable();
-			mc.Material.Texture->Unbind();
+			mc.Material->Shader->Disable();
+			mc.Material->Texture->Unbind();
 		}
 		void Renderer2D::DrawSkybox()
 		{

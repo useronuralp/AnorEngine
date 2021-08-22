@@ -5,6 +5,11 @@
 #include "Utility/WindowsUtils.h"
 #include "ExampleLayer.h"
 #include "Panels/ContentBrowserPanel.h"
+namespace AnorEngine
+{
+	extern const std::filesystem::path g_AssetPath;
+	extern const std::filesystem::path g_ResourcesPath;
+}
 namespace Game
 {
 	using namespace AnorEngine;
@@ -70,6 +75,7 @@ namespace Game
 				m_Framebuffer->Unbind();
 				ImGuiBase::Begin(); //-----------------------ImGui Beginning-------------------------
 
+				//ImGui::ShowDemoWindow();
 				ImGuiDockspaceSetup();
 				m_IsRuntime = m_SceneHierarchyPanel->OnImGuiRender();
 				m_ContentBrowserPanel->OnImGuiRender();
@@ -95,7 +101,10 @@ namespace Game
 					if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("CONTENT_BROWSER_ITEM"))
 					{
 						const wchar_t* path = (const wchar_t*)payload->Data;
-						OpenScene(std::filesystem::path((std::string(__SOLUTION_DIR) + "AnorEngine/Assets")) / path);
+						if (std::wstring(path).find(L"Scenes\\") != std::wstring::npos)
+						{
+							OpenScene(g_AssetPath / path);
+						}
 					}
 					ImGui::EndDragDropTarget();
 				}

@@ -19,12 +19,12 @@ namespace AnorEngine {
 			std::string									 m_Name;
 			std::string									 m_VertPath = "Empty";
 			std::string									 m_FragPath = "Empty";
-			std::string									 m_FilePath = "Empty";
+			std::string									 m_AbsoluteFilePath = "Empty";
 			std::unordered_map<std::string, GLint>       m_UniformLocationCache;
 			std::unordered_map<std::string, UniformData> m_UniformBuffer;
 		public:
 			Shader(std::string name, std::string vertPath, std::string fragPath);
-			Shader(std::string name, std::string filepath);
+			Shader(std::string name, std::string relativeFilePath);
 			~Shader();	
 		public:
 			inline const std::string& GetName() const { return m_Name; }
@@ -47,7 +47,7 @@ namespace AnorEngine {
 			void Compile(const std::unordered_map<GLenum, std::string>& shaderSources);
 			GLint GetUniformLocation(std::string name);
 		public:
-			inline const std::string GetFilePath() const { return m_FilePath; }
+			inline const std::string GetFilePath() const { return m_AbsoluteFilePath; }
 			inline GLuint getShaderID() const { return m_ShaderID; }
 		};
 

@@ -178,12 +178,13 @@ namespace AnorEngine
 		
 			auto& meshRendererComponent = entity.GetComponent<MeshRendererComponent>();
 			out << YAML::Key << "Color" << YAML::Value << meshRendererComponent.Color;
-			out << YAML::Key << "Shader" << YAML::Value << meshRendererComponent.Material.Shader->GetName();
-			out << YAML::Key << "Ambient" << YAML::Value << meshRendererComponent.Material.Properties.Ambient;
-			out << YAML::Key << "Diffuse" << YAML::Value << meshRendererComponent.Material.Properties.Diffuse;
-			out << YAML::Key << "Specular" << YAML::Value << meshRendererComponent.Material.Properties.Specular;
-			out << YAML::Key << "Shininess" << YAML::Value << meshRendererComponent.Material.Properties.Shininess;
-			out << YAML::Key << "Metalness" << YAML::Value << meshRendererComponent.Material.Properties.Metalness;
+			out << YAML::Key << "Shader" << YAML::Value << meshRendererComponent.Material->Shader->GetName();
+			out << YAML::Key << "Ambient" << YAML::Value << meshRendererComponent.Material->Properties.Ambient;
+			out << YAML::Key << "Diffuse" << YAML::Value << meshRendererComponent.Material->Properties.Diffuse;
+			out << YAML::Key << "Specular" << YAML::Value << meshRendererComponent.Material->Properties.Specular;
+			out << YAML::Key << "Shininess" << YAML::Value << meshRendererComponent.Material->Properties.Shininess;
+			out << YAML::Key << "Metalness" << YAML::Value << meshRendererComponent.Material->Properties.Metalness;
+			out << YAML::Key << "Texture" << YAML::Value << meshRendererComponent.Material->Texture->GetPath();
 
 			out << YAML::EndMap; // MeshRendererComponent
 		}
@@ -297,13 +298,14 @@ namespace AnorEngine
 				if (meshRendererComponent)
 				{
 					glm::vec4 color = meshRendererComponent["Color"].as<glm::vec4>();
-					Graphics::Material material;
-					material.Shader = Graphics::ShaderLibrary::GetShader(meshRendererComponent["Shader"].as<std::string>());
-					material.Properties.Ambient = meshRendererComponent["Ambient"].as<float>();
-					material.Properties.Diffuse =meshRendererComponent["Diffuse"].as<float>();
-					material.Properties.Specular =meshRendererComponent["Specular"].as<float>();
-					material.Properties.Shininess =meshRendererComponent["Shininess"].as<float>();
-					material.Properties.Metalness =meshRendererComponent["Metalness"].as<float>();
+					Ref<Graphics::Material> material = std::make_shared<Graphics::Material>();
+					material->Shader = Graphics::ShaderLibrary::GetShader(meshRendererComponent["Shader"].as<std::string>());
+					material->Properties.Ambient = meshRendererComponent["Ambient"].as<float>();
+					material->Properties.Diffuse =meshRendererComponent["Diffuse"].as<float>();
+					material->Properties.Specular =meshRendererComponent["Specular"].as<float>();
+					material->Properties.Shininess =meshRendererComponent["Shininess"].as<float>();
+					material->Properties.Metalness =meshRendererComponent["Metalness"].as<float>();
+					material->Texture->CreateTextureWithRelativePath(meshRendererComponent["Texture"].as<std::string>());
 					auto& src = deserializedEntity.AddComponent<MeshRendererComponent>(color, material);
 				}
 				auto pointLightComponent = entity["PointLightComponent"];

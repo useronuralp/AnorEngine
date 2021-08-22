@@ -11,8 +11,9 @@ namespace AnorEngine
 		static ImVec4 ButtonHoveredColor = { 0.3f, 0.305f, 0.31f, 1.0f };
 		static ImVec4 ButtonActiveColor =  { 0.15f, 0.1505f, 0.151f, 1.0f };
 
-		static ImVec4 HeaderColor = { 0.2f, 0.205f, 0.21f, 1.0f };
-		static ImVec4 HeaderHoveredColor = { 0.3f, 0.305f, 0.31f, 1.0f };
+		//Header
+		static ImVec4 HeaderColor = { 0.01f, 0.2f, 0.4f, 1.0f };
+		static ImVec4 HeaderHoveredColor = { 0.3f, 0.4f, 0.6f, 1.0f };
 		static ImVec4 HeaderActiveColor = { 0.15f, 0.1505f, 0.151f, 1.0f };
 
 		// Frame BG
@@ -27,7 +28,7 @@ namespace AnorEngine
 		static ImVec4 TabUnfocusedColor = { 0.15f, 0.1505f, 0.151f, 1.0f };
 		static ImVec4 TabUnfocusedActiveColor{ 0.2f, 0.205f, 0.21f, 1.0f };
 
-			// Title
+		// Title
 		static ImVec4 TitleBgColor = { 0.15f, 0.1505f, 0.151f, 1.0f };
 		static ImVec4 TitleBgActiveColor = { 0.15f, 0.1505f, 0.151f, 1.0f };
 		static ImVec4 TitleBgCollapsedColor = { 0.15f, 0.1505f, 0.151f, 1.0f };
