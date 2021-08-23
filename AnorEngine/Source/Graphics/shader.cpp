@@ -252,6 +252,7 @@ namespace AnorEngine {
 				{
 					switch (iterator->second.Type)
 					{
+						case GL_BOOL:         
 						case GL_FLOAT:		  UploadFloat(iterator->first, *(float*)data);break;
 						case GL_SAMPLER:
 						case GL_SAMPLER_2D:

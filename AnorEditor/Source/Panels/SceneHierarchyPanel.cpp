@@ -169,15 +169,14 @@ namespace AnorEngine
 			DrawDragFloatControl("Shininess", component.Material->Properties.Shininess, 1.0f, 1.0f, 100.0f);
 			DrawDragFloatControl("Metalness", component.Material->Properties.Metalness, 0.01f, 0.0f, 1.0f);
 
-
+			ImGui::PushID("Texture");
 			ImGui::BeginColumns("Columns", 2);
 			ImGui::SetColumnWidth(0, 100);
 			ImGui::TextUnformatted("Texture");
 			ImGui::NextColumn();
 			ImGui::SetNextItemWidth(-1);
 			ImGui::Button(component.Material->Texture->GetPath().c_str());
-
-			
+		
 			if (ImGui::BeginDragDropTarget())
 			{
 				if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("CONTENT_BROWSER_ITEM"))
@@ -193,6 +192,26 @@ namespace AnorEngine
 			ImGui::NextColumn();
 			ImGui::EndColumns();
 			ImGui::Separator();
+			ImGui::PopID();
+
+			ImGui::PushID("Directional Light");
+			ImGui::BeginColumns("Columns", 2);
+			ImGui::SetColumnWidth(0, 180);
+			ImGui::TextUnformatted("Cast Directional Light");
+			ImGui::NextColumn();
+			ImGui::SetNextItemWidth(-1);
+			if (ImGui::Checkbox("", &component.CastDirectionalLightBool))
+			{
+				component.CastDirectionalLightBool ^= false;
+				if (component.CastDirectionalLightBool)
+					component.CastDirectionalLight = 1.0f;
+				else
+					component.CastDirectionalLight = 0.0f;
+			}
+			ImGui::NextColumn();
+			ImGui::EndColumns();
+			ImGui::Separator();
+			ImGui::PopID();
 		});
 		DrawComponent<CameraComponent>("Camera", entity, [](auto& component)
 		{

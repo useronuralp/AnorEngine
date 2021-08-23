@@ -204,10 +204,11 @@ namespace AnorEngine
 				shader->UploadUniform("u_PointLights[" + std::to_string(index) + "].specular", sizeof(mc.Material->Properties.Specular), &mc.Material->Properties.Specular);
 			}
 		}
+
 		void Renderer2D::DrawCube(const TransformComponent& tc, const MeshRendererComponent& mc, const TagComponent& tagc)
 		{
 			mc.Material->Shader->UploadUniform("u_Sampler", sizeof(mc.Material->Texture->GetTextureID()), &mc.Material->Texture->GetTextureID());
-			
+			mc.Material->Shader->UploadUniform("u_CastDirectionalLight", sizeof(mc.CastDirectionalLight), &mc.CastDirectionalLight);
 			mc.Material->Shader->UploadUniform("u_Transform", sizeof(tc.GetTransform()), &tc.GetTransform());
 
 			mc.Material->Shader->UploadUniform("u_Color", sizeof(mc.Color), &mc.Color);

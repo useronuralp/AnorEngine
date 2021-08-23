@@ -63,7 +63,6 @@ struct PointLight {
 	float specular;
 };
 
-
 //Varying INs
 in flat int v_EntityID;
 in vec3 v_Normal;
@@ -77,15 +76,14 @@ uniform vec4 u_Color;
 uniform PointLight u_PointLights[MAX_POINT_LIGHT_NUMBER];
 uniform int u_PointLightCount;
 uniform Material u_Material;
-uniform vec3 u_DirectionalLightColor;
-uniform vec3 u_DirectionalLight;
+uniform float u_CastDirectionalLight;
 uniform sampler2D u_Sampler;
+
 
 vec3 CalcPointLight(PointLight light, vec3 Normal, vec3 FragPosition, vec3 viewDir)
 {
-
-	// ambient    //intensity
-	vec3 ambient = vec3(light.ambient) * vec3(light.color) * vec3(u_Material.ambient);
+	// ambient
+	vec3 ambient = vec3(light.color) * vec3(u_Material.ambient);
 
 	// diffuse 
 	vec3 norm = normalize(Normal);
@@ -98,7 +96,6 @@ vec3 CalcPointLight(PointLight light, vec3 Normal, vec3 FragPosition, vec3 viewD
 	float spec = pow(max(dot(viewDir, reflectDir), 0.0), u_Material.shininess);
 	vec3 specular = vec3(light.specular) * vec3(light.color) * spec * vec3(u_Material.specular);
 
-
 	// attenuation
 	float distance = length(light.position - FragPosition);
 	float attenuation = 1.0 / (light.constant + light.Linear * distance + light.quadratic * (distance * distance));
@@ -107,13 +104,30 @@ vec3 CalcPointLight(PointLight light, vec3 Normal, vec3 FragPosition, vec3 viewD
 	diffuse *= attenuation;
 	specular *= attenuation;
 
-	return (ambient + diffuse + specular) * light.intensity;
+	//Currently not adding the ambient component to the calculation.
+	return (((ambient * 0.0f) + diffuse + specular) * light.intensity);
 }
 
 
+vec3 CalcDirectionalLight(vec3 Normal, vec3 viewDir)
+{
+	//Light properties
+	vec3 DirectionalLightColor = { 1.0f, 1.0f, 1.0f };
+	vec3 DirectionalLightDir = { -10.0f, -10.0f, 10.0f };
+
+	vec3 DirectionalLightDirNormalized = normalize(-DirectionalLightDir);
+	//Ambient
+	vec3 AmbientDirectional = vec3(u_Material.ambient) * DirectionalLightColor;
+	//Diffuse
+	vec3 DiffuseDirectional = max(dot(normalize(Normal), DirectionalLightDirNormalized), 0.0) * DirectionalLightColor * vec3(u_Material.diffuse) * 0.55f;
+	//Specular
+	vec3 SpecularDirectional = vec3(DirectionalLightColor) * pow(max(dot(viewDir, reflect(-DirectionalLightDirNormalized, normalize(Normal))), 0.0), u_Material.shininess) * vec3(u_Material.specular);
+
+	return AmbientDirectional + DiffuseDirectional + SpecularDirectional;
+}
+
 void main()
 {
-
 	//Refraction
 	float ratio = 1.00 / 1.52;
 	vec3 Irefract = normalize(v_Position - u_CameraPos);
@@ -125,14 +139,26 @@ void main()
 	vec3 Rreflect = reflect(Ireflect, normalize(v_Normal));
 	vec4 reflection = vec4(texture(u_Skybox, Rreflect).rgb, 1.0);
 
-	vec3 viewDir = normalize(u_CameraPos - v_Position);
-	vec3 result = vec3(0.0f, 0.0f, 0.0f);
-
 	vec4 texColor = texture(u_Sampler, v_UV);
-	for (int i = 0; i < u_PointLightCount; i++)
-		result += CalcPointLight(u_PointLights[i], v_Normal, v_Position, viewDir) * vec3(texColor) * vec3(u_Color) + (vec3(reflection) * u_Material.metalness);
 
-	
-	FragColor = vec4(result, 1.0);
+	//Takes texture, object base color and metalness into acount.
+	vec3 ObjectProperties = vec3(texColor) * vec3(u_Color) + (vec3(reflection) * u_Material.metalness);
+
+	vec3 viewDir = normalize(u_CameraPos - v_Position);
+
+	//Object looks completely dark when not lit.
+	vec3 FinalColor = {0,0,0};
+
+	//Add directional light calculation to target pixel
+	if (u_CastDirectionalLight > 0.5f)
+		FinalColor += CalcDirectionalLight(v_Normal, viewDir) * ObjectProperties;
+
+	//Add point light calculation to target pixel. (Each point light contributes to the final color)
+	for (int i = 0; i < u_PointLightCount; i++)
+		FinalColor += CalcPointLight(u_PointLights[i], v_Normal, v_Position, viewDir) * ObjectProperties;
+
+	//Color buffer
+	FragColor = vec4(FinalColor, 1.0);
+	//Integer buffer for mouse picking.
 	IntegerColorBuffer = v_EntityID;
 }

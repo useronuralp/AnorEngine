@@ -61,6 +61,8 @@ namespace AnorEngine
 	{
 		glm::vec4 Color{ 1.0f, 1.0f, 1.0f, 1.0f };
 		Ref<Graphics::Material> Material;
+		bool CastDirectionalLightBool = true;
+		float CastDirectionalLight = 1.0f; //Treat this as a bool, this is the one being sent to the shader
 
 		MeshRendererComponent() = default;
 		MeshRendererComponent(Ref<Graphics::Material> material)

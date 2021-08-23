@@ -7,11 +7,11 @@ namespace AnorEngine
 	{
 		struct ANOR_API MaterialProperties
 		{
-			float		Ambient =  1.0f;
-			float		Diffuse =  1.0f;
-			float		Specular = 1.0f;
-			float		Shininess = 100.0f;
-			float		Metalness = 0.0f;
+			float Ambient =  0.1f;
+			float Diffuse =  1.0f;
+			float Specular = 1.0f;
+			float Shininess = 100.0f;
+			float Metalness = 0.0f;
 		};
 		struct ANOR_API Material
 		{
