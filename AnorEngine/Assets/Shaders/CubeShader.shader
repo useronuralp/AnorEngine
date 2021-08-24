@@ -41,9 +41,9 @@ layout(location = 1) out int IntegerColorBuffer;
 
 //Custom variables
 struct Material {
-	float ambient;
-	float diffuse;
-	float specular;
+	float ambientIntensity;
+	float diffuseIntensity;
+	float specularIntensity;
 	float shininess;
 	float metalness;
 };
@@ -79,22 +79,25 @@ uniform Material u_Material;
 uniform float u_CastDirectionalLight;
 uniform sampler2D u_Sampler;
 
-
+//Returns only the required intensity of the point light on the object. You need to multiply the texture or any other colors values seperately with the result of this function.
 vec3 CalcPointLight(PointLight light, vec3 Normal, vec3 FragPosition, vec3 viewDir)
 {
+	vec3 lightDir = normalize(light.position - FragPosition);
+	//Used for Blinn-Phong lighting model.
+	vec3 halfwayDir = normalize(lightDir + viewDir);
+
 	// ambient
-	vec3 ambient = vec3(light.color) * vec3(u_Material.ambient);
+	vec3 ambient = vec3(light.color) * vec3(u_Material.ambientIntensity);
 
 	// diffuse 
 	vec3 norm = normalize(Normal);
-	vec3 lightDir = normalize(light.position - FragPosition);
 	float diff = max(dot(norm, lightDir), 0.0);
-	vec3 diffuse = vec3(light.diffuse) * vec3(light.color) * diff * vec3(u_Material.diffuse);
+	vec3 diffuse = vec3(light.diffuse) * vec3(light.color) * diff * vec3(u_Material.diffuseIntensity);
 
 	// specular
 	vec3 reflectDir = reflect(-lightDir, norm);
-	float spec = pow(max(dot(viewDir, reflectDir), 0.0), u_Material.shininess);
-	vec3 specular = vec3(light.specular) * vec3(light.color) * spec * vec3(u_Material.specular);
+	float spec = pow(max(dot(norm, halfwayDir), 0.0), u_Material.shininess);
+	vec3 specular = vec3(light.specular) * vec3(light.color) * spec * vec3(u_Material.specularIntensity);
 
 	// attenuation
 	float distance = length(light.position - FragPosition);
@@ -108,7 +111,7 @@ vec3 CalcPointLight(PointLight light, vec3 Normal, vec3 FragPosition, vec3 viewD
 	return (((ambient * 0.0f) + diffuse + specular) * light.intensity);
 }
 
-
+//Returns only the required intensity of the directional light on the object. You need to multiply the texture or any other colors values seperately with the result of this function.
 vec3 CalcDirectionalLight(vec3 Normal, vec3 viewDir)
 {
 	//Light properties
@@ -117,11 +120,11 @@ vec3 CalcDirectionalLight(vec3 Normal, vec3 viewDir)
 
 	vec3 DirectionalLightDirNormalized = normalize(-DirectionalLightDir);
 	//Ambient
-	vec3 AmbientDirectional = vec3(u_Material.ambient) * DirectionalLightColor;
+	vec3 AmbientDirectional = vec3(u_Material.ambientIntensity) * DirectionalLightColor;
 	//Diffuse
-	vec3 DiffuseDirectional = max(dot(normalize(Normal), DirectionalLightDirNormalized), 0.0) * DirectionalLightColor * vec3(u_Material.diffuse) * 0.55f;
+	vec3 DiffuseDirectional = max(dot(normalize(Normal), DirectionalLightDirNormalized), 0.0) * DirectionalLightColor * vec3(u_Material.diffuseIntensity) * 0.55f;
 	//Specular
-	vec3 SpecularDirectional = vec3(DirectionalLightColor) * pow(max(dot(viewDir, reflect(-DirectionalLightDirNormalized, normalize(Normal))), 0.0), u_Material.shininess) * vec3(u_Material.specular);
+	vec3 SpecularDirectional = vec3(DirectionalLightColor) * pow(max(dot(viewDir, reflect(-DirectionalLightDirNormalized, normalize(Normal))), 0.0), u_Material.shininess) * vec3(u_Material.specularIntensity);
 
 	return AmbientDirectional + DiffuseDirectional + SpecularDirectional;
 }
@@ -157,7 +160,13 @@ void main()
 	for (int i = 0; i < u_PointLightCount; i++)
 		FinalColor += CalcPointLight(u_PointLights[i], v_Normal, v_Position, viewDir) * ObjectProperties;
 
+	//Gamma correction constant.
+	float gamma = 2.2;
+
+
 	//Color buffer
+	//Use this line if you want gamma correction
+	//FragColor = vec4(pow(FinalColor, vec3(1.0 / gamma)),1.0);
 	FragColor = vec4(FinalColor, 1.0);
 	//Integer buffer for mouse picking.
 	IntegerColorBuffer = v_EntityID;

@@ -59,7 +59,7 @@ namespace AnorEngine
 			glEnable(GL_BLEND);
 			glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 			glEnable(GL_DEPTH_TEST);
-			
+			//glEnable(GL_FRAMEBUFFER_SRGB);
 
 			float skyboxVertices[] = {
 				// positions          
@@ -207,6 +207,7 @@ namespace AnorEngine
 
 		void Renderer2D::DrawCube(const TransformComponent& tc, const MeshRendererComponent& mc, const TagComponent& tagc)
 		{
+			//Component specific shader uniforms are set inside this funciton.
 			mc.Material->Shader->UploadUniform("u_Sampler", sizeof(mc.Material->Texture->GetTextureID()), &mc.Material->Texture->GetTextureID());
 			mc.Material->Shader->UploadUniform("u_CastDirectionalLight", sizeof(mc.CastDirectionalLight), &mc.CastDirectionalLight);
 			mc.Material->Shader->UploadUniform("u_Transform", sizeof(tc.GetTransform()), &tc.GetTransform());
@@ -214,10 +215,10 @@ namespace AnorEngine
 			mc.Material->Shader->UploadUniform("u_Color", sizeof(mc.Color), &mc.Color);
 			mc.Material->Shader->UploadUniform("u_EntityID", sizeof(tc.EntityID), &tc.EntityID);
 
-			mc.Material->Shader->UploadUniform("u_Material.diffuse", sizeof(mc.Material->Properties.Diffuse), &mc.Material->Properties.Diffuse);
-			mc.Material->Shader->UploadUniform("u_Material.ambient", sizeof(mc.Material->Properties.Ambient), &mc.Material->Properties.Ambient);
+			mc.Material->Shader->UploadUniform("u_Material.diffuseIntensity", sizeof(mc.Material->Properties.Diffuse), &mc.Material->Properties.Diffuse);
+			mc.Material->Shader->UploadUniform("u_Material.ambientIntensity", sizeof(mc.Material->Properties.Ambient), &mc.Material->Properties.Ambient);
 			mc.Material->Shader->UploadUniform("u_EntityID", sizeof(tc.EntityID), &tc.EntityID);
-			mc.Material->Shader->UploadUniform("u_Material.specular", sizeof(mc.Material->Properties.Specular), &mc.Material->Properties.Specular);
+			mc.Material->Shader->UploadUniform("u_Material.specularIntensity", sizeof(mc.Material->Properties.Specular), &mc.Material->Properties.Specular);
 			mc.Material->Shader->UploadUniform("u_Material.shininess", sizeof(mc.Material->Properties.Shininess), &mc.Material->Properties.Shininess);
 			mc.Material->Shader->UploadUniform("u_Material.metalness", sizeof(mc.Material->Properties.Metalness), &mc.Material->Properties.Metalness);
 
@@ -326,6 +327,7 @@ namespace AnorEngine
 			//TODO: Hard coded the color attachment index as 4 because it is known at the moment.
 			glClearTexImage(4, 0, GL_RED_INTEGER, GL_INT, &clearValue);
 
+			//Common uniforms for every shader are set here.
 			for (auto& [shaderName, shader] : ShaderLibrary::GetLibrary())
 			{	
 				if (shaderName == "SkyboxShader")

@@ -159,7 +159,6 @@ namespace AnorEngine
 			component.Rotation = glm::radians(rotationDegree);
 			DrawVec3Control("Scale", component.Scale, 0.1f, 1.0f);
 		});
-
 		DrawComponent<MeshRendererComponent>("Mesh Renderer", entity, [](auto& component)
 		{
 			DrawColorEdit4Control("Color", component.Color);
@@ -175,8 +174,7 @@ namespace AnorEngine
 			ImGui::TextUnformatted("Texture");
 			ImGui::NextColumn();
 			ImGui::SetNextItemWidth(-1);
-			ImGui::Button(component.Material->Texture->GetPath().c_str());
-		
+			ImGui::Button(component.Material->Texture->GetPath().c_str());	
 			if (ImGui::BeginDragDropTarget())
 			{
 				if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("CONTENT_BROWSER_ITEM"))
@@ -370,7 +368,6 @@ namespace AnorEngine
 				ImGui::TreePop();
 			ImGui::TreePop();
 		}
-
 		if (entityDeleted)
 		{		
 			m_Context->DestroyEntity(entity);

@@ -15,12 +15,14 @@ namespace AnorEngine
 		Graphics::Renderer2D::BeginScene(camera);
 
 
+		//----------2D Drawing
 		auto quadGroup = m_Registry.group<TransformComponent>(entt::get<SpriteRendererComponent>);
 		for (auto& entity : quadGroup)
 		{
 			auto [transformComponent, spriteRendererComponent] = quadGroup.get<TransformComponent, SpriteRendererComponent>(entity);
 			Graphics::Renderer2D::Submit(transformComponent, spriteRendererComponent, (int)entity);
 		}
+		//----------2D Drawing
 
 
 		//----- Point Lights

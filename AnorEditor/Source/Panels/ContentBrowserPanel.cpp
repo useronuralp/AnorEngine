@@ -73,7 +73,6 @@ namespace AnorEngine
 			ImGui::NextColumn();
 		}
 
-
 		ImGui::Columns(1);
 
 		//ImGui::SliderFloat("Thumbnails Size", &thumbnailSisze, 16, 512);
