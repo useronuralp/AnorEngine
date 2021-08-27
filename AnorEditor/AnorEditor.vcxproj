@@ -79,16 +79,16 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LinkIncremental>true</LinkIncremental>
-    <IncludePath>$(SolutionDir)AnorEngine\Source;$(SolutionDir)Dependencies\GLEW\include;$(SolutionDir)Dependencies\GLFW\includex64;$(SolutionDir)AnorEngine\Vendor\imgui;$(SolutionDir)Dependencies\Entt\include;$(SolutionDir)AnorEditor\Source;$(SolutionDir)Dependencies\GLM;$(SolutionDir)AnorEngine\Vendor\spdlog-1.x\include;$(IncludePath)</IncludePath>
-    <LibraryPath>$(SolutionDir)Dependencies\FreeImage\lib;$(SolutionDir)Dependencies\GLEW\lib\x64;$(SolutionDir)Dependencies\GLFW\lib-vc2019x64;$(SolutionDir)Dependencies\Assimp\lib;$(LibraryPath)</LibraryPath>
+    <IncludePath>$(SolutionDir)AnorEngine\Source;$(SolutionDir)AnorEngine\Vendor\GLEW\include;$(SolutionDir)AnorEngine\Vendor\GLFW\includex64;$(SolutionDir)AnorEngine\Vendor\imgui;$(SolutionDir)AnorEngine\Vendor\Entt\include;$(SolutionDir)AnorEditor\Source;$(SolutionDir)AnorEngine\Vendor\GLM;$(SolutionDir)AnorEngine\Vendor\spdlog-1.x\include;$(IncludePath)</IncludePath>
+    <LibraryPath>$(SolutionDir)AnorEngine\Vendor\FreeImage\lib;$(SolutionDir)AnorEngine\Vendor\GLEW\lib\x64;$(SolutionDir)AnorEngine\Vendor\GLFW\lib-vc2019x64;$(SolutionDir)AnorEngine\Vendor\Assimp\lib;$(LibraryPath)</LibraryPath>
     <OutDir>$(SolutionDir)bin\$(ProjectName)_$(Configuration)_$(Platform)</OutDir>
     <IntDir>$(SolutionDir)IntermediateFiles\$(ProjectName)_$(Configuration)_$(Platform)</IntDir>
     <SourcePath>$(SourcePath)</SourcePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LinkIncremental>false</LinkIncremental>
-    <IncludePath>$(SolutionDir)AnorEngine\Source;$(SolutionDir)Dependencies\GLEW\include;$(SolutionDir)Dependencies\GLFW\includex64;$(SolutionDir)AnorEngine\Vendor\imgui;$(SolutionDir)Dependencies\Entt\include;$(SolutionDir)AnorEditor\Source;$(SolutionDir)Dependencies\GLM;$(SolutionDir)AnorEngine\Vendor\spdlog-1.x\include;$(IncludePath)</IncludePath>
-    <LibraryPath>$(SolutionDir)Dependencies\FreeImage\lib;$(SolutionDir)Dependencies\GLEW\lib\x64;$(SolutionDir)Dependencies\GLFW\lib-vc2019x64;$(SolutionDir)Dependencies\Assimp\lib;$(LibraryPath)</LibraryPath>
+    <IncludePath>$(SolutionDir)AnorEngine\Source;$(SolutionDir)AnorEngine\Vendor\GLEW\include;$(SolutionDir)AnorEngine\Vendor\GLFW\includex64;$(SolutionDir)AnorEngine\Vendor\imgui;$(SolutionDir)AnorEngine\Vendor\Entt\include;$(SolutionDir)AnorEditor\Source;$(SolutionDir)AnorEngine\Vendor\GLM;$(SolutionDir)AnorEngine\Vendor\spdlog-1.x\include;$(IncludePath)</IncludePath>
+    <LibraryPath>$(SolutionDir)AnorEngine\Vendor\FreeImage\lib;$(SolutionDir)AnorEngine\Vendor\GLEW\lib\x64;$(SolutionDir)AnorEngine\Vendor\GLFW\lib-vc2019x64;$(SolutionDir)AnorEngine\Vendor\Assimp\lib;$(LibraryPath)</LibraryPath>
     <OutDir>$(SolutionDir)bin\$(ProjectName)_$(Configuration)_$(Platform)</OutDir>
     <IntDir>$(SolutionDir)IntermediateFiles\$(ProjectName)_$(Configuration)_$(Platform)</IntDir>
     <SourcePath>$(SourcePath)</SourcePath>
