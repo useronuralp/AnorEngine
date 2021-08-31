@@ -16,6 +16,7 @@ namespace AnorEngine
 	public:
 		Scene();
 		~Scene();
+		entt::registry& GetRegistry() { return m_Registry; };
 		void OnUpdateRuntime(float deltaTime);
 		void OnUpdateEditor(float deltaTime, Ref<Graphics::EditorCamera> camera);
 		void OnResizeViewport(uint32_t width, uint32_t height);

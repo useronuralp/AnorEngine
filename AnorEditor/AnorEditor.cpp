@@ -54,6 +54,7 @@ namespace Game
 			m_SceneHierarchyPanel = std::make_shared<SceneHierarchyPanel>(m_Layer->GetScene());
 			//Layer insertion/////////////////////////////////
 			PushLayer(m_Layer);
+			Renderer2D::GenerateDepthBuffer();
 		}
 	public:
 		virtual void Run() override
@@ -61,6 +62,9 @@ namespace Game
 			while (!m_OpenGLWindow->IsClosed())
 			{
 				float deltaTime = DeltaTime();
+
+				Renderer2D::RenderShadowMap(m_Layer->GetScene());
+
 				m_Framebuffer->Bind();
 				Renderer2D::ClearColor(glm::vec4(0.1f, 0.1f, 0.1f, 1));
 				Renderer2D::Clear();
@@ -92,6 +96,7 @@ namespace Game
 				//Mouse picking calculations.
 				ReadDataFromMousePos();
 
+				int depthBuffer = 12;
 				uint32_t texture = m_Framebuffer->GetColorAttachmentID();
 				ImGui::Image((void*)texture, { m_Framebuffer->GetDimensions().x, m_Framebuffer->GetDimensions().y }, { 0,1 }, { 1,0 });
 

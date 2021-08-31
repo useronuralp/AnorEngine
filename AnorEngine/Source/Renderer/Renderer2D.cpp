@@ -1,6 +1,7 @@
 #include "pch.h"
 #include "Renderer2D.h"
 #include "Scene/Components.h"
+#include "Graphics/Framebuffer.h"
 namespace AnorEngine
 {
 	namespace Graphics
@@ -49,6 +50,9 @@ namespace AnorEngine
 			Ref<CubeMapTexture>						  SkyboxTexture;
 			int										  PointLightCount = 0;
 
+			Ref<Framebuffer>					      DepthBuffer;
+			glm::vec3								  DirectionalLightPosition = { 120.0f, 200.0f, -200.0f };
+			glm::vec3								  DirectionalLightColor = { 1.0f, 1.0f, 1.0f };
 		};
 
 		//Instance the s_Data here for only once.
@@ -61,6 +65,7 @@ namespace AnorEngine
 			glEnable(GL_DEPTH_TEST);
 			//glEnable(GL_FRAMEBUFFER_SRGB);
 
+			//GenerateDepthBuffer();
 			float skyboxVertices[] = {
 				// positions          
 				-0.5f, -0.5f, -0.5f,  0.0f,  0.0f, -1.0f,  0.0f,  0.0f,
@@ -134,6 +139,7 @@ namespace AnorEngine
 			ShaderLibrary::LoadShader("CubeShader", "Shaders\\CubeShader.shader");
 			ShaderLibrary::LoadShader("LightCubeShader", "Shaders\\LightCubeShader.shader");
 			ShaderLibrary::LoadShader("2DShader", "Shaders\\2DShader.shader");
+			ShaderLibrary::LoadShader("ShadowShader", "Shaders\\Shadow.shader");
 
 			int samplers[s_Data.MaxTextureSlots];
 			for (uint32_t i = 0; i < s_Data.MaxTextureSlots; i++)
@@ -209,6 +215,7 @@ namespace AnorEngine
 		{
 			//Component specific shader uniforms are set inside this funciton.
 			mc.Material->Shader->UploadUniform("u_Sampler", sizeof(mc.Material->Texture->GetTextureID()), &mc.Material->Texture->GetTextureID());
+			mc.Material->Shader->UploadUniform("u_ShadowMap", sizeof(s_Data.DepthBuffer->GetDepthAttachmentID()), &s_Data.DepthBuffer->GetDepthAttachmentID());
 			mc.Material->Shader->UploadUniform("u_CastDirectionalLight", sizeof(mc.CastDirectionalLight), &mc.CastDirectionalLight);
 			mc.Material->Shader->UploadUniform("u_Transform", sizeof(tc.GetTransform()), &tc.GetTransform());
 
@@ -223,6 +230,10 @@ namespace AnorEngine
 			mc.Material->Shader->UploadUniform("u_Material.metalness", sizeof(mc.Material->Properties.Metalness), &mc.Material->Properties.Metalness);
 
 			mc.Material->Texture->Bind(mc.Material->Texture->GetTextureID());
+			//TODO:: You need to automate this for every render pass. Think something.
+			//You need to bind the shadow map texture before you render.
+			glActiveTexture(GL_TEXTURE0 + 12); //allows you to speicfy a texture slot, usually on pc there are 32 texture.
+			glBindTexture(GL_TEXTURE_2D, 12);
 			mc.Material->Shader->Enable();
 			s_Data.CubeVertexArray->Bind();
 
@@ -304,6 +315,52 @@ namespace AnorEngine
 
 			s_Data.QuadIndexCount += 6;
 		}
+		void Renderer2D::GenerateDepthBuffer()
+		{
+			FramebufferSpecifications specs;
+			specs.Height = 3840;
+			specs.Width = 3840;
+			specs.Attachments = { {FramebufferTextureFormat::Depth} };
+			s_Data.DepthBuffer = std::make_shared<Framebuffer>(specs);
+		}
+		void Renderer2D::RenderShadowMap(Ref<Scene> scene)
+		{
+			s_Data.DepthBuffer->Bind();
+			glClear(GL_DEPTH_BUFFER_BIT);
+			//Set up all the light properties in the shadow shader here
+			float near_plane = 0.1f, far_plane = 1000.0f;
+			glm::mat4 directionalLightProjection = glm::ortho(-50.0f, 50.0f, -50.0f, 50.0f, near_plane, far_plane);
+			glm::mat4 directionalLightView = glm::lookAt(s_Data.DirectionalLightPosition, glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+			glm::mat4 directionalightViewProjMatrix = directionalLightProjection * directionalLightView;
+			for (auto& [shaderName, shader] : ShaderLibrary::GetLibrary())
+			{
+				//Directional light should be single and fixed. And thus, I am storing the properties of it here in the renderer.
+				shader->UploadUniform("u_DirectionalLightPosition", sizeof(s_Data.DirectionalLightPosition), &s_Data.DirectionalLightPosition);
+				shader->UploadUniform("u_DirectionalLightColor", sizeof(s_Data.DirectionalLightColor), &s_Data.DirectionalLightColor);
+				//Upload directional light view projection matrix.
+				shader->UploadUniform("u_DirectionalLightViewProjMatrix", sizeof(directionalightViewProjMatrix), &directionalightViewProjMatrix);
+				shader->UploadUniform("u_DirectionalLightNear_plane", sizeof(near_plane), &near_plane);
+				shader->UploadUniform("u_DirectionalLightFar_plane", sizeof(far_plane), &far_plane);
+			}
+
+			//----- Render Cubes
+			auto viewCube = scene->GetRegistry().view<TransformComponent, MeshRendererComponent, TagComponent>();
+			for (auto& entity : viewCube)
+			{
+				auto [transformComponent, meshRendererComponent, tagComponent] = viewCube.get<TransformComponent, MeshRendererComponent, TagComponent>(entity);
+				auto transform = transformComponent.GetTransform();
+
+				ShaderLibrary::GetShader("ShadowShader")->UploadUniform("u_Transform", sizeof(transform), &transform);
+				s_Data.CubeVertexArray->Bind();
+				
+				glDrawArrays(GL_TRIANGLES, 0, 36);
+				s_Data.CubeVertexArray->Unbind();
+				ShaderLibrary::GetShader("ShadowShader")->Disable();
+				
+			}
+			//----- Render Cubes
+			s_Data.DepthBuffer->Unbind();
+		}
 		void Renderer2D::Flush()
 		{
 			uint32_t count = s_Data.QuadIndexCount ? s_Data.QuadIndexCount : 0;
@@ -324,6 +381,7 @@ namespace AnorEngine
 			s_Data.EditorCamera = camera;
 
 			int clearValue = -1;
+			//THIS IS GONNA CAUSE PROBLEMS CLEAR THE CORRECT FRAMEBUFFER ATTACHMENT
 			//TODO: Hard coded the color attachment index as 4 because it is known at the moment.
 			glClearTexImage(4, 0, GL_RED_INTEGER, GL_INT, &clearValue);
 

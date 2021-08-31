@@ -14,18 +14,21 @@ out vec3 v_Normal;
 out vec3 v_Position;
 out flat int v_EntityID;
 out vec2 v_UV;
+out vec4 v_FragPosLightSpace;
 
 //Uniforms
 uniform mat4 u_Transform = mat4(1.0);
 uniform mat4 u_ViewProjMat = mat4(1.0);
 uniform int u_EntityID;
+uniform mat4 u_DirectionalLightViewProjMatrix;
 
 void main()
 {
 	v_UV = a_UV;
 	v_Normal = mat3(transpose(inverse(u_Transform))) * a_Normal;
 	v_Position = vec3(u_Transform * vec4(a_Position, 1.0));
-	gl_Position = (u_ViewProjMat * u_Transform) * vec4(a_Position, 1.0);
+	gl_Position = (u_ViewProjMat * vec4(v_Position, 1.0));
+	v_FragPosLightSpace = (u_DirectionalLightViewProjMatrix * vec4(v_Position, 1.0));
 	v_EntityID = u_EntityID;
 }
 
@@ -68,16 +71,60 @@ in flat int v_EntityID;
 in vec3 v_Normal;
 in vec3 v_Position;
 in vec2 v_UV;
+in vec4 v_FragPosLightSpace;
+
 
 //Uniforms
 uniform vec3 u_CameraPos;
 uniform samplerCube u_Skybox;
 uniform vec4 u_Color;
 uniform PointLight u_PointLights[MAX_POINT_LIGHT_NUMBER];
+uniform vec3 u_DirectionalLightPosition;
+uniform vec3 u_DirectionalLightColor;
 uniform int u_PointLightCount;
 uniform Material u_Material;
 uniform float u_CastDirectionalLight;
 uniform sampler2D u_Sampler;
+uniform sampler2D u_ShadowMap;
+uniform float u_Near_plane;
+uniform float u_Far_plane;
+
+float LinearizeDepth(float depth)
+{
+	float z = depth * 2.0 - 1.0; // Back to NDC 
+	return (2.0 * u_Near_plane * u_Far_plane) / (u_Far_plane + u_Near_plane - z * (u_Far_plane - u_Near_plane));
+}
+
+float ShadowCalculation(vec4 fragPosLightSpace, vec3 fragPos, vec3 lightPosition, vec3 normal)
+{
+	// perform perspective divide
+	vec3 projCoords = fragPosLightSpace.xyz / fragPosLightSpace.w;
+	// transform to [0,1] range
+	projCoords = projCoords * 0.5 + 0.5;
+	// get closest depth value from light's perspective (using [0,1] range fragPosLight as coords)
+	float closestDepth = texture(u_ShadowMap, projCoords.xy).r;
+	// get depth of current fragment from light's perspective
+	float currentDepth = projCoords.z;
+	//Shadow bias to eliminate shadow acne, this bias might need tweaking in the future for each scene.
+	vec3 lightDir = normalize(lightPosition - fragPos);
+	float bias = max(0.0001 * (1.0 - dot(normal, lightDir)), 0.000001);
+	// check whether current frag pos is in shadow
+	float shadow = 0.0;
+	vec2 texelSize = 1.0 / textureSize(u_ShadowMap, 0);
+	for (int x = -1; x <= 1; ++x)
+	{
+		//Sampling from the same depth mat multiple times and averaging the shadows to have smooth shadows.
+		for (int y = -1; y <= 1; ++y)
+		{
+			float pcfDepth = texture(u_ShadowMap, projCoords.xy + vec2(x, y) * texelSize).r;
+			shadow += currentDepth - bias > pcfDepth ? 1.0 : 0.0;
+		}
+	}
+	shadow /= 9.0;
+	if (projCoords.z > 1.0)
+		shadow = 0.0;
+	return shadow;
+}
 
 //Returns only the required intensity of the point light on the object. You need to multiply the texture or any other colors values seperately with the result of this function.
 vec3 CalcPointLight(PointLight light, vec3 Normal, vec3 FragPosition, vec3 viewDir)
@@ -112,21 +159,17 @@ vec3 CalcPointLight(PointLight light, vec3 Normal, vec3 FragPosition, vec3 viewD
 }
 
 //Returns only the required intensity of the directional light on the object. You need to multiply the texture or any other colors values seperately with the result of this function.
-vec3 CalcDirectionalLight(vec3 Normal, vec3 viewDir)
+vec3 CalcDirectionalLight(vec3 Normal, vec3 viewDir,  vec3 FragPosition, float shadow)
 {
-	//Light properties
-	vec3 DirectionalLightColor = { 1.0f, 1.0f, 1.0f };
-	vec3 DirectionalLightDir = { -10.0f, -10.0f, 10.0f };
-
-	vec3 DirectionalLightDirNormalized = normalize(-DirectionalLightDir);
+	vec3 DirectionalLightDir = normalize(u_DirectionalLightPosition - FragPosition);
 	//Ambient
-	vec3 AmbientDirectional = vec3(u_Material.ambientIntensity) * DirectionalLightColor;
+	vec3 AmbientDirectional = vec3(u_Material.ambientIntensity) * u_DirectionalLightColor;
 	//Diffuse
-	vec3 DiffuseDirectional = max(dot(normalize(Normal), DirectionalLightDirNormalized), 0.0) * DirectionalLightColor * vec3(u_Material.diffuseIntensity) * 0.55f;
+	vec3 DiffuseDirectional = max(dot(normalize(Normal), DirectionalLightDir), 0.0) * u_DirectionalLightColor * vec3(u_Material.diffuseIntensity);
 	//Specular
-	vec3 SpecularDirectional = vec3(DirectionalLightColor) * pow(max(dot(viewDir, reflect(-DirectionalLightDirNormalized, normalize(Normal))), 0.0), u_Material.shininess) * vec3(u_Material.specularIntensity);
+	vec3 SpecularDirectional = vec3(u_DirectionalLightColor) * pow(max(dot(viewDir, reflect(-DirectionalLightDir, normalize(Normal))), 0.0), u_Material.shininess) * vec3(u_Material.specularIntensity);
 
-	return AmbientDirectional + DiffuseDirectional + SpecularDirectional;
+	return (AmbientDirectional + (1.0 - shadow) * (DiffuseDirectional + SpecularDirectional)) * u_DirectionalLightColor;
 }
 
 void main()
@@ -152,17 +195,20 @@ void main()
 	//Object looks completely dark when not lit.
 	vec3 FinalColor = {0,0,0};
 
+	//Shadow
+	float shadow = ShadowCalculation(v_FragPosLightSpace, v_Position, u_DirectionalLightPosition, v_Normal);
+
 	//Add directional light calculation to target pixel
 	if (u_CastDirectionalLight > 0.5f)
-		FinalColor += CalcDirectionalLight(v_Normal, viewDir) * ObjectProperties;
+		FinalColor += CalcDirectionalLight(v_Normal, viewDir, v_Position, shadow) * ObjectProperties;
 
 	//Add point light calculation to target pixel. (Each point light contributes to the final color)
-	for (int i = 0; i < u_PointLightCount; i++)
-		FinalColor += CalcPointLight(u_PointLights[i], v_Normal, v_Position, viewDir) * ObjectProperties;
+	//for (int i = 0; i < u_PointLightCount; i++)
+	//	FinalColor += CalcPointLight(u_PointLights[i], v_Normal, v_Position, viewDir) * ObjectProperties;
+
 
 	//Gamma correction constant.
 	float gamma = 2.2;
-
 
 	//Color buffer
 	//Use this line if you want gamma correction

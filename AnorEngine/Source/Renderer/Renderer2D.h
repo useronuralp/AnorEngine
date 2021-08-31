@@ -12,6 +12,7 @@ namespace AnorEngine
 	class MeshRendererComponent;
 	class TagComponent;
 	class PointLightComponent;
+	class Scene;
 	namespace Graphics
 	{
 		class ANOR_API Renderer2D
@@ -26,8 +27,11 @@ namespace AnorEngine
 			static void Clear();
 			static void Shutdown() {};
 			static void SetEditorCamera(const Ref<EditorCamera> camera);
+			static void RenderShadowMap(Ref<Scene> scene);
+			static void GenerateDepthBuffer();
 			//Will become deprecated soon.
 			static void SetOrthographicCamera(const Ref<OrthographicCamera> camera);
+			//---
 			static void SetPointLightCount(int count);
 			static void SetPointLightInAllShaders(const TransformComponent& tc, const MeshRendererComponent& mc, const PointLightComponent& plc, int index);
 			static void DrawCube(const TransformComponent& tc, const MeshRendererComponent& mc, const TagComponent& tagc);

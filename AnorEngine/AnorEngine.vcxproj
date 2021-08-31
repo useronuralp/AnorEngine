@@ -386,6 +386,7 @@
     <None Include="Assets\Shaders\CubemapShader.shader" />
     <None Include="Assets\Shaders\CubeShader.shader" />
     <None Include="Assets\Shaders\LightCubeShader.shader" />
+    <None Include="Assets\Shaders\Shadow.shader" />
     <None Include="Vendor\ImGUI\.editorconfig" />
     <None Include="Vendor\ImGUI\.gitattributes" />
     <None Include="Vendor\ImGUI\.gitignore" />

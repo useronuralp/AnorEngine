@@ -90,7 +90,6 @@ namespace AnorEngine
 			ImGui::UpdatePlatformWindows();
 			ImGui::RenderPlatformWindowsDefault();
 			glfwMakeContextCurrent(backup_current_context);
-		}
-		
+		}		
 	}
 }

@@ -68,6 +68,7 @@ namespace AnorEngine
 			void ClearTextureAttachmentWithIntegerValue(GLuint colorAttachmentID, int clearValue);
 			void Unbind();
 			inline uint32_t GetColorAttachmentID(uint32_t index = 0) const { return m_ColorAttachments[index]; }
+			const inline uint32_t& GetDepthAttachmentID() const { return m_DepthAttachment; }
 		private:
 			void SetupFramebuffer();
 		};
