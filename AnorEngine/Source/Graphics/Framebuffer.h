@@ -64,8 +64,10 @@ namespace AnorEngine
 			int ReadPixel(uint32_t attachmentIndex, int x, int y);
 			void Resize(uint32_t width, uint32_t height);
 			glm::vec2 GetDimensions() { return { m_Specs.Width, m_Specs.Height }; }
-			void Bind();
 			void ClearTextureAttachmentWithIntegerValue(GLuint colorAttachmentID, int clearValue);
+			void BindDepthAttachmentTexture();
+			void UnbindDepthAttachmentTexture();
+			void Bind();
 			void Unbind();
 			inline uint32_t GetColorAttachmentID(uint32_t index = 0) const { return m_ColorAttachments[index]; }
 			const inline uint32_t& GetDepthAttachmentID() const { return m_DepthAttachment; }

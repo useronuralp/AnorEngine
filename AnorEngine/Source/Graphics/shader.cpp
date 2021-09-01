@@ -62,6 +62,8 @@ namespace AnorEngine {
 				return GL_VERTEX_SHADER;
 			if (type == "pixel" || type == "fragment")
 				return GL_FRAGMENT_SHADER;
+			if (type == "geometry")
+				return GL_GEOMETRY_SHADER;
 		}
 
 		Shader::Shader(std::string name, std::string vertPath, std::string fragPath)
@@ -147,6 +149,8 @@ namespace AnorEngine {
 						typeString = "vertex";
 					else if (type == 35632)
 						typeString = "fragment";
+					else if (type == GL_GEOMETRY_SHADER)
+						typeString = "geometry";
 					CRITICAL_ASSERT("Failed to compile {0} shader, {1}", typeString, &error[0]);
 				}
 				glAttachShader(program, shader);
@@ -216,7 +220,7 @@ namespace AnorEngine {
 				}
 				size_t begin = pos + typeTokenLength + 1;
 				std::string type = source.substr(begin, eol - begin);
-				if (type == "vertex" || type == "fragment" || type == "pixel")
+				if (type == "vertex" || type == "fragment" || type == "pixel" || "geometry")
 				{
 				}
 				else

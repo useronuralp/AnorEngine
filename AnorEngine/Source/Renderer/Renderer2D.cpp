@@ -50,7 +50,7 @@ namespace AnorEngine
 			Ref<CubeMapTexture>						  SkyboxTexture;
 			int										  PointLightCount = 0;
 
-			Ref<Framebuffer>					      DepthBuffer;
+			Ref<Framebuffer>					      DirectionalLightShadowBuffer;
 			glm::vec3								  DirectionalLightPosition = { 120.0f, 200.0f, -200.0f };
 			glm::vec3								  DirectionalLightColor = { 1.0f, 1.0f, 1.0f };
 		};
@@ -65,7 +65,6 @@ namespace AnorEngine
 			glEnable(GL_DEPTH_TEST);
 			//glEnable(GL_FRAMEBUFFER_SRGB);
 
-			//GenerateDepthBuffer();
 			float skyboxVertices[] = {
 				// positions          
 				-0.5f, -0.5f, -0.5f,  0.0f,  0.0f, -1.0f,  0.0f,  0.0f,
@@ -214,8 +213,7 @@ namespace AnorEngine
 		void Renderer2D::DrawCube(const TransformComponent& tc, const MeshRendererComponent& mc, const TagComponent& tagc)
 		{
 			//Component specific shader uniforms are set inside this funciton.
-			mc.Material->Shader->UploadUniform("u_Sampler", sizeof(mc.Material->Texture->GetTextureID()), &mc.Material->Texture->GetTextureID());
-			mc.Material->Shader->UploadUniform("u_ShadowMap", sizeof(s_Data.DepthBuffer->GetDepthAttachmentID()), &s_Data.DepthBuffer->GetDepthAttachmentID());
+			mc.Material->Shader->UploadUniform("u_Sampler", sizeof(mc.Material->Texture->GetTextureID()), &mc.Material->Texture->GetTextureID());	
 			mc.Material->Shader->UploadUniform("u_CastDirectionalLight", sizeof(mc.CastDirectionalLight), &mc.CastDirectionalLight);
 			mc.Material->Shader->UploadUniform("u_Transform", sizeof(tc.GetTransform()), &tc.GetTransform());
 
@@ -230,10 +228,8 @@ namespace AnorEngine
 			mc.Material->Shader->UploadUniform("u_Material.metalness", sizeof(mc.Material->Properties.Metalness), &mc.Material->Properties.Metalness);
 
 			mc.Material->Texture->Bind(mc.Material->Texture->GetTextureID());
-			//TODO:: You need to automate this for every render pass. Think something.
-			//You need to bind the shadow map texture before you render.
-			glActiveTexture(GL_TEXTURE0 + 12); //allows you to speicfy a texture slot, usually on pc there are 32 texture.
-			glBindTexture(GL_TEXTURE_2D, 12);
+			//Binding of this depth texture is necessary, cause the cube is going to sample from it.
+			s_Data.DirectionalLightShadowBuffer->BindDepthAttachmentTexture();
 			mc.Material->Shader->Enable();
 			s_Data.CubeVertexArray->Bind();
 
@@ -241,6 +237,7 @@ namespace AnorEngine
 
 			s_Data.CubeVertexArray->Unbind();
 			mc.Material->Shader->Disable();
+			s_Data.DirectionalLightShadowBuffer->UnbindDepthAttachmentTexture();
 			mc.Material->Texture->Unbind();
 		}
 		void Renderer2D::DrawSkybox()
@@ -315,18 +312,23 @@ namespace AnorEngine
 
 			s_Data.QuadIndexCount += 6;
 		}
-		void Renderer2D::GenerateDepthBuffer()
+		void Renderer2D::GenerateDirectionalLightDepthBuffer()
 		{
 			FramebufferSpecifications specs;
 			specs.Height = 3840;
 			specs.Width = 3840;
 			specs.Attachments = { {FramebufferTextureFormat::Depth} };
-			s_Data.DepthBuffer = std::make_shared<Framebuffer>(specs);
+			s_Data.DirectionalLightShadowBuffer = std::make_shared<Framebuffer>(specs);
 		}
-		void Renderer2D::RenderShadowMap(Ref<Scene> scene)
+		
+		void Renderer2D::RenderDirectionalLightShadowMap(Ref<Scene> scene)
 		{
-			s_Data.DepthBuffer->Bind();
+			if (!s_Data.DirectionalLightShadowBuffer)
+				GenerateDirectionalLightDepthBuffer();
+
+			s_Data.DirectionalLightShadowBuffer->Bind();
 			glClear(GL_DEPTH_BUFFER_BIT);
+
 			//Set up all the light properties in the shadow shader here
 			float near_plane = 0.1f, far_plane = 1000.0f;
 			glm::mat4 directionalLightProjection = glm::ortho(-50.0f, 50.0f, -50.0f, 50.0f, near_plane, far_plane);
@@ -354,12 +356,13 @@ namespace AnorEngine
 				s_Data.CubeVertexArray->Bind();
 				
 				glDrawArrays(GL_TRIANGLES, 0, 36);
+
 				s_Data.CubeVertexArray->Unbind();
 				ShaderLibrary::GetShader("ShadowShader")->Disable();
 				
 			}
 			//----- Render Cubes
-			s_Data.DepthBuffer->Unbind();
+			s_Data.DirectionalLightShadowBuffer->Unbind();
 		}
 		void Renderer2D::Flush()
 		{
@@ -395,6 +398,7 @@ namespace AnorEngine
 				}
 				else
 				{
+					shader->UploadUniform("u_DirectionalShadowMap", sizeof(s_Data.DirectionalLightShadowBuffer->GetDepthAttachmentID()), &s_Data.DirectionalLightShadowBuffer->GetDepthAttachmentID());
 					shader->UploadUniform("u_ViewProjMat", sizeof(s_Data.EditorCamera->GetViewProjectionMatrix()), &s_Data.EditorCamera->GetViewProjectionMatrix());
 					shader->UploadUniform("u_CameraPos", sizeof(s_Data.EditorCamera->GetPosition()), &s_Data.EditorCamera->GetPosition());
 					shader->UploadUniform("u_PointLightCount", sizeof(s_Data.PointLightCount), &s_Data.PointLightCount);

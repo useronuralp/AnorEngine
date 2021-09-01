@@ -54,7 +54,6 @@ namespace Game
 			m_SceneHierarchyPanel = std::make_shared<SceneHierarchyPanel>(m_Layer->GetScene());
 			//Layer insertion/////////////////////////////////
 			PushLayer(m_Layer);
-			Renderer2D::GenerateDepthBuffer();
 		}
 	public:
 		virtual void Run() override
@@ -63,7 +62,7 @@ namespace Game
 			{
 				float deltaTime = DeltaTime();
 
-				Renderer2D::RenderShadowMap(m_Layer->GetScene());
+				Renderer2D::RenderDirectionalLightShadowMap(m_Layer->GetScene());
 
 				m_Framebuffer->Bind();
 				Renderer2D::ClearColor(glm::vec4(0.1f, 0.1f, 0.1f, 1));

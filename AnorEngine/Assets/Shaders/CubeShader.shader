@@ -85,24 +85,18 @@ uniform int u_PointLightCount;
 uniform Material u_Material;
 uniform float u_CastDirectionalLight;
 uniform sampler2D u_Sampler;
-uniform sampler2D u_ShadowMap;
+uniform sampler2D u_DirectionalShadowMap;
 uniform float u_Near_plane;
 uniform float u_Far_plane;
 
-float LinearizeDepth(float depth)
-{
-	float z = depth * 2.0 - 1.0; // Back to NDC 
-	return (2.0 * u_Near_plane * u_Far_plane) / (u_Far_plane + u_Near_plane - z * (u_Far_plane - u_Near_plane));
-}
-
-float ShadowCalculation(vec4 fragPosLightSpace, vec3 fragPos, vec3 lightPosition, vec3 normal)
+float DirectionalShadowCalculation(vec4 fragPosLightSpace, vec3 fragPos, vec3 lightPosition, vec3 normal)
 {
 	// perform perspective divide
 	vec3 projCoords = fragPosLightSpace.xyz / fragPosLightSpace.w;
 	// transform to [0,1] range
 	projCoords = projCoords * 0.5 + 0.5;
 	// get closest depth value from light's perspective (using [0,1] range fragPosLight as coords)
-	float closestDepth = texture(u_ShadowMap, projCoords.xy).r;
+	float closestDepth = texture(u_DirectionalShadowMap, projCoords.xy).r;
 	// get depth of current fragment from light's perspective
 	float currentDepth = projCoords.z;
 	//Shadow bias to eliminate shadow acne, this bias might need tweaking in the future for each scene.
@@ -110,13 +104,13 @@ float ShadowCalculation(vec4 fragPosLightSpace, vec3 fragPos, vec3 lightPosition
 	float bias = max(0.0001 * (1.0 - dot(normal, lightDir)), 0.000001);
 	// check whether current frag pos is in shadow
 	float shadow = 0.0;
-	vec2 texelSize = 1.0 / textureSize(u_ShadowMap, 0);
+	vec2 texelSize = 1.0 / textureSize(u_DirectionalShadowMap, 0);
 	for (int x = -1; x <= 1; ++x)
 	{
 		//Sampling from the same depth mat multiple times and averaging the shadows to have smooth shadows.
 		for (int y = -1; y <= 1; ++y)
 		{
-			float pcfDepth = texture(u_ShadowMap, projCoords.xy + vec2(x, y) * texelSize).r;
+			float pcfDepth = texture(u_DirectionalShadowMap, projCoords.xy + vec2(x, y) * texelSize).r;
 			shadow += currentDepth - bias > pcfDepth ? 1.0 : 0.0;
 		}
 	}
@@ -158,6 +152,7 @@ vec3 CalcPointLight(PointLight light, vec3 Normal, vec3 FragPosition, vec3 viewD
 	return (((ambient * 0.0f) + diffuse + specular) * light.intensity);
 }
 
+
 //Returns only the required intensity of the directional light on the object. You need to multiply the texture or any other colors values seperately with the result of this function.
 vec3 CalcDirectionalLight(vec3 Normal, vec3 viewDir,  vec3 FragPosition, float shadow)
 {
@@ -196,16 +191,16 @@ void main()
 	vec3 FinalColor = {0,0,0};
 
 	//Shadow
-	float shadow = ShadowCalculation(v_FragPosLightSpace, v_Position, u_DirectionalLightPosition, v_Normal);
+	float directionalShadow = DirectionalShadowCalculation(v_FragPosLightSpace, v_Position, u_DirectionalLightPosition, v_Normal);
+
 
 	//Add directional light calculation to target pixel
 	if (u_CastDirectionalLight > 0.5f)
-		FinalColor += CalcDirectionalLight(v_Normal, viewDir, v_Position, shadow) * ObjectProperties;
+		FinalColor += CalcDirectionalLight(v_Normal, viewDir, v_Position, directionalShadow) * ObjectProperties;
 
 	//Add point light calculation to target pixel. (Each point light contributes to the final color)
-	//for (int i = 0; i < u_PointLightCount; i++)
-	//	FinalColor += CalcPointLight(u_PointLights[i], v_Normal, v_Position, viewDir) * ObjectProperties;
-
+	for (int i = 0; i < u_PointLightCount; i++)
+		FinalColor += CalcPointLight(u_PointLights[i], v_Normal, v_Position, viewDir) * ObjectProperties;
 
 	//Gamma correction constant.
 	float gamma = 2.2;
@@ -213,6 +208,7 @@ void main()
 	//Color buffer
 	//Use this line if you want gamma correction
 	//FragColor = vec4(pow(FinalColor, vec3(1.0 / gamma)),1.0);
+
 	FragColor = vec4(FinalColor, 1.0);
 	//Integer buffer for mouse picking.
 	IntegerColorBuffer = v_EntityID;

@@ -27,8 +27,7 @@ namespace AnorEngine
 			static void Clear();
 			static void Shutdown() {};
 			static void SetEditorCamera(const Ref<EditorCamera> camera);
-			static void RenderShadowMap(Ref<Scene> scene);
-			static void GenerateDepthBuffer();
+			static void RenderDirectionalLightShadowMap(Ref<Scene> scene);
 			//Will become deprecated soon.
 			static void SetOrthographicCamera(const Ref<OrthographicCamera> camera);
 			//---
@@ -51,6 +50,8 @@ namespace AnorEngine
 		public:
 			static uint32_t GetIndexCount();
 			static uint32_t GetNumberOfDrawCalls();
+		private:
+			static void GenerateDirectionalLightDepthBuffer();
 		};
 	}
 }

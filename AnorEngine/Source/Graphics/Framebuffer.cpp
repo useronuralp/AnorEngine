@@ -45,7 +45,6 @@ namespace AnorEngine
 			}
 			else
 			{
-				//GL_RGBA here is hard coded for now since we are only using GL_RGBA8 formats right now.
 				glTexImage2D(GL_TEXTURE_2D, 0, internalFormat, width, height, 0, format, type, nullptr);
 				glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 				glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
@@ -92,7 +91,6 @@ namespace AnorEngine
 						m_DepthAttachmentSpec = textureSpec.TextureFormat;
 				}
 			}
-			
 			SetupFramebuffer();
 		}
 		void Framebuffer::Resize(uint32_t width, uint32_t height)
@@ -196,6 +194,15 @@ namespace AnorEngine
 			
 			//Since the clear value is int in the function paramater, the type is hard coded to GL_INT for now.
 			glClearTexImage(m_ColorAttachments[colorAttachmentID], 0, format, GL_INT, &clearValue);
+		}
+		void Framebuffer::BindDepthAttachmentTexture()
+		{
+			glActiveTexture(GL_TEXTURE0 + m_DepthAttachment % 32); //allows you to speicfy a texture slot, usually on pc there are 32 texture.
+			glBindTexture(GL_TEXTURE_2D, m_DepthAttachment);
+		}
+		void Framebuffer::UnbindDepthAttachmentTexture()
+		{
+			glBindTexture(GL_TEXTURE_2D, 0);
 		}
 		void Framebuffer::Unbind()
 		{
