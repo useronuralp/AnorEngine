@@ -32,7 +32,7 @@ namespace AnorEngine {
 			void UploadUniform(std::string uniformName, size_t size, const void* data);
 			void Enable();
 			void Disable() const;
-		private:
+		public:
 			void UploadFloat(const std::string name, const float value);
 			void UploadFloatArray(const std::string name, float* value,int count);
 			void UploadInteger(const std::string name, const int value);
@@ -40,6 +40,7 @@ namespace AnorEngine {
 			void UploadFloat3(const std::string name, const glm::vec3& vector);
 			void UploadFloat4(const std::string name, const glm::vec4& vector);
 			void UploadMat4(const std::string name, const glm::mat4& matrix);
+			void UploadMat4Array(const std::string name,const glm::mat4& matrix, const int& count);
 			void UploadIntegerArray(const std::string name, int* values, uint32_t count);
 			void FillUniformBuffer();
 			std::string ReadFile(std::string filepath);

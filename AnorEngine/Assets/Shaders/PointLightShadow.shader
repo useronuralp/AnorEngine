@@ -14,8 +14,8 @@ void main()
 
 layout(triangles) in;
 layout(triangle_strip, max_vertices = 18) out;
-
-uniform mat4 u_ShadowMatrices[6];
+#define MATRIX_SIZE 6
+uniform mat4 u_ShadowMatrices[MATRIX_SIZE];
 
 out vec4 FragPos; // FragPos from GS (output per emitvertex)
 

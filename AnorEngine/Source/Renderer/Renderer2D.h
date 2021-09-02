@@ -13,6 +13,11 @@ namespace AnorEngine
 	class TagComponent;
 	class PointLightComponent;
 	class Scene;
+	struct FramebufferData
+	{
+		unsigned int fboID;
+		unsigned int depthTextureID;
+	};
 	namespace Graphics
 	{
 		class ANOR_API Renderer2D
@@ -28,6 +33,7 @@ namespace AnorEngine
 			static void Shutdown() {};
 			static void SetEditorCamera(const Ref<EditorCamera> camera);
 			static void RenderDirectionalLightShadowMap(Ref<Scene> scene);
+			static void RenderPointLightShadowMap(Ref<Scene> scene);
 			//Will become deprecated soon.
 			static void SetOrthographicCamera(const Ref<OrthographicCamera> camera);
 			//---
@@ -51,7 +57,8 @@ namespace AnorEngine
 			static uint32_t GetIndexCount();
 			static uint32_t GetNumberOfDrawCalls();
 		private:
-			static void GenerateDirectionalLightDepthBuffer();
+			static void GenerateDirectionalLightFramebuffer();
+			static FramebufferData GeneratePointLightFramebuffer();
 		};
 	}
 }

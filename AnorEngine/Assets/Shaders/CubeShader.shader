@@ -35,7 +35,7 @@ void main()
 #type fragment
 #version 450 core
 //There is a limit to this define number in glsl.
-#define MAX_POINT_LIGHT_NUMBER 100 
+#define MAX_POINT_LIGHT_NUMBER 10
 
 
 //Attributes
@@ -81,13 +81,38 @@ uniform vec4 u_Color;
 uniform PointLight u_PointLights[MAX_POINT_LIGHT_NUMBER];
 uniform vec3 u_DirectionalLightPosition;
 uniform vec3 u_DirectionalLightColor;
-uniform int u_PointLightCount;
 uniform Material u_Material;
 uniform float u_CastDirectionalLight;
 uniform sampler2D u_Sampler;
+uniform samplerCube u_CubeSampler[MAX_POINT_LIGHT_NUMBER]; //Modified here!!
+uniform int u_PointLightCount;
 uniform sampler2D u_DirectionalShadowMap;
 uniform float u_Near_plane;
 uniform float u_Far_plane;
+
+
+uniform float far_plane;
+
+float PointShadowCalculation(vec3 fragPos, int index)
+{
+	float shadow;
+	for (int i = 0; i < u_PointLightCount; i++)
+	{
+		vec3 lightToFrag = fragPos - u_PointLights[i].position;
+
+		float depth = texture(u_CubeSampler[i], lightToFrag).r;
+		depth *= far_plane;
+
+		float bias = 0.5;
+		shadow = (depth + bias) < length(lightToFrag) ? 0.0 : 1.0f;
+
+		if (i == index && shadow == 1.0)
+		{
+			return 1.0f;
+		}
+	}
+	return shadow;
+}
 
 float DirectionalShadowCalculation(vec4 fragPosLightSpace, vec3 fragPos, vec3 lightPosition, vec3 normal)
 {
@@ -121,7 +146,7 @@ float DirectionalShadowCalculation(vec4 fragPosLightSpace, vec3 fragPos, vec3 li
 }
 
 //Returns only the required intensity of the point light on the object. You need to multiply the texture or any other colors values seperately with the result of this function.
-vec3 CalcPointLight(PointLight light, vec3 Normal, vec3 FragPosition, vec3 viewDir)
+vec3 CalcPointLight(PointLight light, vec3 Normal, vec3 FragPosition, vec3 viewDir, float shadow)
 {
 	vec3 lightDir = normalize(light.position - FragPosition);
 	//Used for Blinn-Phong lighting model.
@@ -149,7 +174,9 @@ vec3 CalcPointLight(PointLight light, vec3 Normal, vec3 FragPosition, vec3 viewD
 	specular *= attenuation;
 
 	//Currently not adding the ambient component to the calculation.
-	return (((ambient * 0.0f) + diffuse + specular) * light.intensity);
+	//return (((ambient * 0.0f) + diffuse + specular) * light.intensity);
+
+	return (((shadow) * (diffuse + specular)) + (ambient * 0.0f)) * light.intensity;
 }
 
 
@@ -164,7 +191,7 @@ vec3 CalcDirectionalLight(vec3 Normal, vec3 viewDir,  vec3 FragPosition, float s
 	//Specular
 	vec3 SpecularDirectional = vec3(u_DirectionalLightColor) * pow(max(dot(viewDir, reflect(-DirectionalLightDir, normalize(Normal))), 0.0), u_Material.shininess) * vec3(u_Material.specularIntensity);
 
-	return (AmbientDirectional + (1.0 - shadow) * (DiffuseDirectional + SpecularDirectional)) * u_DirectionalLightColor;
+	return ( (1.0 - shadow) * (DiffuseDirectional + SpecularDirectional) + AmbientDirectional) * u_DirectionalLightColor;
 }
 
 void main()
@@ -192,6 +219,7 @@ void main()
 
 	//Shadow
 	float directionalShadow = DirectionalShadowCalculation(v_FragPosLightSpace, v_Position, u_DirectionalLightPosition, v_Normal);
+	
 
 
 	//Add directional light calculation to target pixel
@@ -200,7 +228,10 @@ void main()
 
 	//Add point light calculation to target pixel. (Each point light contributes to the final color)
 	for (int i = 0; i < u_PointLightCount; i++)
-		FinalColor += CalcPointLight(u_PointLights[i], v_Normal, v_Position, viewDir) * ObjectProperties;
+	{
+		float pointShadow = PointShadowCalculation(v_Position, i);
+		FinalColor += CalcPointLight(u_PointLights[i], v_Normal, v_Position, viewDir, pointShadow) * ObjectProperties;
+	}
 
 	//Gamma correction constant.
 	float gamma = 2.2;

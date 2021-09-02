@@ -63,6 +63,8 @@ namespace Game
 				float deltaTime = DeltaTime();
 
 				Renderer2D::RenderDirectionalLightShadowMap(m_Layer->GetScene());
+				//TODO: Need to render this for every point light source in the scene. Put it inside a loop.
+				Renderer2D::RenderPointLightShadowMap(m_Layer->GetScene());
 
 				m_Framebuffer->Bind();
 				Renderer2D::ClearColor(glm::vec4(0.1f, 0.1f, 0.1f, 1));

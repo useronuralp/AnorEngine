@@ -234,15 +234,6 @@ namespace AnorEngine {
 			}
 			return shaderSources;
 		}
-		GLint Shader::GetUniformLocation(std::string name)
-		{
-			if (m_UniformLocationCache.find(name) != m_UniformLocationCache.end())
-				return m_UniformLocationCache[name];
-
-			GLint location = glGetUniformLocation(m_ShaderID, name.c_str());
-			m_UniformLocationCache[name] = location;
-			return location;
-		}
 		void Shader::UploadUniform(std::string uniformName, size_t size, const void* data)
 		{
 			if (m_UniformBuffer.find(uniformName) != m_UniformBuffer.end())
@@ -269,7 +260,7 @@ namespace AnorEngine {
 						case GL_FLOAT_VEC2:   UploadFloat2(iterator->first, *(glm::vec2*)data); break;
 						case GL_FLOAT_VEC3:	  UploadFloat3(iterator->first, *(glm::vec3*)data); break;
 						case GL_FLOAT_VEC4:	  UploadFloat4(iterator->first, *(glm::vec4*)data); break;
-						case GL_FLOAT_MAT4:	  UploadMat4(iterator->first, *(glm::mat4*)data); break;
+						case GL_FLOAT_MAT4:	  UploadMat4Array(iterator->first, *(glm::mat4*)data, iterator->second.Count); break;
 					}
 				}
 			}
@@ -308,6 +299,15 @@ namespace AnorEngine {
 			}
 #endif
 		}
+		GLint Shader::GetUniformLocation(std::string name)
+		{
+			if (m_UniformLocationCache.find(name) != m_UniformLocationCache.end())
+				return m_UniformLocationCache[name];
+
+			GLint location = glGetUniformLocation(m_ShaderID, name.c_str());
+			m_UniformLocationCache[name] = location;
+			return location;
+		}
 		void Shader::UploadFloat(const std::string name, const float value)
 		{
 			Enable();
@@ -342,6 +342,11 @@ namespace AnorEngine {
 		{
 			Enable();
 			glUniformMatrix4fv(GetUniformLocation(name), 1, GL_FALSE, glm::value_ptr(matrix));
+		}
+		void Shader::UploadMat4Array(const std::string name, const glm::mat4& matrix, const int& count)
+		{
+			Enable();
+			glUniformMatrix4fv(GetUniformLocation(name), count, GL_FALSE, glm::value_ptr(matrix));
 		}
 		void Shader::UploadIntegerArray(const std::string name, int* values, uint32_t count)
 		{
