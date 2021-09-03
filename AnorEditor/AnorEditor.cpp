@@ -43,6 +43,7 @@ namespace Game
 			Input::EventHandler::SetTargetApplication(this); //Important to set this to the active Application else, you won't get your input processed.	
 			//Framebuffer////////////////////////////////////////
 			FramebufferSpecifications fbSpecs;
+			fbSpecs.Texture_Type = TextureType::TEXTURE_2D;
 			fbSpecs.Attachments = { {FramebufferTextureFormat::RGBA8}, {FramebufferTextureFormat::RED_INTEGER}, {FramebufferTextureFormat::DEPTH24STENCIL8} };
 			m_Framebuffer = std::make_shared<Framebuffer>(fbSpecs);
 			//Camera////////////////////////////////////////
@@ -64,7 +65,7 @@ namespace Game
 
 				Renderer2D::RenderDirectionalLightShadowMap(m_Layer->GetScene());
 				//TODO: Need to render this for every point light source in the scene. Put it inside a loop.
-				Renderer2D::RenderPointLightShadowMap(m_Layer->GetScene());
+				Renderer2D::RenderPointLightShadowMaps(m_Layer->GetScene());
 
 				m_Framebuffer->Bind();
 				Renderer2D::ClearColor(glm::vec4(0.1f, 0.1f, 0.1f, 1));
@@ -97,7 +98,7 @@ namespace Game
 				//Mouse picking calculations.
 				ReadDataFromMousePos();
 
-				int depthBuffer = 12;
+				int depthBuffer = 22;
 				uint32_t texture = m_Framebuffer->GetColorAttachmentID();
 				ImGui::Image((void*)texture, { m_Framebuffer->GetDimensions().x, m_Framebuffer->GetDimensions().y }, { 0,1 }, { 1,0 });
 

@@ -42,6 +42,7 @@ namespace AnorEngine {
 			void UploadMat4(const std::string name, const glm::mat4& matrix);
 			void UploadMat4Array(const std::string name,const glm::mat4& matrix, const int& count);
 			void UploadIntegerArray(const std::string name, int* values, uint32_t count);
+		public:
 			void FillUniformBuffer();
 			std::string ReadFile(std::string filepath);
 			std::unordered_map<GLenum, std::string> PreProcess(const std::string& source);

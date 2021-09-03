@@ -84,14 +84,14 @@ uniform vec3 u_DirectionalLightColor;
 uniform Material u_Material;
 uniform float u_CastDirectionalLight;
 uniform sampler2D u_Sampler;
-uniform samplerCube u_CubeSampler[MAX_POINT_LIGHT_NUMBER]; //Modified here!!
+uniform samplerCube u_CubeSampler[MAX_POINT_LIGHT_NUMBER]; 
 uniform int u_PointLightCount;
 uniform sampler2D u_DirectionalShadowMap;
 uniform float u_Near_plane;
 uniform float u_Far_plane;
 
 
-uniform float far_plane;
+uniform float u_PointLigthFarPlane;
 
 float PointShadowCalculation(vec3 fragPos, int index)
 {
@@ -101,7 +101,7 @@ float PointShadowCalculation(vec3 fragPos, int index)
 		vec3 lightToFrag = fragPos - u_PointLights[i].position;
 
 		float depth = texture(u_CubeSampler[i], lightToFrag).r;
-		depth *= far_plane;
+		depth *= u_PointLigthFarPlane;
 
 		float bias = 0.5;
 		shadow = (depth + bias) < length(lightToFrag) ? 0.0 : 1.0f;

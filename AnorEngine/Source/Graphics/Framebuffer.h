@@ -4,6 +4,12 @@ namespace AnorEngine
 {
 	namespace Graphics
 	{
+		enum class TextureType
+		{
+			None = 0,
+			TEXTURE_2D = 1,
+			CUBEMAP = 2
+		};
 		enum class FramebufferTextureFormat
 		{
 			None = 0,
@@ -42,7 +48,7 @@ namespace AnorEngine
 			std::vector<FramebufferAttachmentSpecification> Attachments;
 			uint32_t FramebufferID = 0;
 			uint32_t Width = 1280, Height = 720;
-
+			TextureType Texture_Type = TextureType::None;
 			int Samples = 1;
 		};
 

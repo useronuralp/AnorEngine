@@ -113,6 +113,7 @@ namespace AnorEngine {
 		}
 		void CubeMapTexture::Bind(unsigned int slot) const
 		{
+			glActiveTexture(GL_TEXTURE0 + m_TextureID);
 			glBindTexture(GL_TEXTURE_CUBE_MAP, m_TextureID);
 		}
 		void CubeMapTexture::Unbind() const

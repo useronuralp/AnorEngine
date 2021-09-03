@@ -5,6 +5,7 @@ namespace AnorEngine
 {
 	namespace Graphics
 	{
+		
 		static GLenum FromAnorFormatToOpenGLFormat(FramebufferTextureFormat format)
 		{
 			switch (format)
@@ -14,14 +15,19 @@ namespace AnorEngine
 			}
 			return GL_INVALID_ENUM;
 		}
-		static GLenum TextureTarget(bool multisampled)
+		static GLenum TextureTarget(bool multisampled, TextureType type)
 		{
-			return multisampled ? GL_TEXTURE_2D_MULTISAMPLE : GL_TEXTURE_2D;
+			switch(type)
+			{
+				case TextureType::TEXTURE_2D: return multisampled ? GL_TEXTURE_2D_MULTISAMPLE : GL_TEXTURE_2D;
+				case TextureType::CUBEMAP: return GL_TEXTURE_CUBE_MAP;
+			}
+			
 		}
-		static void CreateTextures(bool multiSample, uint32_t* outID, uint32_t count)
+		static void CreateTextures(bool multiSample, TextureType type, uint32_t* outID, uint32_t count)
 		{
 			//Memory allocation part for the textures.
-			glCreateTextures(TextureTarget(multiSample), count, outID);
+			glCreateTextures(TextureTarget(multiSample, type), count, outID);
 		}
 		static bool IsDepthFormat(FramebufferTextureFormat format)
 		{
@@ -32,11 +38,11 @@ namespace AnorEngine
 			}
 			return false;
 		}
-		static void BindTexture(bool multiSample, uint32_t id)
+		static void BindTexture(bool multiSample, TextureType type ,uint32_t id)
 		{
-			glBindTexture(TextureTarget(multiSample), id);
+			glBindTexture(TextureTarget(multiSample, type), id);
 		}
-		static void AttachColorTexture(uint32_t id, int samples, GLenum internalFormat, GLenum format, GLenum type, uint32_t width, uint32_t height, int index)
+		static void AttachColorTexture(uint32_t id, int samples, GLenum internalFormat, GLenum format, TextureType texType, GLenum type, uint32_t width, uint32_t height, int index)
 		{
 			bool multisampled = samples > 1;
 			if (multisampled)
@@ -54,29 +60,46 @@ namespace AnorEngine
 			}
 			//glFramebufferTexture2D attaches the texture image specified by TEXTURE and LEVEL as one of the logical buffers of the currently bound framebuffer object.
 			//Attachment specifies whether the texture image should be attached to the framebuffer object's color, depth, or stencil buffer.
-			glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0 + index, TextureTarget(multisampled), id, 0);
+			glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0 + index, TextureTarget(multisampled , texType), id, 0);
 		}
-		static void AttachDepthTexture(uint32_t id, int samples, GLenum format, GLenum attachmentType, uint32_t width, uint32_t height)
+		static void AttachDepthTexture(uint32_t id, int samples, GLenum format, TextureType type, GLenum attachmentType, uint32_t width, uint32_t height)
 		{
 			bool multisampled = samples > 1;
-			if (multisampled)
+			if (multisampled && type == TextureType::TEXTURE_2D)
 			{
 				glTexImage2DMultisample(GL_TEXTURE_2D_MULTISAMPLE, samples, format, width, height, GL_FALSE);
 			}
-			else
+			else 
 			{
-				glTexStorage2D(GL_TEXTURE_2D, 1, format, width, height);
+				if (type == TextureType::TEXTURE_2D)
+				{
+					glTexStorage2D(GL_TEXTURE_2D, 1, format, width, height);
+					glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+					glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+					glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
+					glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
+					glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
+					float borderColor[] = { 1.0f, 1.0f, 1.0f, 1.0f };
+					glTexParameterfv(GL_TEXTURE_2D, GL_TEXTURE_BORDER_COLOR, borderColor);
+					glFramebufferTexture2D(GL_FRAMEBUFFER, attachmentType, TextureTarget(multisampled, type), id, 0);
 
-				glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-				glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-				glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
-				glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
-				glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
-				float borderColor[] = { 1.0f, 1.0f, 1.0f, 1.0f };
-				glTexParameterfv(GL_TEXTURE_2D, GL_TEXTURE_BORDER_COLOR, borderColor);
+				}
+				else if (type == TextureType::CUBEMAP)
+				{
+					for (unsigned int i = 0; i < 6; ++i)
+						glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, GL_DEPTH_COMPONENT, width, height, 0, GL_DEPTH_COMPONENT, GL_FLOAT, NULL);
+
+					glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+					glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+					glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+					glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+					glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
+
+					glFramebufferTexture(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, id, 0);
+				}
+
 			}
 
-			glFramebufferTexture2D(GL_FRAMEBUFFER, attachmentType, TextureTarget(multisampled), id, 0);
 		}
 		Framebuffer::Framebuffer(const FramebufferSpecifications& specs)
 			:m_Specs(specs)
@@ -121,18 +144,18 @@ namespace AnorEngine
 			{
 				m_ColorAttachments.resize(m_ColorAttachmentsSpecs.size());
 				//Passing a pointer to the empty m_ColorAttachments to the CreateTextures. Memory block of m_ColorAttachments will be filled by CreateTextures.
-				CreateTextures(multisample, m_ColorAttachments.data(), m_ColorAttachments.size());
+				CreateTextures(multisample, m_Specs.Texture_Type, m_ColorAttachments.data(), m_ColorAttachments.size());
 				for(size_t i = 0; i < m_ColorAttachments.size(); i++)
 				{
-					BindTexture(multisample, m_ColorAttachments[i]);
+					BindTexture(multisample, m_Specs.Texture_Type, m_ColorAttachments[i]);
 					switch(m_ColorAttachmentsSpecs[i].TextureFormat)
 					{
 						//This switch is where you extend this code path when there is more types to add.
 						case FramebufferTextureFormat::RGBA8:
-							AttachColorTexture(m_ColorAttachments[i], m_Specs.Samples, GL_RGBA8, GL_RGBA, GL_UNSIGNED_BYTE, m_Specs.Width, m_Specs.Height, i);
+							AttachColorTexture(m_ColorAttachments[i], m_Specs.Samples, GL_RGBA8, GL_RGBA, m_Specs.Texture_Type, GL_UNSIGNED_BYTE, m_Specs.Width, m_Specs.Height, i);
 							break;
 						case FramebufferTextureFormat::RED_INTEGER:
-							AttachColorTexture(m_ColorAttachments[i], m_Specs.Samples, GL_R32I, GL_RED_INTEGER, GL_INT, m_Specs.Width, m_Specs.Height, i);
+							AttachColorTexture(m_ColorAttachments[i], m_Specs.Samples, GL_R32I, GL_RED_INTEGER, m_Specs.Texture_Type, GL_INT, m_Specs.Width, m_Specs.Height, i);
 							break;
 					}
 				}
@@ -140,12 +163,12 @@ namespace AnorEngine
 			
 			if (m_DepthAttachmentSpec.TextureFormat != FramebufferTextureFormat::None)
 			{
-				CreateTextures(multisample, &m_DepthAttachment, 1);
-				BindTexture(multisample, m_DepthAttachment);
+				CreateTextures(multisample, m_Specs.Texture_Type, &m_DepthAttachment, 1);
+				BindTexture(multisample, m_Specs.Texture_Type, m_DepthAttachment);
 				switch (m_DepthAttachmentSpec.TextureFormat)
 				{
 					case FramebufferTextureFormat::DEPTH24STENCIL8:
-						AttachDepthTexture(m_DepthAttachment, m_Specs.Samples, GL_DEPTH24_STENCIL8, GL_DEPTH_STENCIL_ATTACHMENT, m_Specs.Width, m_Specs.Height);
+						AttachDepthTexture(m_DepthAttachment, m_Specs.Samples, GL_DEPTH24_STENCIL8, m_Specs.Texture_Type, GL_DEPTH_STENCIL_ATTACHMENT, m_Specs.Width, m_Specs.Height);
 						break;
 				}
 			}
@@ -197,11 +220,29 @@ namespace AnorEngine
 		}
 		void Framebuffer::BindDepthAttachmentTexture()
 		{
-			glActiveTexture(GL_TEXTURE0 + m_DepthAttachment % 32); //allows you to speicfy a texture slot, usually on pc there are 32 texture.
-			glBindTexture(GL_TEXTURE_2D, m_DepthAttachment);
+			switch (m_Specs.Texture_Type)
+			{
+				case TextureType::TEXTURE_2D:
+					glActiveTexture(GL_TEXTURE0 + m_DepthAttachment % 32); //allows you to speicfy a texture slot, usually on pc there are 32 texture.
+					glBindTexture(GL_TEXTURE_2D, m_DepthAttachment);
+					break;
+				case TextureType::CUBEMAP:
+					glActiveTexture(GL_TEXTURE0 + m_DepthAttachment % 32); //allows you to speicfy a texture slot, usually on pc there are 32 texture.
+					glBindTexture(GL_TEXTURE_CUBE_MAP, m_DepthAttachment);
+					break;
+			}
 		}
 		void Framebuffer::UnbindDepthAttachmentTexture()
 		{
+			switch (m_Specs.Texture_Type)
+			{
+			case TextureType::TEXTURE_2D:
+				glBindTexture(GL_TEXTURE_2D, 0);
+				break;
+			case TextureType::CUBEMAP:
+				glBindTexture(GL_TEXTURE_CUBE_MAP, 0);
+				break;
+			}
 			glBindTexture(GL_TEXTURE_2D, 0);
 		}
 		void Framebuffer::Unbind()

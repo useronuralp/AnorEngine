@@ -14,7 +14,6 @@ namespace AnorEngine
 	{
 		Graphics::Renderer2D::BeginScene(camera);
 
-
 		//----------2D Drawing
 		auto quadGroup = m_Registry.group<TransformComponent>(entt::get<SpriteRendererComponent>);
 		for (auto& entity : quadGroup)
@@ -24,18 +23,6 @@ namespace AnorEngine
 		}
 		//----------2D Drawing
 
-
-		////----- Point Lights
-		//auto pointLightView = m_Registry.view<TransformComponent, MeshRendererComponent, TagComponent, PointLightComponent>();
-		//int PointLightCount = 0;
-		//for (auto& entity : pointLightView)
-		//{
-		//	auto [transformComponent, meshRendererComponent, tagComponent, pointLightComponent] = pointLightView.get<TransformComponent, MeshRendererComponent, TagComponent, PointLightComponent>(entity);
-		//	Graphics::Renderer2D::SetPointLightInAllShaders(transformComponent, meshRendererComponent, pointLightComponent, PointLightCount);
-		//	PointLightCount++;
-		//}
-		//Graphics::Renderer2D::SetPointLightCount(PointLightCount);
-		////----- Point Lights
 
 		//----- Cubes
 		auto viewCube = m_Registry.view<TransformComponent, MeshRendererComponent, TagComponent>();
@@ -54,47 +41,49 @@ namespace AnorEngine
 		//Update scripts.
 		//This part requires some deep knowledge of C++ to really wrap your head around it. It just calls the bound functions of the scriptComponent though. 
 		//Function binding part is what really makes the whole thing complicated.
-		{
-			m_Registry.view<NativeScriptComponent>().each([=](auto entity, auto& nsc)
-			{
-				if (!nsc.Instance)
-				{
-					nsc.Instance = nsc.InstantiateScript();
-					nsc.Instance->m_Entity = Entity { entity, this };
-					nsc.Instance->OnCreate();
-				}
-				if(nsc.isEnabled)
-					nsc.Instance->OnUpdate(deltaTime);
-			});
-		}
 
-		//Retrieving the camera component of each entity in the scene. What you do after you retrieve them is up to you / to user.
-		Graphics::Camera* mainCamera = nullptr;
-		auto view = m_Registry.view<TransformComponent, CameraComponent>();
-		glm::mat4 mainCameraTransform;
-		for (auto& entity : view)
-		{
-			auto [transform, camera] = view.get<TransformComponent, CameraComponent>(entity);
-			if (camera.Primary)
-			{
-				mainCamera = &camera.Camera;
-				mainCameraTransform = transform.GetTransform();
-				break;
-			}
-		}
 
-		//Retrieving sprite renderer component here so that we can send the corresponding data to the renderer2D.
-		if (mainCamera)
-		{
-			Graphics::Renderer2D::BeginScene(mainCamera, mainCameraTransform);
-			auto group = m_Registry.group<TransformComponent>(entt::get<SpriteRendererComponent>);
-			for (auto& entity : group)
-			{
-				auto [transformComponent, spriteRendererComponent] = group.get<TransformComponent, SpriteRendererComponent>(entity);
-				Graphics::Renderer2D::Submit(transformComponent, spriteRendererComponent, (int)entity);
-			}
-			Graphics::Renderer2D::EndScene();
-		}
+		//{
+		//	m_Registry.view<NativeScriptComponent>().each([=](auto entity, auto& nsc)
+		//	{
+		//		if (!nsc.Instance)
+		//		{
+		//			nsc.Instance = nsc.InstantiateScript();
+		//			nsc.Instance->m_Entity = Entity { entity, this };
+		//			nsc.Instance->OnCreate();
+		//		}
+		//		if(nsc.isEnabled)
+		//			nsc.Instance->OnUpdate(deltaTime);
+		//	});
+		//}
+		//
+		////Retrieving the camera component of each entity in the scene. What you do after you retrieve them is up to you / to user.
+		//Graphics::Camera* mainCamera = nullptr;
+		//auto view = m_Registry.view<TransformComponent, CameraComponent>();
+		//glm::mat4 mainCameraTransform;
+		//for (auto& entity : view)
+		//{
+		//	auto [transform, camera] = view.get<TransformComponent, CameraComponent>(entity);
+		//	if (camera.Primary)
+		//	{
+		//		mainCamera = &camera.Camera;
+		//		mainCameraTransform = transform.GetTransform();
+		//		break;
+		//	}
+		//}
+		//
+		////Retrieving sprite renderer component here so that we can send the corresponding data to the renderer2D.
+		//if (mainCamera)
+		//{
+		//	Graphics::Renderer2D::BeginScene(mainCamera, mainCameraTransform);
+		//	auto group = m_Registry.group<TransformComponent>(entt::get<SpriteRendererComponent>);
+		//	for (auto& entity : group)
+		//	{
+		//		auto [transformComponent, spriteRendererComponent] = group.get<TransformComponent, SpriteRendererComponent>(entity);
+		//		Graphics::Renderer2D::Submit(transformComponent, spriteRendererComponent, (int)entity);
+		//	}
+		//	Graphics::Renderer2D::EndScene();
+		//}
 	}
 	void Scene::OnResizeViewport(uint32_t width, uint32_t height)
 	{

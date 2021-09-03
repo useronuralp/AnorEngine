@@ -2,6 +2,7 @@
 #include "Renderer2D.h"
 #include "Scene/Components.h"
 #include "Graphics/Framebuffer.h"
+
 namespace AnorEngine
 {
 	namespace Graphics
@@ -27,6 +28,7 @@ namespace AnorEngine
 		};
 		struct Renderer2DData //Used to store data in this static class. Defined this struct in the .cpp so that nothing else can include it.
 		{
+			static constexpr int					  MAX_POINT_LIGHT_COUNT = 10;
 			static const uint32_t					  MaxQuads = 10000;
 			static const uint32_t					  MaxVertices = MaxQuads * 4;
 			static const uint32_t					  MaxIndices = MaxQuads * 6;
@@ -58,22 +60,40 @@ namespace AnorEngine
 			Ref<VertexArray>						  CubeVertexArray;
 			Ref<VertexBuffer>						  CubeVertexBuffer;
 			Ref<CubeMapTexture>						  SkyboxTexture;
-			int										  PointLightCount = 0;
 
+			//Directional light
 			Ref<Framebuffer>					      DirectionalLightShadowBuffer;
 			glm::vec3								  DirectionalLightPosition = { 120.0f, 200.0f, -200.0f };
 			glm::vec3								  DirectionalLightColor = { 1.0f, 1.0f, 1.0f };
 
 			//Point lights
-			FramebufferData							  PointLightShadowBuffers[10];
-
-			unsigned int							  PointLightShadowBuffer = 10000;
-			unsigned int							  PointLightShadowBufferTextureID;
-			std::vector<PointLightProperties>		  PointLights;
+			Ref<Framebuffer>						  PointLightShadowBuffers[MAX_POINT_LIGHT_COUNT];
+			std::vector<PointLightProperties>         PointLights;
+			int										  PointLightCount = 0;
 		};
 
 		//Instance the s_Data here for only once.
 		static Renderer2DData s_Data;
+		static Ref<Framebuffer> GenerateDirectionalLightFramebuffer()
+		{
+			FramebufferSpecifications specs;
+			specs.Height = 7680;
+			specs.Width = 7680;
+			specs.Attachments = { {FramebufferTextureFormat::Depth} };
+			specs.Texture_Type = TextureType::TEXTURE_2D;
+
+			return std::make_shared<Framebuffer>(specs);
+		}
+		static Ref<Framebuffer> GeneratePointLightFramebuffer()
+		{
+			FramebufferSpecifications specs;
+			specs.Height = 1024;
+			specs.Width = 1024;
+			specs.Attachments = { {FramebufferTextureFormat::Depth} };
+			specs.Texture_Type = TextureType::CUBEMAP;
+
+			return std::make_shared<Framebuffer>(specs);
+		}
 
 		void Renderer2D::Init()
 		{
@@ -81,8 +101,10 @@ namespace AnorEngine
 			glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 			glEnable(GL_DEPTH_TEST);
 
-			for (int i = 0; i < 10; i++)
-				s_Data.PointLightShadowBuffers[i].fboID = 10000;
+			s_Data.DirectionalLightShadowBuffer = nullptr;
+			for (int i = 0; i < s_Data.MAX_POINT_LIGHT_COUNT; i++)
+				s_Data.PointLightShadowBuffers[i] = nullptr;
+
 
 			float skyboxVertices[] = {
 				// positions          
@@ -212,34 +234,144 @@ namespace AnorEngine
 			s_Data.QuadVertexPositions[3] = { -0.5f,  0.5f, 0.0f, 1.0f };
 
 		}
-		void Renderer2D::SetPointLightCount(int count)
+		void Renderer2D::RenderPointLightShadowMaps(Ref<Scene> scene)
 		{
-			s_Data.PointLightCount = count;
+			//----- Loop through the point lights in the scene
+			s_Data.PointLights.clear();
+			auto pointLightView = scene->GetRegistry().view<TransformComponent, MeshRendererComponent, TagComponent, PointLightComponent>();
+			int PointLightCount = 0;
+			for (auto& entity : pointLightView)
+			{
+				auto [transformComponent, meshRendererComponent, tagComponent, pointLightComponent] = pointLightView.get<TransformComponent, MeshRendererComponent, TagComponent, PointLightComponent>(entity);
+				for (auto& [shaderName, shader] : ShaderLibrary::GetLibrary())
+				{
+					shader->UploadUniform("u_PointLights[" + std::to_string(PointLightCount) + "].color", sizeof(meshRendererComponent.Color), &meshRendererComponent.Color);
+					shader->UploadUniform("u_PointLights[" + std::to_string(PointLightCount) + "].position", sizeof(transformComponent.Translation), &transformComponent.Translation);
+					shader->UploadUniform("u_PointLights[" + std::to_string(PointLightCount) + "].constant", sizeof(float), &pointLightComponent.Constant);
+					shader->UploadUniform("u_PointLights[" + std::to_string(PointLightCount) + "].Linear", sizeof(pointLightComponent.Linear), &pointLightComponent.Linear);
+					shader->UploadUniform("u_PointLights[" + std::to_string(PointLightCount) + "].quadratic", sizeof(pointLightComponent.Quadratic), &pointLightComponent.Quadratic);
+					shader->UploadUniform("u_PointLights[" + std::to_string(PointLightCount) + "].intensity", sizeof(pointLightComponent.Intensity), &pointLightComponent.Intensity);
+					shader->UploadUniform("u_PointLights[" + std::to_string(PointLightCount) + "].ambient", sizeof(meshRendererComponent.Material->Properties.Ambient), &meshRendererComponent.Material->Properties.Ambient);
+					shader->UploadUniform("u_PointLights[" + std::to_string(PointLightCount) + "].diffuse", sizeof(meshRendererComponent.Material->Properties.Diffuse), &meshRendererComponent.Material->Properties.Diffuse); 
+					shader->UploadUniform("u_PointLights[" + std::to_string(PointLightCount) + "].specular", sizeof(meshRendererComponent.Material->Properties.Specular), &meshRendererComponent.Material->Properties.Specular);
+				}
+				PointLightProperties props(transformComponent, meshRendererComponent, pointLightComponent, PointLightCount);
+				//store all the point lights in the scene.
+				s_Data.PointLights.push_back(props);
+				if (PointLightCount < s_Data.MAX_POINT_LIGHT_COUNT)
+					PointLightCount++;
+			}
+			s_Data.PointLightCount = PointLightCount;
+			//----- Loop through the point lights in the scene
+			
+			//If theres no point lights in the scene no need to continue.
+			if (PointLightCount == 0)
+				return;
+
+			//Rendering
+			for (int i = 0; i < PointLightCount; i++)
+			{
+				if (!s_Data.PointLightShadowBuffers[i])
+					s_Data.PointLightShadowBuffers[i] = GeneratePointLightFramebuffer();
+
+				s_Data.PointLightShadowBuffers[i]->Bind();
+				glClear(GL_DEPTH_BUFFER_BIT);
+
+				float near_plane = 0.001f;
+				float far_plane = 50.0f;
+				glm::mat4 shadowProj = glm::perspective(glm::radians(90.0f), (float)1024 / (float)1024, near_plane, far_plane);
+				glm::mat4 shadowTransforms[6];
+
+				//Direction vectors to sample from a cubemap
+				shadowTransforms[0] = shadowProj * glm::lookAt(s_Data.PointLights[i].tc.Translation, s_Data.PointLights[i].tc.Translation + glm::vec3( 1.0,  0.0,  0.0),  glm::vec3(0.0, -1.0,  0.0));
+				shadowTransforms[1] = shadowProj * glm::lookAt(s_Data.PointLights[i].tc.Translation, s_Data.PointLights[i].tc.Translation + glm::vec3(-1.0,  0.0,  0.0),  glm::vec3(0.0, -1.0,  0.0));
+				shadowTransforms[2] = shadowProj * glm::lookAt(s_Data.PointLights[i].tc.Translation, s_Data.PointLights[i].tc.Translation + glm::vec3( 0.0,  1.0,  0.0),  glm::vec3(0.0,  0.0,  1.0));
+				shadowTransforms[3] = shadowProj * glm::lookAt(s_Data.PointLights[i].tc.Translation, s_Data.PointLights[i].tc.Translation + glm::vec3( 0.0, -1.0,  0.0),  glm::vec3(0.0,  0.0, -1.0));
+				shadowTransforms[4] = shadowProj * glm::lookAt(s_Data.PointLights[i].tc.Translation, s_Data.PointLights[i].tc.Translation + glm::vec3( 0.0,  0.0,  1.0),  glm::vec3(0.0, -1.0,  0.0));
+				shadowTransforms[5] = shadowProj * glm::lookAt(s_Data.PointLights[i].tc.Translation, s_Data.PointLights[i].tc.Translation + glm::vec3( 0.0,  0.0, -1.0),  glm::vec3(0.0, -1.0,  0.0));
+
+				ShaderLibrary::GetShader("PointLightShadowShader")->UploadUniform("u_ShadowMatrices[0]", sizeof(shadowTransforms) , &shadowTransforms);
+				ShaderLibrary::GetShader("PointLightShadowShader")->UploadUniform("u_Far_plane", sizeof(far_plane), &far_plane);
+				ShaderLibrary::GetShader("PointLightShadowShader")->UploadUniform("u_LightPos", sizeof(s_Data.PointLights[i].tc.Translation), &s_Data.PointLights[i].tc.Translation);
+				for (auto& [shaderName, shader] : ShaderLibrary::GetLibrary())
+					shader->UploadInteger("u_CubeSampler[" + std::to_string(i) + "]", s_Data.PointLightShadowBuffers[i]->GetDepthAttachmentID());
+
+				//----- Render Cubes
+				auto viewCube = scene->GetRegistry().view<TransformComponent, MeshRendererComponent, TagComponent>();
+				for (auto& entity : viewCube)
+				{
+					auto [transformComponent, meshRendererComponent, tagComponent] = viewCube.get<TransformComponent, MeshRendererComponent, TagComponent>(entity);
+					auto transform = transformComponent.GetTransform();
+
+					ShaderLibrary::GetShader("PointLightShadowShader")->UploadUniform("u_Transform", sizeof(transform), &transform);
+					s_Data.CubeVertexArray->Bind();
+
+					if (tagComponent.Tag != "Point Light")
+					{
+						glDrawArrays(GL_TRIANGLES, 0, 36);
+					}
+
+					s_Data.CubeVertexArray->Unbind();
+					ShaderLibrary::GetShader("PointLightShadowShader")->Disable();
+
+				}
+				//----- Render Cubes
+				s_Data.PointLightShadowBuffers[i]->Unbind();
+
+				for (auto& [shaderName, shader] : ShaderLibrary::GetLibrary())
+				{
+					shader->UploadUniform("u_PointLigthFarPlane", sizeof(far_plane), &far_plane);
+				}
+			}
 		}
-		void Renderer2D::SetPointLightInAllShaders(const TransformComponent& tc, const MeshRendererComponent& mc, const PointLightComponent& plc, int index)
+		void Renderer2D::RenderDirectionalLightShadowMap(Ref<Scene> scene)
 		{
+			if (!s_Data.DirectionalLightShadowBuffer)
+				s_Data.DirectionalLightShadowBuffer = GenerateDirectionalLightFramebuffer();
+
+			s_Data.DirectionalLightShadowBuffer->Bind();
+			glClear(GL_DEPTH_BUFFER_BIT);
+
+			//----- Render Cubes
+			auto viewCube = scene->GetRegistry().view<TransformComponent, MeshRendererComponent, TagComponent>();
+			for (auto& entity : viewCube)
+			{
+				auto [transformComponent, meshRendererComponent, tagComponent] = viewCube.get<TransformComponent, MeshRendererComponent, TagComponent>(entity);
+				auto transform = transformComponent.GetTransform();
+
+				ShaderLibrary::GetShader("ShadowShader")->UploadUniform("u_Transform", sizeof(transform), &transform);
+				s_Data.CubeVertexArray->Bind();
+				
+				glDrawArrays(GL_TRIANGLES, 0, 36);
+
+				s_Data.CubeVertexArray->Unbind();
+				ShaderLibrary::GetShader("ShadowShader")->Disable();		
+			}
+			//----- Render Cubes
+			s_Data.DirectionalLightShadowBuffer->Unbind();
+
+
+			//Set up all the light properties in the shadow shader here
+			float near_plane = 0.1f, far_plane = 1000.0f;
+			glm::mat4 directionalLightProjection = glm::ortho(-50.0f, 50.0f, -50.0f, 50.0f, near_plane, far_plane);
+			glm::mat4 directionalLightView = glm::lookAt(s_Data.DirectionalLightPosition, glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+			glm::mat4 directionalightViewProjMatrix = directionalLightProjection * directionalLightView;
 			for (auto& [shaderName, shader] : ShaderLibrary::GetLibrary())
 			{
-				shader->UploadUniform("u_PointLights[" + std::to_string(index) + "].color", sizeof(mc.Color), &mc.Color);
-				shader->UploadUniform("u_PointLights[" + std::to_string(index) + "].position", sizeof(tc.Translation), &tc.Translation);
-				shader->UploadUniform("u_PointLights[" + std::to_string(index) + "].constant", sizeof(float), &plc.Constant);
-				shader->UploadUniform("u_PointLights[" + std::to_string(index) + "].Linear", sizeof(plc.Linear), &plc.Linear);
-				shader->UploadUniform("u_PointLights[" + std::to_string(index) + "].quadratic", sizeof(plc.Quadratic), &plc.Quadratic);
-				shader->UploadUniform("u_PointLights[" + std::to_string(index) + "].intensity", sizeof(plc.Intensity), &plc.Intensity);		
-				shader->UploadUniform("u_PointLights[" + std::to_string(index) + "].ambient", sizeof(mc.Material->Properties.Ambient), &mc.Material->Properties.Ambient);
-				shader->UploadUniform("u_PointLights[" + std::to_string(index) + "].diffuse", sizeof(mc.Material->Properties.Diffuse), &mc.Material->Properties.Diffuse); // darken diffuse light a bit
-				shader->UploadUniform("u_PointLights[" + std::to_string(index) + "].specular", sizeof(mc.Material->Properties.Specular), &mc.Material->Properties.Specular);
+				//Directional light should be single and fixed. And thus, I am storing the properties of it here in the renderer.
+				shader->UploadUniform("u_DirectionalShadowMap", sizeof(s_Data.DirectionalLightShadowBuffer->GetDepthAttachmentID()), &s_Data.DirectionalLightShadowBuffer->GetDepthAttachmentID());
+				shader->UploadUniform("u_DirectionalLightPosition", sizeof(s_Data.DirectionalLightPosition), &s_Data.DirectionalLightPosition);
+				shader->UploadUniform("u_DirectionalLightColor", sizeof(s_Data.DirectionalLightColor), &s_Data.DirectionalLightColor);
+				//Upload directional light view projection matrix.
+				shader->UploadUniform("u_DirectionalLightViewProjMatrix", sizeof(directionalightViewProjMatrix), &directionalightViewProjMatrix);
+				shader->UploadUniform("u_DirectionalLightNear_plane", sizeof(near_plane), &near_plane);
+				shader->UploadUniform("u_DirectionalLightFar_plane", sizeof(far_plane), &far_plane);
 			}
 		}
 		void Renderer2D::DrawCube(const TransformComponent& tc, const MeshRendererComponent& mc, const TagComponent& tagc)
 		{
 			//Component specific shader uniforms are set inside this funciton.
-			for (int i = 0; i < s_Data.PointLightCount; i++)
-			{
-				mc.Material->Shader->UploadInteger("u_CubeSampler[" + std::to_string(i) + "]", s_Data.PointLightShadowBuffers[i].depthTextureID);
-			}
 			mc.Material->Shader->UploadUniform("u_Sampler", sizeof(mc.Material->Texture->GetTextureID()), &mc.Material->Texture->GetTextureID());
-			//mc.Material->Shader->UploadUniform("u_CubeSampler", sizeof(s_Data.PointLightShadowBufferTextureID), &s_Data.PointLightShadowBufferTextureID);
 			mc.Material->Shader->UploadUniform("u_CastDirectionalLight", sizeof(mc.CastDirectionalLight), &mc.CastDirectionalLight);
 			mc.Material->Shader->UploadUniform("u_Transform", sizeof(tc.GetTransform()), &tc.GetTransform());
 
@@ -254,13 +386,6 @@ namespace AnorEngine
 			mc.Material->Shader->UploadUniform("u_Material.metalness", sizeof(mc.Material->Properties.Metalness), &mc.Material->Properties.Metalness);
 
 			mc.Material->Texture->Bind(mc.Material->Texture->GetTextureID());
-			//Binding of this depth texture is necessary, cause the cube is going to sample from it.
-			s_Data.DirectionalLightShadowBuffer->BindDepthAttachmentTexture();
-			for (int i = 0; i < s_Data.PointLightCount; i++)
-			{
-				glActiveTexture(GL_TEXTURE0 + s_Data.PointLightShadowBuffers[i].depthTextureID);
-				glBindTexture(GL_TEXTURE_CUBE_MAP, s_Data.PointLightShadowBuffers[i].depthTextureID);
-			}
 			mc.Material->Shader->Enable();
 			s_Data.CubeVertexArray->Bind();
 
@@ -268,16 +393,14 @@ namespace AnorEngine
 
 			s_Data.CubeVertexArray->Unbind();
 			mc.Material->Shader->Disable();
-			//glBindTexture(GL_TEXTURE_CUBE_MAP, 0);
-			s_Data.DirectionalLightShadowBuffer->UnbindDepthAttachmentTexture();
 			mc.Material->Texture->Unbind();
 		}
 		void Renderer2D::DrawSkybox()
 		{
 			glDepthMask(GL_FALSE);
-
 			glBindTexture(GL_TEXTURE_CUBE_MAP, s_Data.SkyboxTexture->GetTextureID());
-			ShaderLibrary::GetShader("SkyboxShader")->Enable();
+			auto viewProjMatrix = s_Data.EditorCamera->GetProjectionMatrix() * glm::mat4(glm::mat3(s_Data.EditorCamera->GetViewMatrix()));
+			ShaderLibrary::GetShader("SkyboxShader")->UploadUniform("u_ViewProjMat", sizeof(viewProjMatrix), &(viewProjMatrix));
 			s_Data.CubeVertexArray->Bind();
 
 			glDrawArrays(GL_TRIANGLES, 0, 36);
@@ -285,6 +408,10 @@ namespace AnorEngine
 
 			s_Data.CubeVertexArray->Unbind();
 			ShaderLibrary::GetShader("SkyboxShader")->Disable();
+			//THIS IS GONNA CAUSE PROBLEMS CLEAR THE CORRECT FRAMEBUFFER ATTACHMENT
+			//TODO: Hard coded the color attachment index as 4 because it is known at the moment.
+			int clearValue = -1;
+			glClearTexImage(4, 0, GL_RED_INTEGER, GL_INT, &clearValue);
 		}
 		void Renderer2D::Submit(const TransformComponent& tc, SpriteRendererComponent& sc, int entityID)
 		{
@@ -344,165 +471,6 @@ namespace AnorEngine
 
 			s_Data.QuadIndexCount += 6;
 		}
-		void Renderer2D::GenerateDirectionalLightFramebuffer()
-		{
-			FramebufferSpecifications specs;
-			specs.Height = 7680;
-			specs.Width = 7680;
-			specs.Attachments = { {FramebufferTextureFormat::Depth} };
-			s_Data.DirectionalLightShadowBuffer = std::make_shared<Framebuffer>(specs);
-		}
-		FramebufferData Renderer2D::GeneratePointLightFramebuffer()
-		{
-			unsigned int depthFBO;
-			unsigned int depthTextureID;
-			glGenFramebuffers(1, &depthFBO);
-			glGenTextures(1, &depthTextureID);
-			glBindTexture(GL_TEXTURE_CUBE_MAP, depthTextureID);
-			for (unsigned int i = 0; i < 6; ++i)
-				glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, GL_DEPTH_COMPONENT, 1024, 1024, 0, GL_DEPTH_COMPONENT, GL_FLOAT, NULL);
-
-			glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-			glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-			glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-			glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-			glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
-
-			//attach deopth texture to FBO.
-			glBindFramebuffer(GL_FRAMEBUFFER, depthFBO);
-			glFramebufferTexture(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, depthTextureID, 0);
-			glDrawBuffer(GL_NONE);
-			glReadBuffer(GL_NONE);
-			glBindFramebuffer(GL_FRAMEBUFFER, 0);
-
-			return FramebufferData{ depthFBO, depthTextureID };
-		}
-		void Renderer2D::RenderPointLightShadowMap(Ref<Scene> scene)
-		{
-			//----- Loop through the point lights in the scene
-			s_Data.PointLights.clear();
-			auto pointLightView = scene->GetRegistry().view<TransformComponent, MeshRendererComponent, TagComponent, PointLightComponent>();
-			int PointLightCount = 0;
-			for (auto& entity : pointLightView)
-			{
-				auto [transformComponent, meshRendererComponent, tagComponent, pointLightComponent] = pointLightView.get<TransformComponent, MeshRendererComponent, TagComponent, PointLightComponent>(entity);
-				Graphics::Renderer2D::SetPointLightInAllShaders(transformComponent, meshRendererComponent, pointLightComponent, PointLightCount);
-				PointLightProperties props(transformComponent, meshRendererComponent, pointLightComponent, PointLightCount);
-				s_Data.PointLights.push_back(props);
-				PointLightCount++;
-			}
-			Graphics::Renderer2D::SetPointLightCount(PointLightCount);
-			//----- Loop through the point lights in the scene
-			
-			for (int i = 0; i < s_Data.PointLights.size(); i++)
-			{
-				if (s_Data.PointLightShadowBuffers[i].fboID == 10000)
-				{
-					auto [fboID, textureID] = GeneratePointLightFramebuffer();
-					s_Data.PointLightShadowBuffers[i].fboID = fboID;
-					s_Data.PointLightShadowBuffers[i].depthTextureID = textureID;
-				}
-			}
-
-			//If theres no point lights in the scene no need to continue.
-			if (s_Data.PointLights.empty())
-				return;
-
-			for (int i = 0; i < s_Data.PointLights.size(); i++)
-			{
-				glBindFramebuffer(GL_FRAMEBUFFER, s_Data.PointLightShadowBuffers[i].fboID);
-				glViewport(0, 0, 1024, 1024);
-				glClear(GL_DEPTH_BUFFER_BIT);
-
-				float near_plane = 0.001f;
-				float far_plane = 50.0f;
-				glm::mat4 shadowProj = glm::perspective(glm::radians(90.0f), (float)1024 / (float)1024, near_plane, far_plane);
-				glm::mat4 shadowTransforms[6];
-
-				//Think something about this part. You need to loop through every point light in the scene.
-				shadowTransforms[0] = shadowProj * glm::lookAt(s_Data.PointLights[i].tc.Translation, s_Data.PointLights[i].tc.Translation + glm::vec3( 1.0,  0.0,  0.0),  glm::vec3(0.0, -1.0,  0.0));
-				shadowTransforms[1] = shadowProj * glm::lookAt(s_Data.PointLights[i].tc.Translation, s_Data.PointLights[i].tc.Translation + glm::vec3(-1.0,  0.0,  0.0),  glm::vec3(0.0, -1.0,  0.0));
-				shadowTransforms[2] = shadowProj * glm::lookAt(s_Data.PointLights[i].tc.Translation, s_Data.PointLights[i].tc.Translation + glm::vec3( 0.0,  1.0,  0.0),  glm::vec3(0.0,  0.0,  1.0));
-				shadowTransforms[3] = shadowProj * glm::lookAt(s_Data.PointLights[i].tc.Translation, s_Data.PointLights[i].tc.Translation + glm::vec3( 0.0, -1.0,  0.0),  glm::vec3(0.0,  0.0, -1.0));
-				shadowTransforms[4] = shadowProj * glm::lookAt(s_Data.PointLights[i].tc.Translation, s_Data.PointLights[i].tc.Translation + glm::vec3( 0.0,  0.0,  1.0),  glm::vec3(0.0, -1.0,  0.0));
-				shadowTransforms[5] = shadowProj * glm::lookAt(s_Data.PointLights[i].tc.Translation, s_Data.PointLights[i].tc.Translation + glm::vec3( 0.0,  0.0, -1.0),  glm::vec3(0.0, -1.0,  0.0));
-
-
-				ShaderLibrary::GetShader("PointLightShadowShader")->UploadUniform("u_ShadowMatrices[0]", sizeof(shadowTransforms) , &shadowTransforms);
-				ShaderLibrary::GetShader("PointLightShadowShader")->UploadUniform("far_plane", sizeof(far_plane), &far_plane);
-				ShaderLibrary::GetShader("PointLightShadowShader")->UploadUniform("lightPos", sizeof(s_Data.PointLights[i].tc.Translation), &s_Data.PointLights[i].tc.Translation);
-				ShaderLibrary::GetShader("CubeShader")->UploadUniform("far_plane", sizeof(far_plane), &far_plane);
-
-				//----- Render Cubes
-				auto viewCube = scene->GetRegistry().view<TransformComponent, MeshRendererComponent, TagComponent>();
-				for (auto& entity : viewCube)
-				{
-					auto [transformComponent, meshRendererComponent, tagComponent] = viewCube.get<TransformComponent, MeshRendererComponent, TagComponent>(entity);
-					auto transform = transformComponent.GetTransform();
-
-					ShaderLibrary::GetShader("PointLightShadowShader")->UploadUniform("u_Transform", sizeof(transform), &transform);
-					s_Data.CubeVertexArray->Bind();
-
-					if (tagComponent.Tag != "Point Light")
-					{
-						glDrawArrays(GL_TRIANGLES, 0, 36);
-					}
-
-					s_Data.CubeVertexArray->Unbind();
-					ShaderLibrary::GetShader("PointLightShadowShader")->Disable();
-
-				}
-				//----- Render Cubes
-				glBindFramebuffer(GL_FRAMEBUFFER, 0);
-			}
-
-
-			//Left here, you need to upload point light count and point light samplers to the shaders now, and sample from the suitable depth maps in the shader one by one.
-		}
-		void Renderer2D::RenderDirectionalLightShadowMap(Ref<Scene> scene)
-		{
-
-			if (!s_Data.DirectionalLightShadowBuffer)
-				GenerateDirectionalLightFramebuffer();
-
-			s_Data.DirectionalLightShadowBuffer->Bind();
-			glClear(GL_DEPTH_BUFFER_BIT);
-
-			//Set up all the light properties in the shadow shader here
-			float near_plane = 0.1f, far_plane = 1000.0f;
-			glm::mat4 directionalLightProjection = glm::ortho(-50.0f, 50.0f, -50.0f, 50.0f, near_plane, far_plane);
-			glm::mat4 directionalLightView = glm::lookAt(s_Data.DirectionalLightPosition, glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
-			glm::mat4 directionalightViewProjMatrix = directionalLightProjection * directionalLightView;
-			for (auto& [shaderName, shader] : ShaderLibrary::GetLibrary())
-			{
-				//Directional light should be single and fixed. And thus, I am storing the properties of it here in the renderer.
-				shader->UploadUniform("u_DirectionalLightPosition", sizeof(s_Data.DirectionalLightPosition), &s_Data.DirectionalLightPosition);
-				shader->UploadUniform("u_DirectionalLightColor", sizeof(s_Data.DirectionalLightColor), &s_Data.DirectionalLightColor);
-				//Upload directional light view projection matrix.
-				shader->UploadUniform("u_DirectionalLightViewProjMatrix", sizeof(directionalightViewProjMatrix), &directionalightViewProjMatrix);
-				shader->UploadUniform("u_DirectionalLightNear_plane", sizeof(near_plane), &near_plane);
-				shader->UploadUniform("u_DirectionalLightFar_plane", sizeof(far_plane), &far_plane);
-			}
-
-			//----- Render Cubes
-			auto viewCube = scene->GetRegistry().view<TransformComponent, MeshRendererComponent, TagComponent>();
-			for (auto& entity : viewCube)
-			{
-				auto [transformComponent, meshRendererComponent, tagComponent] = viewCube.get<TransformComponent, MeshRendererComponent, TagComponent>(entity);
-				auto transform = transformComponent.GetTransform();
-
-				ShaderLibrary::GetShader("ShadowShader")->UploadUniform("u_Transform", sizeof(transform), &transform);
-				s_Data.CubeVertexArray->Bind();
-				
-				glDrawArrays(GL_TRIANGLES, 0, 36);
-
-				s_Data.CubeVertexArray->Unbind();
-				ShaderLibrary::GetShader("ShadowShader")->Disable();
-				
-			}
-			//----- Render Cubes
-			s_Data.DirectionalLightShadowBuffer->Unbind();
-		}
 		void Renderer2D::Flush()
 		{
 			uint32_t count = s_Data.QuadIndexCount ? s_Data.QuadIndexCount : 0;
@@ -519,52 +487,28 @@ namespace AnorEngine
 		}
 		void Renderer2D::BeginScene(const Ref<EditorCamera>& camera)
 		{
-			DrawSkybox();
 			s_Data.EditorCamera = camera;
-
-			int clearValue = -1;
-			//THIS IS GONNA CAUSE PROBLEMS CLEAR THE CORRECT FRAMEBUFFER ATTACHMENT
-			//TODO: Hard coded the color attachment index as 4 because it is known at the moment.
-			glClearTexImage(4, 0, GL_RED_INTEGER, GL_INT, &clearValue);
-
 			//Common uniforms for every shader are set here.
 			for (auto& [shaderName, shader] : ShaderLibrary::GetLibrary())
 			{	
-				if (shaderName == "SkyboxShader")
-				{
-					auto viewProjMatrix = s_Data.EditorCamera->GetProjectionMatrix() * glm::mat4(glm::mat3(s_Data.EditorCamera->GetViewMatrix()));
-					shader->UploadUniform("u_ViewProjMat", sizeof(viewProjMatrix), &(viewProjMatrix));
-				}
-				else
-				{
-					shader->UploadUniform("u_DirectionalShadowMap", sizeof(s_Data.DirectionalLightShadowBuffer->GetDepthAttachmentID()), &s_Data.DirectionalLightShadowBuffer->GetDepthAttachmentID());
-					shader->UploadUniform("u_ViewProjMat", sizeof(s_Data.EditorCamera->GetViewProjectionMatrix()), &s_Data.EditorCamera->GetViewProjectionMatrix());
-					shader->UploadUniform("u_CameraPos", sizeof(s_Data.EditorCamera->GetPosition()), &s_Data.EditorCamera->GetPosition());
-					shader->UploadUniform("u_PointLightCount", sizeof(s_Data.PointLightCount), &s_Data.PointLightCount);
-				}
+				shader->UploadUniform("u_ViewProjMat", sizeof(s_Data.EditorCamera->GetViewProjectionMatrix()), &s_Data.EditorCamera->GetViewProjectionMatrix());
+				shader->UploadUniform("u_CameraPos", sizeof(s_Data.EditorCamera->GetPosition()), &s_Data.EditorCamera->GetPosition());
+				shader->UploadUniform("u_PointLightCount", sizeof(s_Data.PointLightCount), &s_Data.PointLightCount);		
 			}
 
 			s_Data.NumberOfDrawCalls = 0;
 			s_Data.QuadIndexCount = 0;
 			s_Data.QuadVertexBufferPtr = s_Data.QuadVertexBufferBase;
 			s_Data.TextureSlotIndex = 1;
-		}
-		void Renderer2D::BeginScene(Camera* camera, const glm::mat4& transform)
-		{
-			s_Data.RuntimeCamera = camera;
+			DrawSkybox();
 
-			glm::mat4 viewProjMatrix = s_Data.RuntimeCamera->GetProjectionMatrix() * glm::inverse(transform);
-			ShaderLibrary::GetShader("2Shader")->UploadUniform("u_ViewProjMat", sizeof(viewProjMatrix), &viewProjMatrix);
 
-			glm::mat4 viewMatrix = transform;
-			viewMatrix = glm::mat4(glm::mat3(viewMatrix));
-			auto viewProj = camera->GetProjectionMatrix() * viewMatrix;
-			ShaderLibrary::GetShader("SkyboxShader")->UploadUniform("u_ViewProjMat", sizeof(viewProj), &viewProj);
-
-			s_Data.NumberOfDrawCalls = 0;
-			s_Data.QuadIndexCount = 0;
-			s_Data.QuadVertexBufferPtr = s_Data.QuadVertexBufferBase;
-			s_Data.TextureSlotIndex = 1;
+			//Bind the shadow maps.
+			s_Data.DirectionalLightShadowBuffer->BindDepthAttachmentTexture();
+			for (int i = 0; i < s_Data.PointLightCount; i++)
+			{
+				s_Data.PointLightShadowBuffers[i]->BindDepthAttachmentTexture();
+			}
 		}
 		void Renderer2D::EndScene()
 		{
