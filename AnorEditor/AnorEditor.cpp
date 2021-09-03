@@ -221,15 +221,15 @@ namespace Game
 			}
 			// DockSpace
 			auto& style = ImGui::GetStyle();
-			float minWinSizeX = style.WindowMinSize.x;
-			style.WindowMinSize.x = 420.0f;
+			//float minWinSizeX = style.WindowMinSize.x;
+			//style.WindowMinSize.x = 420.0f;
 			ImGuiIO& io = ImGui::GetIO();
 			if (io.ConfigFlags & ImGuiConfigFlags_DockingEnable)
 			{
 				ImGuiID dockspace_id = ImGui::GetID("MyDockSpace");
 				ImGui::DockSpace(dockspace_id, ImVec2(0.0f, 0.0f), dockspace_flags);
 			}
-			style.WindowMinSize.x = minWinSizeX;
+			//style.WindowMinSize.x = minWinSizeX;
 
 			static bool show = true;
 			ImGui::End();
