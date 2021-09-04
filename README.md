@@ -6,3 +6,5 @@ Developing a game engine for practice
 -Build the engine using the compiler of visual studio.
 
 -Then you can either launch the editor from the IDE itself or by navigating to bin/AnorEngine_Debug_x64/AnorEditor.exe
+
+![oi](https://user-images.githubusercontent.com/61450895/132106632-60b128bc-784f-4437-9ac5-e181afff35c0.PNG)
