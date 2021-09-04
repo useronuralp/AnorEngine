@@ -77,6 +77,9 @@ namespace AnorEngine
 		float Constant = 1.0f;
 		float Quadratic = 0.32f;
 		float Intensity = 1.0f;
+		bool CastPointLightShadowBool = true;
+		float CastPointLightShadow = 1.0f;
+
 		PointLightComponent() = default;
 		PointLightComponent(float Lin, float Con, float Quad, float In)
 			:Linear(Lin), Constant(Con), Quadratic(Quad), Intensity(In){}

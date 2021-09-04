@@ -64,8 +64,8 @@ struct PointLight {
 	float ambient;
 	float diffuse;
 	float specular;
+	float castShadow;
 };
-
 //Varying INs
 in flat int v_EntityID;
 in vec3 v_Normal;
@@ -75,41 +75,44 @@ in vec4 v_FragPosLightSpace;
 
 
 //Uniforms
-uniform vec3 u_CameraPos;
+uniform vec3		u_CameraPos;
+uniform vec4		u_Color;
+uniform Material	u_Material;
 uniform samplerCube u_Skybox;
-uniform vec4 u_Color;
-uniform PointLight u_PointLights[MAX_POINT_LIGHT_NUMBER];
-uniform vec3 u_DirectionalLightPosition;
-uniform vec3 u_DirectionalLightColor;
-uniform Material u_Material;
-uniform float u_CastDirectionalLight;
-uniform sampler2D u_Sampler;
-uniform samplerCube u_CubeSampler[MAX_POINT_LIGHT_NUMBER]; 
-uniform int u_PointLightCount;
-uniform sampler2D u_DirectionalShadowMap;
-uniform float u_Near_plane;
-uniform float u_Far_plane;
+uniform sampler2D	u_Sampler;
+uniform vec3		u_DirectionalLightPosition;
+uniform vec3		u_DirectionalLightColor;
+uniform sampler2D   u_DirectionalShadowMap;
+uniform float		u_CastDirectionalLight;
+uniform PointLight	u_PointLights[MAX_POINT_LIGHT_NUMBER];
+uniform samplerCube u_PointLightShadowMap[MAX_POINT_LIGHT_NUMBER];
+uniform int			u_PointLightCount;
+uniform float		u_PointLigthFarPlane;
 
 
-uniform float u_PointLigthFarPlane;
 
 float PointShadowCalculation(vec3 fragPos, int index)
 {
 	float shadow;
+	//If the fragment is lit by a direct light, conclude that it is not occluded by shadow.
+	vec3 lightToFrag = fragPos - u_PointLights[index].position;
+	float depth = texture(u_PointLightShadowMap[index], lightToFrag).r;
+	depth *= u_PointLigthFarPlane;
+	float bias = 0.5;
+	shadow = (depth + bias) < length(lightToFrag) ? 0.0 : 1.0f;
+	if (shadow == 1.0f)
+		return 1.0f;
+	//--------------end of direct light check
+
 	for (int i = 0; i < u_PointLightCount; i++)
 	{
-		vec3 lightToFrag = fragPos - u_PointLights[i].position;
-
-		float depth = texture(u_CubeSampler[i], lightToFrag).r;
+		lightToFrag = fragPos - u_PointLights[i].position;
+		depth = texture(u_PointLightShadowMap[i], lightToFrag).r;
 		depth *= u_PointLigthFarPlane;
-
-		float bias = 0.5;
+		bias = 0.5;
 		shadow = (depth + bias) < length(lightToFrag) ? 0.0 : 1.0f;
-
-		if (i == index && shadow == 1.0)
-		{
-			return 1.0f;
-		}
+		if (shadow == 0.0f)
+			return 0.0f;
 	}
 	return shadow;
 }
@@ -217,11 +220,9 @@ void main()
 	//Object looks completely dark when not lit.
 	vec3 FinalColor = {0,0,0};
 
-	//Shadow
+	//Directional Shadow
 	float directionalShadow = DirectionalShadowCalculation(v_FragPosLightSpace, v_Position, u_DirectionalLightPosition, v_Normal);
 	
-
-
 	//Add directional light calculation to target pixel
 	if (u_CastDirectionalLight > 0.5f)
 		FinalColor += CalcDirectionalLight(v_Normal, viewDir, v_Position, directionalShadow) * ObjectProperties;
@@ -229,8 +230,12 @@ void main()
 	//Add point light calculation to target pixel. (Each point light contributes to the final color)
 	for (int i = 0; i < u_PointLightCount; i++)
 	{
+		//Point Light shadow
 		float pointShadow = PointShadowCalculation(v_Position, i);
-		FinalColor += CalcPointLight(u_PointLights[i], v_Normal, v_Position, viewDir, pointShadow) * ObjectProperties;
+		if (u_PointLights[i].castShadow > 0.5f)
+			FinalColor += CalcPointLight(u_PointLights[i], v_Normal, v_Position, viewDir, pointShadow) * ObjectProperties;
+		else
+			FinalColor += CalcPointLight(u_PointLights[i], v_Normal, v_Position, viewDir, 1) * ObjectProperties;
 	}
 
 	//Gamma correction constant.

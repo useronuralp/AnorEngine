@@ -279,9 +279,37 @@ namespace AnorEngine
 		});
 		DrawComponent<PointLightComponent>("Point Light", entity, [](auto& component)
 		{
+			ImGui::PushID("Intensity");
+			ImGui::BeginColumns("Columns", 2);
+			ImGui::SetColumnWidth(0, 120);
+			ImGui::TextUnformatted("Intensity");
+			ImGui::NextColumn();
+			ImGui::SetNextItemWidth(-1);
+			ImGui::DragFloat("", &component.Intensity, 0.3f, 0.0f, 30.0f);
+			ImGui::NextColumn();
+			ImGui::EndColumns();
 			ImGui::Separator();
-			ImGui::DragFloat("Intensity", &component.Intensity, 0.3f, 0.0f, 30.0f);
+			ImGui::PopID();
+
+
+			ImGui::PushID("Point light shadow");
+			ImGui::BeginColumns("Columns", 2);
+			ImGui::SetColumnWidth(0, 120);
+			ImGui::TextUnformatted("Cast Shadow");
+			ImGui::NextColumn();
+			ImGui::SetNextItemWidth(-1);
+			if (ImGui::Checkbox("", &component.CastPointLightShadowBool))
+			{
+				component.CastPointLightShadowBool ^= false;
+				if (component.CastPointLightShadowBool)
+					component.CastPointLightShadow = 1.0f;
+				else
+					component.CastPointLightShadow = 0.0f;
+			}
+			ImGui::NextColumn();
+			ImGui::EndColumns();
 			ImGui::Separator();
+			ImGui::PopID();
 		});
 		DrawComponent<NativeScriptComponent>("Script", entity, [](auto& component)
 		{

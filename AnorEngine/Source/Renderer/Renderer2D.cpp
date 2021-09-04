@@ -254,6 +254,7 @@ namespace AnorEngine
 					shader->UploadUniform("u_PointLights[" + std::to_string(PointLightCount) + "].ambient", sizeof(meshRendererComponent.Material->Properties.Ambient), &meshRendererComponent.Material->Properties.Ambient);
 					shader->UploadUniform("u_PointLights[" + std::to_string(PointLightCount) + "].diffuse", sizeof(meshRendererComponent.Material->Properties.Diffuse), &meshRendererComponent.Material->Properties.Diffuse); 
 					shader->UploadUniform("u_PointLights[" + std::to_string(PointLightCount) + "].specular", sizeof(meshRendererComponent.Material->Properties.Specular), &meshRendererComponent.Material->Properties.Specular);
+					shader->UploadUniform("u_PointLights[" + std::to_string(PointLightCount) + "].castShadow", sizeof(pointLightComponent.CastPointLightShadow), &pointLightComponent.CastPointLightShadow);
 				}
 				PointLightProperties props(transformComponent, meshRendererComponent, pointLightComponent, PointLightCount);
 				//store all the point lights in the scene.
@@ -294,7 +295,7 @@ namespace AnorEngine
 				ShaderLibrary::GetShader("PointLightShadowShader")->UploadUniform("u_Far_plane", sizeof(far_plane), &far_plane);
 				ShaderLibrary::GetShader("PointLightShadowShader")->UploadUniform("u_LightPos", sizeof(s_Data.PointLights[i].tc.Translation), &s_Data.PointLights[i].tc.Translation);
 				for (auto& [shaderName, shader] : ShaderLibrary::GetLibrary())
-					shader->UploadInteger("u_CubeSampler[" + std::to_string(i) + "]", s_Data.PointLightShadowBuffers[i]->GetDepthAttachmentID());
+					shader->UploadInteger("u_PointLightShadowMap[" + std::to_string(i) + "]", s_Data.PointLightShadowBuffers[i]->GetDepthAttachmentID());
 
 				//----- Render Cubes
 				auto viewCube = scene->GetRegistry().view<TransformComponent, MeshRendererComponent, TagComponent>();
