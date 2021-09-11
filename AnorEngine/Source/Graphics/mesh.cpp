@@ -10,7 +10,7 @@ namespace AnorEngine {
             this->textures = textures;
             setupMesh();
         }
-        void Mesh::Draw(const Ref<Shader> shader, const Ref<PerspectiveCamera> camera)
+        void Mesh::Draw(const Ref<Shader> shader, const Ref<EditorCamera> camera)
         {       
             unsigned int diffuseNr = 1;
             unsigned int specularNr = 1;
@@ -27,8 +27,8 @@ namespace AnorEngine {
             int viewLocation = glGetUniformLocation(shader->getShaderID(), "vw_matrix");
             int projectionLocation = glGetUniformLocation(shader->getShaderID(), "pr_matrix");
             glUniformMatrix4fv(modelLocation, 1, GL_FALSE, glm::value_ptr(modelMatrix));
-            glUniformMatrix4fv(viewLocation, 1, GL_FALSE, glm::value_ptr(glm::lookAt(camera->cameraPos, camera->cameraPos + camera->cameraFront, camera->cameraUp)));
-            glUniformMatrix4fv(projectionLocation, 1, GL_FALSE, glm::value_ptr(camera->m_ProjectionMatrix));
+            glUniformMatrix4fv(viewLocation, 1, GL_FALSE, glm::value_ptr(glm::lookAt(camera->GetPosition(), camera->GetPosition() + glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f)))); //TODO:This part could be problematic.
+            glUniformMatrix4fv(projectionLocation, 1, GL_FALSE, glm::value_ptr(camera->GetProjectionMatrix()));
 
             //glDrawArrays(GL_TRIANGLES, 0, vertices.size()); // switch to this if you wanna draw with arrays.
             glDrawElements(GL_TRIANGLES, (GLsizei)indices.size(), GL_UNSIGNED_INT, 0);

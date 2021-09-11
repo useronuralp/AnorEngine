@@ -111,6 +111,7 @@ float PointShadowCalculation(vec3 fragPos, int index)
 		depth *= u_PointLigthFarPlane;
 		bias = 0.5;
 		shadow = (depth + bias) < length(lightToFrag) ? 0.0 : 1.0f;
+		//break if the fragment is occluded by any of the point lights in the scene, no need for further if checks.
 		if (shadow == 0.0f)
 			return 0.0f;
 	}
@@ -241,7 +242,6 @@ void main()
 	//Gamma correction constant.
 	float gamma = 2.2;
 
-	//Color buffer
 	//Use this line if you want gamma correction
 	//FragColor = vec4(pow(FinalColor, vec3(1.0 / gamma)),1.0);
 

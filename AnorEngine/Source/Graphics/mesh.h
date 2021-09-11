@@ -3,7 +3,7 @@
 #include <glm.hpp>
 #include <gtc/matrix_transform.hpp>
 #include <gtc/type_ptr.hpp>
-#include "Camera.h"
+#include "EditorCamera.h"
 namespace AnorEngine {
     namespace Graphics {
 
@@ -33,7 +33,7 @@ namespace AnorEngine {
         public:
             // mesh data
             Mesh(const std::vector<Vertex>& vertices, const std::vector<unsigned int>& indices, const std::vector<TextureInfo>& textures);
-            void Draw(const Ref<Shader> shader, const Ref<PerspectiveCamera> camera);
+            void Draw(const Ref<Shader> shader, const Ref<EditorCamera> camera);
             inline glm::mat4& getModelMatrix() { return modelMatrix; }
         };
     }

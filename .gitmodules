@@ -1,9 +1,9 @@
-[submodule "AnorEngine/src/vendor/imgui"]
-	path = AnorEngine/src/vendor/imgui
-	url = https://github.com/ocornut/imgui.git
 [submodule "AnorEngine/Vendor/ImGui"]
 	path = AnorEngine/Vendor/ImGui
 	url = https://github.com/useronuralp/imgui.git
 [submodule "AnorEngine/Vendor/yaml-cpp"]
 	path = AnorEngine/Vendor/yaml-cpp
 	url = https://github.com/useronuralp/yaml-cpp.git
+[submodule "AnorEngine/Vendor/Assimp/assimp"]
+	path = AnorEngine/Vendor/Assimp/assimp
+	url = https://github.com/useronuralp/assimp.git

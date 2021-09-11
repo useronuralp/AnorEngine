@@ -82,8 +82,8 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LinkIncremental>true</LinkIncremental>
-    <IncludePath>$(SolutionDir)AnorEngine\Source;$(SolutionDir)AnorEngine\Vendor\GLM;$(SolutionDir)AnorEngine\Vendor\FreeImage\include;$(SolutionDir)AnorEngine\Vendor\GLEW\include;$(SolutionDir)AnorEngine\Vendor\GLFW\includex64;$(SolutionDir)AnorEngine\Vendor\Assimp\include;$(SolutionDir)AnorEngine\Vendor\spdlog-1.x\include;$(SolutionDir)AnorEngine\Vendor\imgui;$(SolutionDir)AnorEngine\Vendor\Entt\include;$(SolutionDir)AnorEngine\Vendor\yaml-cpp\include;$(IncludePath)</IncludePath>
-    <LibraryPath>$(SolutionDir)AnorEngine\Vendor\FreeImage\lib;$(SolutionDir)AnorEngine\Vendor\GLEW\lib\x64;$(SolutionDir)AnorEngine\Vendor\GLFW\lib-vc2019x64;$(SolutionDir)AnorEngine\Vendor\Assimp\lib;$(LibraryPath)</LibraryPath>
+    <IncludePath>$(SolutionDir)AnorEngine\Source;$(SolutionDir)AnorEngine\Vendor\GLM;$(SolutionDir)AnorEngine\Vendor\FreeImage\include;$(SolutionDir)AnorEngine\Vendor\GLEW\include;$(SolutionDir)AnorEngine\Vendor\GLFW\includex64;$(SolutionDir)AnorEngine\Vendor\Assimp\assimp\include;$(SolutionDir)AnorEngine\Vendor\spdlog-1.x\include;$(SolutionDir)AnorEngine\Vendor\imgui;$(SolutionDir)AnorEngine\Vendor\Entt\include;$(SolutionDir)AnorEngine\Vendor\yaml-cpp\include;$(IncludePath)</IncludePath>
+    <LibraryPath>$(SolutionDir)AnorEngine\Vendor\FreeImage\lib;$(SolutionDir)AnorEngine\Vendor\GLEW\lib\x64;$(SolutionDir)AnorEngine\Vendor\GLFW\lib-vc2019x64;$(SolutionDir)AnorEngine\Vendor\Assimp\assimp\lib\Release;$(LibraryPath)</LibraryPath>
     <IntDir>$(SolutionDir)IntermediateFiles\$(ProjectName)_$(Configuration)_$(Platform)</IntDir>
     <OutDir>$(SolutionDir)bin\$(ProjectName)_$(Configuration)_$(Platform)</OutDir>
   </PropertyGroup>
@@ -91,8 +91,8 @@
     <LinkIncremental>false</LinkIncremental>
     <OutDir>$(SolutionDir)bin\$(ProjectName)_$(Configuration)_$(Platform)</OutDir>
     <IntDir>$(SolutionDir)IntermediateFiles\$(ProjectName)_$(Configuration)_$(Platform)</IntDir>
-    <IncludePath>$(SolutionDir)AnorEngine\Source;$(SolutionDir)AnorEngine\Vendor\GLM;$(SolutionDir)AnorEngine\Vendor\FreeImage\include;$(SolutionDir)AnorEngine\Vendor\GLEW\include;$(SolutionDir)AnorEngine\Vendor\GLFW\includex64;$(SolutionDir)AnorEngine\Vendor\Assimp\include;$(SolutionDir)AnorEngine\Vendor\spdlog-1.x\include;$(SolutionDir)AnorEngine\Vendor\imgui;$(SolutionDir)AnorEngine\Vendor\Entt\include;$(SolutionDir)AnorEngine\Vendor\yaml-cpp\include;$(IncludePath)</IncludePath>
-    <LibraryPath>$(SolutionDir)AnorEngine\Vendor\FreeImage\lib;$(SolutionDir)AnorEngine\Vendor\GLEW\lib\x64;$(SolutionDir)AnorEngine\Vendor\GLFW\lib-vc2019x64;$(SolutionDir)AnorEngine\Vendor\Assimp\lib;$(LibraryPath)</LibraryPath>
+    <IncludePath>$(SolutionDir)AnorEngine\Source;$(SolutionDir)AnorEngine\Vendor\GLM;$(SolutionDir)AnorEngine\Vendor\FreeImage\include;$(SolutionDir)AnorEngine\Vendor\GLEW\include;$(SolutionDir)AnorEngine\Vendor\GLFW\includex64;$(SolutionDir)AnorEngine\Vendor\Assimp\assimp\include;$(SolutionDir)AnorEngine\Vendor\spdlog-1.x\include;$(SolutionDir)AnorEngine\Vendor\imgui;$(SolutionDir)AnorEngine\Vendor\Entt\include;$(SolutionDir)AnorEngine\Vendor\yaml-cpp\include;$(IncludePath)</IncludePath>
+    <LibraryPath>$(SolutionDir)AnorEngine\Vendor\FreeImage\lib;$(SolutionDir)AnorEngine\Vendor\GLEW\lib\x64;$(SolutionDir)AnorEngine\Vendor\GLFW\lib-vc2019x64;$(SolutionDir)AnorEngine\Vendor\Assimp\assimp\lib\Release;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>

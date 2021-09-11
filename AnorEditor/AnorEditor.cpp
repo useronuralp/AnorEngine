@@ -5,6 +5,7 @@
 #include "Utility/WindowsUtils.h"
 #include "ExampleLayer.h"
 #include "Panels/ContentBrowserPanel.h"
+//#include "Graphics/Model.h"
 namespace AnorEngine
 {
 	extern const std::filesystem::path g_AssetPath;
@@ -36,6 +37,7 @@ namespace Game
 		bool							  m_IsRuntime = false; 
 		int								  m_HoveredPixel = -1;
 		std::vector<ProfileResult>		  m_ProfileResults;
+		//Ref<Model>					      backpack;
 	public:
 		AnorEditor(const char* appName)
 			:Application(appName), m_OrthoCamera(std::make_shared<OrthographicCamera>(-1280.0f / 720.0f * (5), 1280.0f / 720.0f * (5), -1 * (5), 1 * (5))), m_PersCamera(std::make_shared<PerspectiveCamera>(1280, 720))
@@ -55,6 +57,7 @@ namespace Game
 			m_SceneHierarchyPanel = std::make_shared<SceneHierarchyPanel>(m_Layer->GetScene());
 			//Layer insertion/////////////////////////////////
 			PushLayer(m_Layer);
+			//backpack = std::make_shared<Model>("C:\\ProgrammingProjects\\AnorEngine\\AnorEngine\\AnorEngine\\Assets\\Models\\backpack\\backpack.obj");
 		}
 	public:
 		virtual void Run() override

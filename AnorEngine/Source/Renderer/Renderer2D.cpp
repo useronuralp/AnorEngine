@@ -181,7 +181,7 @@ namespace AnorEngine
 			ShaderLibrary::LoadShader("2DShader", "Shaders\\2DShader.shader");
 			ShaderLibrary::LoadShader("ShadowShader", "Shaders\\Shadow.shader");
 			ShaderLibrary::LoadShader("PointLightShadowShader", "Shaders\\PointLightShadow.shader");
-
+			ShaderLibrary::LoadShader("3DShader", "Shaders\\3DShader.shader");
 
 			int samplers[s_Data.MaxTextureSlots];
 			for (uint32_t i = 0; i < s_Data.MaxTextureSlots; i++)
