@@ -211,6 +211,29 @@ namespace AnorEngine
 			ImGui::Separator();
 			ImGui::PopID();
 		});
+		DrawComponent<ModelRendererComponent>("Model Editor", entity, [](auto& component)
+		{
+			DrawColorEdit4Control("Color", component.Color);
+
+			ImGui::PushID("Directional Light");
+			ImGui::BeginColumns("Columns", 2);
+			ImGui::SetColumnWidth(0, 180);
+			ImGui::TextUnformatted("Cast Directional Light");
+			ImGui::NextColumn();
+			ImGui::SetNextItemWidth(-1);
+			if (ImGui::Checkbox("", &component.CastDirectionalLightBool))
+			{
+				component.CastDirectionalLightBool ^= false;
+				if (component.CastDirectionalLightBool)
+					component.CastDirectionalLight = 1.0f;
+				else
+					component.CastDirectionalLight = 0.0f;
+			}
+			ImGui::NextColumn();
+			ImGui::EndColumns();
+			ImGui::Separator();
+			ImGui::PopID();
+		});
 		DrawComponent<CameraComponent>("Camera", entity, [](auto& component)
 		{
 			if (component.Camera.GetProjectionType() == ProjectionType::Perspective)

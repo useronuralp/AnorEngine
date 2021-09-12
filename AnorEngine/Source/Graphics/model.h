@@ -1,37 +1,25 @@
 #pragma once
-#include "../vendor/stb_image/stb_image.h"
 #include "mesh.h"
-#include <assimp/Importer.hpp>
-#include <assimp/scene.h>
-#include <assimp/postprocess.h>
-
-
 namespace AnorEngine {
     namespace Graphics {
         class ANOR_API Model
         {
         public:
-            Model(const char* path)
-            {
-                loadModel(path);
-            }
+            Model(const std::filesystem::path& filePath);
         private:
             // model data
-            std::vector<Mesh>        meshes;
-            std::string              directory;
-            std::vector<TextureInfo> textures_loaded;
+            std::string               m_AbsolutePath;
+            std::vector<Mesh>         m_Meshes;
+            std::string               m_Directory;
+            std::vector<Ref<Texture>> m_Textures;
         private:
-            void loadModel(std::string path);
-            void processNode(aiNode* node, const aiScene* scene);
-            Mesh processMesh(aiMesh* mesh, const aiScene* scene);
-            std::vector<TextureInfo> loadMaterialTextures(aiMaterial* mat, aiTextureType type, std::string typeName);
-            unsigned int TextureFromFile(const char* path, const std::string& directory, bool gamma = false);
+            void LoadModel(const std::filesystem::path& filePath);
+            void ProcessNode(aiNode* node, const aiScene* scene);
+            Mesh ProcessMesh(aiMesh* mesh, const aiScene* scene);
+            std::vector<Ref<Texture>> LoadMaterialTextures(aiMaterial* mat, aiTextureType type, std::string typeName);
         public:
-            std::vector<Mesh> getMeshes() { return meshes; }
-            void Draw(const Ref<Shader> shader, const Ref<EditorCamera> camera);
-            void rotate(const float& degree, const float& x, const float& y, const float& z);
-            void translate(const float& x, const float& y, const float& z);
-            void scale(const float& x, const float& y, const float& z);
+            void Draw(const Ref<Shader>& shader);
+            const std::string& GetAbsolutePath() { return m_AbsolutePath; }
         };
     }
 }

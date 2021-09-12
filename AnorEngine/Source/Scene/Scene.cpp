@@ -32,6 +32,16 @@ namespace AnorEngine
 			Graphics::Renderer2D::DrawCube(transformComponent, meshRendererComponent, tagComponent);
 		}
 		//----- Cubes
+
+		//----- Models
+		auto viewModel = m_Registry.view<TransformComponent, ModelRendererComponent, TagComponent>();
+		for (auto& entity : viewModel)
+		{
+			auto [transformComponent, modelComponent, tagComponent] = viewModel.get<TransformComponent, ModelRendererComponent, TagComponent>(entity);
+			Graphics::Renderer2D::DrawModel(transformComponent, modelComponent, tagComponent, Graphics::ShaderLibrary::GetShader("3DShader"));
+		}
+		//----- Models
+
 		Graphics::Renderer2D::EndScene();
 	}
 	void Scene::OnUpdateRuntime(float deltaTime)

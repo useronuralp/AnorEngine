@@ -70,7 +70,21 @@ namespace AnorEngine
 		MeshRendererComponent(glm::vec4 color, Ref<Graphics::Material> material)
 			:Color(color), Material(material){}
 	};
-	//TODO: Make the serialization / deserialization code work and display this component in the UI.
+
+	//----------------
+	struct ANOR_API ModelRendererComponent //Temporary
+	{
+		Ref<Graphics::Model> Model; //Self contains all the necessary textures.
+		glm::vec4 Color{ 1.0f, 1.0f, 1.0f, 1.0f };
+		bool CastDirectionalLightBool = true;
+		float CastDirectionalLight = 1.0f; //Treat this as a bool, this is the one being sent to the shader
+		ModelRendererComponent(Ref<Graphics::Model> model)
+			:Model(model){}
+		ModelRendererComponent(const Ref<Graphics::Model>& model, const glm::vec4& color, bool castDirectionalLightBool, float castDirectionalLight)
+			:Model(model), Color(color), CastDirectionalLightBool(castDirectionalLightBool), CastDirectionalLight(castDirectionalLight){}
+	};
+	//----------------
+
 	struct ANOR_API PointLightComponent
 	{
 		float Linear = 0.09f;

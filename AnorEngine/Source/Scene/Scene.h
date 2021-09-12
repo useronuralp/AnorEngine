@@ -3,6 +3,7 @@
 #include "Renderer/Renderer2D.h"
 #include "Graphics/Camera.h"
 #include "Graphics/EditorCamera.h"
+#include "Graphics/Model.h"
 namespace AnorEngine
 {
 	struct Position2D

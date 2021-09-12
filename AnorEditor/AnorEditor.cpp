@@ -5,7 +5,7 @@
 #include "Utility/WindowsUtils.h"
 #include "ExampleLayer.h"
 #include "Panels/ContentBrowserPanel.h"
-//#include "Graphics/Model.h"
+#include "Graphics/Mesh.h"
 namespace AnorEngine
 {
 	extern const std::filesystem::path g_AssetPath;
@@ -26,6 +26,7 @@ namespace Game
 		Ref<PerspectiveCamera>			  m_PersCamera;
 		Ref<ExampleLayer>				  m_Layer;
 		Ref<Framebuffer>				  m_Framebuffer;
+		//Ref<Scene>						  m_ActiveScene;
 		glm::vec2						  m_ViewportSize;
 		glm::vec2						  m_MousePositionRelativeToRenderViewport;
 		glm::vec2						  m_ViewportBounds[2];
@@ -37,7 +38,6 @@ namespace Game
 		bool							  m_IsRuntime = false; 
 		int								  m_HoveredPixel = -1;
 		std::vector<ProfileResult>		  m_ProfileResults;
-		//Ref<Model>					      backpack;
 	public:
 		AnorEditor(const char* appName)
 			:Application(appName), m_OrthoCamera(std::make_shared<OrthographicCamera>(-1280.0f / 720.0f * (5), 1280.0f / 720.0f * (5), -1 * (5), 1 * (5))), m_PersCamera(std::make_shared<PerspectiveCamera>(1280, 720))
@@ -57,7 +57,6 @@ namespace Game
 			m_SceneHierarchyPanel = std::make_shared<SceneHierarchyPanel>(m_Layer->GetScene());
 			//Layer insertion/////////////////////////////////
 			PushLayer(m_Layer);
-			//backpack = std::make_shared<Model>("C:\\ProgrammingProjects\\AnorEngine\\AnorEngine\\AnorEngine\\Assets\\Models\\backpack\\backpack.obj");
 		}
 	public:
 		virtual void Run() override
@@ -101,7 +100,7 @@ namespace Game
 				//Mouse picking calculations.
 				ReadDataFromMousePos();
 
-				int depthBuffer = 22;
+				int depthBuffer = 12;
 				uint32_t texture = m_Framebuffer->GetColorAttachmentID();
 				ImGui::Image((void*)texture, { m_Framebuffer->GetDimensions().x, m_Framebuffer->GetDimensions().y }, { 0,1 }, { 1,0 });
 
@@ -114,6 +113,14 @@ namespace Game
 						if (std::wstring(path).find(L"Scenes\\") != std::wstring::npos)
 						{
 							OpenScene(g_AssetPath / path);
+						}
+						else if (std::wstring(path).find(L".obj") != std::wstring::npos)
+						{	
+
+							Ref<Model> model = std::make_shared<Model>(g_AssetPath / path);
+							auto entity = m_Layer->GetScene()->CreateEntity();
+							entity.GetComponent<TagComponent>().Tag = "Model";
+							entity.AddComponent<ModelRendererComponent>(model);
 						}
 					}
 					ImGui::EndDragDropTarget();

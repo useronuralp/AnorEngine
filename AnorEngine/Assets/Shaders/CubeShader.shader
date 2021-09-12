@@ -6,20 +6,15 @@ layout(location = 0) in vec3 a_Position;
 layout(location = 1) in vec3 a_Normal;
 layout(location = 2) in vec2 a_UV;
 
-//Custom variables
-
-
 //Varying OUTSs
 out vec3 v_Normal;
 out vec3 v_Position;
-out flat int v_EntityID;
 out vec2 v_UV;
 out vec4 v_FragPosLightSpace;
 
 //Uniforms
 uniform mat4 u_Transform = mat4(1.0);
 uniform mat4 u_ViewProjMat = mat4(1.0);
-uniform int u_EntityID;
 uniform mat4 u_DirectionalLightViewProjMatrix;
 
 void main()
@@ -27,9 +22,8 @@ void main()
 	v_UV = a_UV;
 	v_Normal = mat3(transpose(inverse(u_Transform))) * a_Normal;
 	v_Position = vec3(u_Transform * vec4(a_Position, 1.0));
-	gl_Position = (u_ViewProjMat * vec4(v_Position, 1.0));
+	gl_Position = u_ViewProjMat * vec4(v_Position, 1.0);
 	v_FragPosLightSpace = (u_DirectionalLightViewProjMatrix * vec4(v_Position, 1.0));
-	v_EntityID = u_EntityID;
 }
 
 #type fragment
@@ -66,8 +60,8 @@ struct PointLight {
 	float specular;
 	float castShadow;
 };
+
 //Varying INs
-in flat int v_EntityID;
 in vec3 v_Normal;
 in vec3 v_Position;
 in vec2 v_UV;
@@ -88,7 +82,7 @@ uniform PointLight	u_PointLights[MAX_POINT_LIGHT_NUMBER];
 uniform samplerCube u_PointLightShadowMap[MAX_POINT_LIGHT_NUMBER];
 uniform int			u_PointLightCount;
 uniform float		u_PointLigthFarPlane;
-
+uniform int		    u_EntityID;
 
 
 float PointShadowCalculation(vec3 fragPos, int index)
@@ -195,7 +189,7 @@ vec3 CalcDirectionalLight(vec3 Normal, vec3 viewDir,  vec3 FragPosition, float s
 	//Specular
 	vec3 SpecularDirectional = vec3(u_DirectionalLightColor) * pow(max(dot(viewDir, reflect(-DirectionalLightDir, normalize(Normal))), 0.0), u_Material.shininess) * vec3(u_Material.specularIntensity);
 
-	return ( (1.0 - shadow) * (DiffuseDirectional + SpecularDirectional) + AmbientDirectional) * u_DirectionalLightColor;
+	return ( (1.0 - shadow) * (DiffuseDirectional + SpecularDirectional) + AmbientDirectional);
 }
 
 void main()
@@ -247,5 +241,5 @@ void main()
 
 	FragColor = vec4(FinalColor, 1.0);
 	//Integer buffer for mouse picking.
-	IntegerColorBuffer = v_EntityID;
+	IntegerColorBuffer = u_EntityID;
 }

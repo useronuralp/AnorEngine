@@ -2,66 +2,63 @@
 #include "mesh.h"
 namespace AnorEngine {
     namespace Graphics {
-        Mesh::Mesh(const std::vector<Vertex>& vertices, const std::vector<unsigned int>& indices, const std::vector<TextureInfo>& textures)
-            :modelMatrix(glm::mat4(1.0f))
+        Mesh::Mesh(const std::vector<Vertex>& vertices, const std::vector<unsigned int>& indices, const std::vector<Ref<Texture>>& textures)
+            :m_ModelMatrix(glm::mat4(1.0f))
         {
-            this->vertices = vertices;
-            this->indices = indices;
-            this->textures = textures;
-            setupMesh();
+            this->m_Vertices = vertices;
+            this->m_Indices = indices;
+            this->m_Textures = textures;
+            SetupMesh();
         }
-        void Mesh::Draw(const Ref<Shader> shader, const Ref<EditorCamera> camera)
+        void Mesh::Draw(const Ref<Shader>& shader)
         {       
             unsigned int diffuseNr = 1;
             unsigned int specularNr = 1;
             shader->Enable();
-            for (unsigned int i = 0; i < textures.size(); i++)
+            for (unsigned int i = 0; i < m_Textures.size(); i++)
             {
-                glActiveTexture(GL_TEXTURE0 + textures[i].id); // activate proper texture unit before binding
-                glBindTexture(GL_TEXTURE_2D, textures[i].id);
-                //shader->UploadInteger("textureSampler", textures[i].id);
+                glActiveTexture(GL_TEXTURE0 + m_Textures[i]->GetTextureID()); // activate proper texture unit before binding
+                glBindTexture(GL_TEXTURE_2D, m_Textures[i]->GetTextureID());
             }
-            //shader->UploadInteger("textureSampler", textures[0].id);
-            glBindVertexArray(VAO);
-            int modelLocation = glGetUniformLocation(shader->getShaderID(), "ml_matrix");
-            int viewLocation = glGetUniformLocation(shader->getShaderID(), "vw_matrix");
-            int projectionLocation = glGetUniformLocation(shader->getShaderID(), "pr_matrix");
-            glUniformMatrix4fv(modelLocation, 1, GL_FALSE, glm::value_ptr(modelMatrix));
-            glUniformMatrix4fv(viewLocation, 1, GL_FALSE, glm::value_ptr(glm::lookAt(camera->GetPosition(), camera->GetPosition() + glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f)))); //TODO:This part could be problematic.
-            glUniformMatrix4fv(projectionLocation, 1, GL_FALSE, glm::value_ptr(camera->GetProjectionMatrix()));
+            for (auto& texture : m_Textures)
+            {
+                if (texture->GetType() == "texture_diffuse")
+                    shader->UploadUniform("u_TextureSamplerDiffuse", sizeof(texture->GetTextureID()), &texture->GetTextureID());
+                else if (texture->GetType() == "texture_specular")
+                    shader->UploadUniform("u_TextureSamplerSpecular", sizeof(texture->GetTextureID()), &texture->GetTextureID());
+            }
+            m_VAO->Bind();
 
-            //glDrawArrays(GL_TRIANGLES, 0, vertices.size()); // switch to this if you wanna draw with arrays.
-            glDrawElements(GL_TRIANGLES, (GLsizei)indices.size(), GL_UNSIGNED_INT, 0);
-            glBindVertexArray(0);
+            //glDrawArrays(GL_TRIANGLES, 0, m_Vertices.size()); // switch to this if you wanna draw with arrays.
+            glDrawElements(GL_TRIANGLES, (GLsizei)m_Indices.size(), GL_UNSIGNED_INT, 0);
+            m_VAO->Unbind();
             shader->Disable();
         }
-
-        void Mesh::setupMesh()
+        void Mesh::SetupMesh()
         {
-            glGenVertexArrays(1, &VAO);
-            glGenBuffers(1, &VBO);
-            glGenBuffers(1, &EBO);
+            BufferLayout BufferLayout = {
+                {ShaderDataType::vec3, "a_Position", 0},
+                {ShaderDataType::vec2, "a_UV", 1},
+                {ShaderDataType::vec3, "a_Normal", 2},
+            };
 
-            glBindVertexArray(VAO);
-            glBindBuffer(GL_ARRAY_BUFFER, VBO);
-            glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
+            std::vector<float> arr;
+            for (int i = 0; i < m_Vertices.size(); i++)
+            {
+                arr.push_back(m_Vertices[i].Position.x);
+                arr.push_back(m_Vertices[i].Position.y);
+                arr.push_back(m_Vertices[i].Position.z);
 
-            glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(Vertex), &vertices[0], GL_STATIC_DRAW);
-            glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices.size() * sizeof(unsigned int), &indices[0], GL_STATIC_DRAW);
+                arr.push_back(m_Vertices[i].TexCoords.x);
+                arr.push_back(m_Vertices[i].TexCoords.y);
 
-            // vertex positions
-            glEnableVertexAttribArray(0);
-            glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, Position));
-            // vertex texture coords
-            glEnableVertexAttribArray(1);
-            glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, TexCoords));
-            // normals
-            glEnableVertexAttribArray(4);
-            glVertexAttribPointer(4, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, Normal));
-
-            glBindVertexArray(0);
-            glBindBuffer(VBO, 0);
-            glBindBuffer(EBO, 0);
-        }
+                arr.push_back(m_Vertices[i].Normal.x);
+                arr.push_back(m_Vertices[i].Normal.y);
+                arr.push_back(m_Vertices[i].Normal.z);
+            }
+            m_VAO = std::make_shared<VertexArray>();
+            m_VAO->AddVertexBuffer(std::make_shared<VertexBuffer>(&arr[0], arr.size() * sizeof(float), BufferLayout));
+            m_VAO->SetIndexBuffer(std::make_shared<IndexBuffer>(&m_Indices[0], m_Indices.size()));
+        }    
     }
 }

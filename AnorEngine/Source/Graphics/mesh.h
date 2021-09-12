@@ -1,40 +1,39 @@
 #pragma once
 #include "shader.h"
 #include <glm.hpp>
+#include <../Vendor/stb_image/stb_image.h>
 #include <gtc/matrix_transform.hpp>
 #include <gtc/type_ptr.hpp>
+#include <assimp/Importer.hpp>
+#include <assimp/scene.h>
+#include <assimp/postprocess.h>
+#include <Graphics/Buffers/VertexArray.h>
+#include <Graphics/texture.h>
 #include "EditorCamera.h"
+
 namespace AnorEngine {
     namespace Graphics {
-
         struct ANOR_API Vertex {
             glm::vec3 Position;
             glm::vec2 TexCoords;
             glm::vec3 Normal;
         };
 
-        struct ANOR_API TextureInfo {
-            unsigned int id;
-            std::string type;
-            std::string path;
-        };
-
         class ANOR_API Mesh {
-        public:
-            std::vector<Vertex>       vertices;
-            std::vector<unsigned int> indices;
-            std::vector<TextureInfo>  textures;
         private:
-            glm::mat4 modelMatrix;
-            //  render data
-            unsigned int VAO, VBO, EBO;
+            //The vectors are temporary containers before we upload the data into GPU.
+            std::vector<Vertex>       m_Vertices;
+            std::vector<unsigned int> m_Indices;
+            std::vector<Ref<Texture>> m_Textures;
+            glm::mat4                 m_ModelMatrix;
         private:
-            void setupMesh();
+            Ref<VertexArray>          m_VAO;
+        private:
+            void SetupMesh();
         public:
-            // mesh data
-            Mesh(const std::vector<Vertex>& vertices, const std::vector<unsigned int>& indices, const std::vector<TextureInfo>& textures);
-            void Draw(const Ref<Shader> shader, const Ref<EditorCamera> camera);
-            inline glm::mat4& getModelMatrix() { return modelMatrix; }
-        };
+            Mesh(const std::vector<Vertex>& vertices, const std::vector<unsigned int>& indices, const std::vector<Ref<Texture>>& textures);
+        public:
+            void Draw(const Ref<Shader>& shader);
+        };    
     }
 }

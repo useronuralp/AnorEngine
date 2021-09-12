@@ -13,6 +13,7 @@ namespace AnorEngine
 	class MeshRendererComponent;
 	class TagComponent;
 	class PointLightComponent;
+	class ModelRendererComponent;
 	class Scene;
 
 	namespace Graphics
@@ -25,9 +26,10 @@ namespace AnorEngine
 			};
 		public:
 			static void Init();
-			static void RenderDirectionalLightShadowMap(Ref<Scene> scene);
-			static void RenderPointLightShadowMaps(Ref<Scene> scene);
+			static void RenderDirectionalLightShadowMap(const Ref<Scene>& scene);
+			static void RenderPointLightShadowMaps(const Ref<Scene>& scene);
 			static void DrawCube(const TransformComponent& tc, const MeshRendererComponent& mc, const TagComponent& tagc);
+			static void DrawModel(const TransformComponent& tc, const ModelRendererComponent& model, const TagComponent& tagc, const Ref<Shader>& shader);
 			static void DrawSkybox();
 			static void Shutdown() {};
 			//Will become deprecated soon.
@@ -42,6 +44,8 @@ namespace AnorEngine
 			static void ClearColor(const glm::vec4& color);
 			static uint32_t GetIndexCount();
 			static uint32_t GetNumberOfDrawCalls();
+		private:
+			static void RenderScene(const Ref<Scene>& scene, const Ref<Shader>& shader, bool wannaCheckforPointLights = false);
 		};
 	}
 }

@@ -201,6 +201,19 @@ namespace AnorEngine
 
 			out << YAML::EndMap; // PointLightComponent
 		}
+		if (entity.HasComponent<ModelRendererComponent>())
+		{
+			out << YAML::Key << "ModelRendererComponent";
+			out << YAML::BeginMap; // PointLightComponent
+
+			auto& modelRendererComponent = entity.GetComponent<ModelRendererComponent>();
+			out << YAML::Key << "Model" << YAML::Value << modelRendererComponent.Model->GetAbsolutePath();
+			out << YAML::Key << "Color" << YAML::Value << modelRendererComponent.Color;
+			out << YAML::Key << "CastDirectionalLightBool" << YAML::Value << modelRendererComponent.CastDirectionalLightBool;
+			out << YAML::Key << "CastDirectionalLight" << YAML::Value << modelRendererComponent.CastDirectionalLight;
+
+			out << YAML::EndMap; // PointLightComponent
+		}
 		out << YAML::EndMap; // Entity
 	}
 	SceneSerializer::SceneSerializer(const Ref<Scene>& scene)
@@ -316,6 +329,16 @@ namespace AnorEngine
 					float quadratic = pointLightComponent["Quadratic"].as<float>();
 					float intensity = pointLightComponent["Intensity"].as<float>();
 					auto& src = deserializedEntity.AddComponent<PointLightComponent>(linear, constant, quadratic, intensity);
+				}
+				auto modelRendererComponent = entity["ModelRendererComponent"];
+				if (modelRendererComponent)
+				{
+					std::string modelPath = modelRendererComponent["Model"].as<std::string>();
+					glm::vec4 color = modelRendererComponent["Color"].as<glm::vec4>();
+					bool castDirectionalLightBool = modelRendererComponent["CastDirectionalLightBool"].as<bool>();
+					float castDirectionalLight = modelRendererComponent["CastDirectionalLight"].as<float>();
+					Ref<Graphics::Model> model = std::make_shared<Graphics::Model>(modelPath);
+					auto& src = deserializedEntity.AddComponent<ModelRendererComponent>(model, color, castDirectionalLightBool, castDirectionalLight);
 				}
 			}
 		}

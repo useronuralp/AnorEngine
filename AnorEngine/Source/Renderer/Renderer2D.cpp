@@ -94,7 +94,6 @@ namespace AnorEngine
 
 			return std::make_shared<Framebuffer>(specs);
 		}
-
 		void Renderer2D::Init()
 		{
 			glEnable(GL_BLEND);
@@ -154,7 +153,7 @@ namespace AnorEngine
 			BufferLayout CubeBufferLayout = {
 				{ShaderDataType::vec3, "a_Position", 0},
 				{ShaderDataType::vec3, "a_Normal", 1},
-				{ShaderDataType::vec2, "a_UV", 2}
+				{ShaderDataType::vec2, "a_UV", 2},
 			};
 			s_Data.CubeVertexArray = std::make_shared<VertexArray>();
 			s_Data.CubeVertexBuffer = std::make_shared<VertexBuffer>(skyboxVertices, 288 * sizeof(float), CubeBufferLayout);
@@ -234,7 +233,42 @@ namespace AnorEngine
 			s_Data.QuadVertexPositions[3] = { -0.5f,  0.5f, 0.0f, 1.0f };
 
 		}
-		void Renderer2D::RenderPointLightShadowMaps(Ref<Scene> scene)
+		void Renderer2D::RenderScene(const Ref<Scene>& scene, const Ref<Shader>& shader, bool wannaCheckforPointLights)
+		{
+			//----- Render Cubes
+			auto viewCube = scene->GetRegistry().view<TransformComponent, MeshRendererComponent, TagComponent>();
+			for (auto& entity : viewCube)
+			{
+				auto [transformComponent, meshRendererComponent, tagComponent] = viewCube.get<TransformComponent, MeshRendererComponent, TagComponent>(entity);
+				auto transform = transformComponent.GetTransform();
+
+				shader->UploadUniform("u_Transform", sizeof(transform), &transform);
+				s_Data.CubeVertexArray->Bind();
+
+				if (wannaCheckforPointLights)
+				{
+					if (tagComponent.Tag != "Point Light")
+						glDrawArrays(GL_TRIANGLES, 0, 36);
+				}
+				else
+					glDrawArrays(GL_TRIANGLES, 0, 36);
+
+				s_Data.CubeVertexArray->Unbind();
+				//shader->Disable();
+			}
+			//----- Render Cubes
+
+			//----- Models
+			auto viewModel = scene->GetRegistry().view<TransformComponent, ModelRendererComponent, TagComponent>();
+			for (auto& entity : viewModel)
+			{
+				auto [transformComponent, modelComponent, tagComponent] = viewModel.get<TransformComponent, ModelRendererComponent, TagComponent>(entity);
+
+				Graphics::Renderer2D::DrawModel(transformComponent, modelComponent, tagComponent, shader);
+			}
+			//----- Models
+		}
+		void Renderer2D::RenderPointLightShadowMaps(const Ref<Scene>& scene)
 		{
 			//----- Loop through the point lights in the scene
 			s_Data.PointLights.clear();
@@ -275,8 +309,6 @@ namespace AnorEngine
 				if (!s_Data.PointLightShadowBuffers[i])
 					s_Data.PointLightShadowBuffers[i] = GeneratePointLightFramebuffer();
 
-				s_Data.PointLightShadowBuffers[i]->Bind();
-				glClear(GL_DEPTH_BUFFER_BIT);
 
 				float near_plane = 0.001f;
 				float far_plane = 50.0f;
@@ -297,62 +329,23 @@ namespace AnorEngine
 				for (auto& [shaderName, shader] : ShaderLibrary::GetLibrary())
 					shader->UploadInteger("u_PointLightShadowMap[" + std::to_string(i) + "]", s_Data.PointLightShadowBuffers[i]->GetDepthAttachmentID());
 
-				//----- Render Cubes
-				auto viewCube = scene->GetRegistry().view<TransformComponent, MeshRendererComponent, TagComponent>();
-				for (auto& entity : viewCube)
-				{
-					auto [transformComponent, meshRendererComponent, tagComponent] = viewCube.get<TransformComponent, MeshRendererComponent, TagComponent>(entity);
-					auto transform = transformComponent.GetTransform();
-
-					ShaderLibrary::GetShader("PointLightShadowShader")->UploadUniform("u_Transform", sizeof(transform), &transform);
-					s_Data.CubeVertexArray->Bind();
-
-					if (tagComponent.Tag != "Point Light")
-					{
-						glDrawArrays(GL_TRIANGLES, 0, 36);
-					}
-
-					s_Data.CubeVertexArray->Unbind();
-					ShaderLibrary::GetShader("PointLightShadowShader")->Disable();
-
-				}
-				//----- Render Cubes
-				s_Data.PointLightShadowBuffers[i]->Unbind();
-
 				for (auto& [shaderName, shader] : ShaderLibrary::GetLibrary())
 				{
 					shader->UploadUniform("u_PointLigthFarPlane", sizeof(far_plane), &far_plane);
 				}
+
+				s_Data.PointLightShadowBuffers[i]->Bind();
+				glClear(GL_DEPTH_BUFFER_BIT);
+				RenderScene(scene, ShaderLibrary::GetShader("PointLightShadowShader"), true);
+				s_Data.PointLightShadowBuffers[i]->Unbind();
+
 			}
 		}
-		void Renderer2D::RenderDirectionalLightShadowMap(Ref<Scene> scene)
+		void Renderer2D::RenderDirectionalLightShadowMap(const Ref<Scene>& scene)
 		{
 			if (!s_Data.DirectionalLightShadowBuffer)
 				s_Data.DirectionalLightShadowBuffer = GenerateDirectionalLightFramebuffer();
 
-			s_Data.DirectionalLightShadowBuffer->Bind();
-			glClear(GL_DEPTH_BUFFER_BIT);
-
-			//----- Render Cubes
-			auto viewCube = scene->GetRegistry().view<TransformComponent, MeshRendererComponent, TagComponent>();
-			for (auto& entity : viewCube)
-			{
-				auto [transformComponent, meshRendererComponent, tagComponent] = viewCube.get<TransformComponent, MeshRendererComponent, TagComponent>(entity);
-				auto transform = transformComponent.GetTransform();
-
-				ShaderLibrary::GetShader("ShadowShader")->UploadUniform("u_Transform", sizeof(transform), &transform);
-				s_Data.CubeVertexArray->Bind();
-				
-				glDrawArrays(GL_TRIANGLES, 0, 36);
-
-				s_Data.CubeVertexArray->Unbind();
-				ShaderLibrary::GetShader("ShadowShader")->Disable();		
-			}
-			//----- Render Cubes
-			s_Data.DirectionalLightShadowBuffer->Unbind();
-
-
-			//Set up all the light properties in the shadow shader here
 			float near_plane = 0.1f, far_plane = 1000.0f;
 			glm::mat4 directionalLightProjection = glm::ortho(-50.0f, 50.0f, -50.0f, 50.0f, near_plane, far_plane);
 			glm::mat4 directionalLightView = glm::lookAt(s_Data.DirectionalLightPosition, glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
@@ -368,6 +361,11 @@ namespace AnorEngine
 				shader->UploadUniform("u_DirectionalLightNear_plane", sizeof(near_plane), &near_plane);
 				shader->UploadUniform("u_DirectionalLightFar_plane", sizeof(far_plane), &far_plane);
 			}
+
+			s_Data.DirectionalLightShadowBuffer->Bind();
+			glClear(GL_DEPTH_BUFFER_BIT);
+			RenderScene(scene, ShaderLibrary::GetShader("ShadowShader"));
+			s_Data.DirectionalLightShadowBuffer->Unbind();
 		}
 		void Renderer2D::DrawCube(const TransformComponent& tc, const MeshRendererComponent& mc, const TagComponent& tagc)
 		{
@@ -381,7 +379,6 @@ namespace AnorEngine
 
 			mc.Material->Shader->UploadUniform("u_Material.diffuseIntensity", sizeof(mc.Material->Properties.Diffuse), &mc.Material->Properties.Diffuse);
 			mc.Material->Shader->UploadUniform("u_Material.ambientIntensity", sizeof(mc.Material->Properties.Ambient), &mc.Material->Properties.Ambient);
-			mc.Material->Shader->UploadUniform("u_EntityID", sizeof(tc.EntityID), &tc.EntityID);
 			mc.Material->Shader->UploadUniform("u_Material.specularIntensity", sizeof(mc.Material->Properties.Specular), &mc.Material->Properties.Specular);
 			mc.Material->Shader->UploadUniform("u_Material.shininess", sizeof(mc.Material->Properties.Shininess), &mc.Material->Properties.Shininess);
 			mc.Material->Shader->UploadUniform("u_Material.metalness", sizeof(mc.Material->Properties.Metalness), &mc.Material->Properties.Metalness);
@@ -395,6 +392,14 @@ namespace AnorEngine
 			s_Data.CubeVertexArray->Unbind();
 			mc.Material->Shader->Disable();
 			mc.Material->Texture->Unbind();
+		}
+		void Renderer2D::DrawModel(const TransformComponent& tc, const ModelRendererComponent& model, const TagComponent& tagc, const Ref<Shader>& shader)
+		{
+			shader->UploadUniform("u_Transform", sizeof(tc.GetTransform()), &tc.GetTransform());
+			shader->UploadUniform("u_EntityID", sizeof(tc.EntityID), &tc.EntityID);
+			shader->UploadUniform("u_Color", sizeof(model.Color), &model.Color);
+			shader->UploadUniform("u_CastDirectionalLight", sizeof(model.CastDirectionalLight), &model.CastDirectionalLight);
+			model.Model->Draw(shader);
 		}
 		void Renderer2D::DrawSkybox()
 		{
@@ -493,8 +498,8 @@ namespace AnorEngine
 			for (auto& [shaderName, shader] : ShaderLibrary::GetLibrary())
 			{	
 				shader->UploadUniform("u_ViewProjMat", sizeof(s_Data.EditorCamera->GetViewProjectionMatrix()), &s_Data.EditorCamera->GetViewProjectionMatrix());
-				shader->UploadUniform("u_CameraPos", sizeof(s_Data.EditorCamera->GetPosition()), &s_Data.EditorCamera->GetPosition());
-				shader->UploadUniform("u_PointLightCount", sizeof(s_Data.PointLightCount), &s_Data.PointLightCount);		
+				shader->UploadUniform("u_CameraPos", sizeof(s_Data.EditorCamera->GetPosition()), &s_Data.EditorCamera->GetPosition());		
+				shader->UploadUniform("u_PointLightCount", sizeof(s_Data.PointLightCount), &s_Data.PointLightCount);
 			}
 
 			s_Data.NumberOfDrawCalls = 0;

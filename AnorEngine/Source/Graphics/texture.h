@@ -11,6 +11,7 @@ namespace AnorEngine {
 			uint32_t m_Width;
 			uint32_t m_Height;
 			uint32_t m_Channels;
+			std::string m_Type = "Not initialized";
 		private:
 			void SetupTexture();
 		public:
@@ -23,6 +24,9 @@ namespace AnorEngine {
 			inline int GetWidth() const { return m_Width; }
 			inline int GetHeight() const { return m_Height; }
 			inline const unsigned int& GetTextureID() const { return m_TextureID; }
+
+			inline void SetType(const std::string& type) { m_Type = type; }
+			inline std::string GetType() { return m_Type; }
 
 			inline std::string GetPath() { return m_RelativeFilePath == "Not initialized" ? m_AbsoluteFilePath : m_RelativeFilePath; }
 			bool operator == (const Texture& other) const
