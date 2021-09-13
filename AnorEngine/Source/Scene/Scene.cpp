@@ -23,24 +23,25 @@ namespace AnorEngine
 		}
 		//----------2D Drawing
 
+		//----- Models
+		auto viewModel = m_Registry.view<TransformComponent, ModelRendererComponent, MeshRendererComponent, TagComponent>();
+		for (auto& entity : viewModel)
+		{
+			auto [transformComponent, modelComponent, meshRendererComponent, tagComponent] = viewModel.get<TransformComponent, ModelRendererComponent, MeshRendererComponent, TagComponent>(entity);
+			Graphics::Renderer2D::DrawModel(transformComponent, modelComponent, meshRendererComponent, tagComponent);
+		}
+		//----- Models
 
 		//----- Cubes
 		auto viewCube = m_Registry.view<TransformComponent, MeshRendererComponent, TagComponent>();
 		for (auto& entity : viewCube)
 		{
 			auto [transformComponent, meshRendererComponent, tagComponent] = viewCube.get<TransformComponent, MeshRendererComponent, TagComponent>(entity);
-			Graphics::Renderer2D::DrawCube(transformComponent, meshRendererComponent, tagComponent);
+			if (tagComponent.Tag != "Model")
+				Graphics::Renderer2D::DrawCube(transformComponent, meshRendererComponent, tagComponent);
 		}
 		//----- Cubes
 
-		//----- Models
-		auto viewModel = m_Registry.view<TransformComponent, ModelRendererComponent, TagComponent>();
-		for (auto& entity : viewModel)
-		{
-			auto [transformComponent, modelComponent, tagComponent] = viewModel.get<TransformComponent, ModelRendererComponent, TagComponent>(entity);
-			Graphics::Renderer2D::DrawModel(transformComponent, modelComponent, tagComponent, Graphics::ShaderLibrary::GetShader("3DShader"));
-		}
-		//----- Models
 
 		Graphics::Renderer2D::EndScene();
 	}
@@ -118,14 +119,15 @@ namespace AnorEngine
 				cameraComponent.Camera.SetOrthographic(cameraComponent.Camera.GetOrhographicSize() - yoffset, -1.0f, 1.0f);
 		}
 	}
-	Entity Scene::CreateEntity(const std::string& name)
+	Entity Scene::CreateEntity(const std::string& name, const std::string& tag)
 	{
 		entt::entity ID = m_Registry.create();
 		Entity entity = { ID, this };
 		auto& tc = entity.AddComponent<TransformComponent>();
 		tc.EntityID = (int)ID;
-		auto& tag = entity.AddComponent<TagComponent>();
-		tag.Tag = name.empty() ? "Unnamed Entity" : name;
+		auto& Tag = entity.AddComponent<TagComponent>();
+		Tag.Name = name.empty() ? "Unnamed Entity" : name;
+		Tag.Tag = tag.empty() ? "No tag" : tag;
 		return entity;
 	}
 	Position2D Scene::GetPlayerLocation()

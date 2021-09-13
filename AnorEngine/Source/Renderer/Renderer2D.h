@@ -29,7 +29,7 @@ namespace AnorEngine
 			static void RenderDirectionalLightShadowMap(const Ref<Scene>& scene);
 			static void RenderPointLightShadowMaps(const Ref<Scene>& scene);
 			static void DrawCube(const TransformComponent& tc, const MeshRendererComponent& mc, const TagComponent& tagc);
-			static void DrawModel(const TransformComponent& tc, const ModelRendererComponent& model, const TagComponent& tagc, const Ref<Shader>& shader);
+			static void DrawModel(const TransformComponent& tc, const ModelRendererComponent& model, const MeshRendererComponent& mc, const TagComponent& tagc, const Ref<Shader>& differentShader = nullptr);
 			static void DrawSkybox();
 			static void Shutdown() {};
 			//Will become deprecated soon.
@@ -44,6 +44,7 @@ namespace AnorEngine
 			static void ClearColor(const glm::vec4& color);
 			static uint32_t GetIndexCount();
 			static uint32_t GetNumberOfDrawCalls();
+			static glm::vec3& GetDirectionalLightPosition();
 		private:
 			static void RenderScene(const Ref<Scene>& scene, const Ref<Shader>& shader, bool wannaCheckforPointLights = false);
 		};

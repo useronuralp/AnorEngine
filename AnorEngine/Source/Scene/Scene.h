@@ -22,7 +22,7 @@ namespace AnorEngine
 		void OnUpdateEditor(float deltaTime, Ref<Graphics::EditorCamera> camera);
 		void OnResizeViewport(uint32_t width, uint32_t height);
 		void OnMouseScroll(float xoffset, float yoffset);
-		Entity CreateEntity(const std::string& name = std::string());
+		Entity CreateEntity(const std::string& name = std::string(), const std::string& tag = std::string());
 		Position2D GetPlayerLocation();
 		void DestroyEntity(Entity entity);
 	private:

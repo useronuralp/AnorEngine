@@ -5,12 +5,11 @@
 #include <imgui_internal.h>
 namespace AnorEngine
 {
-	static void DrawDragFloatControl(const char* label, float& value, float dragSensetivity = 0.01f, float minValue = 0.1f, float maxValue = 1.0f, float columnWidth = 200.0f)
+	static void DrawDragFloatControl(const char* label, float& value, float dragSensetivity = 0.01f, float minValue = 0.1f, float maxValue = 1.0f, float columnWidth = 100.0f)
 	{
 		ImGui::PushID(label);
 		ImGui::BeginColumns("Columns", 2);
-		ImGui::SetColumnWidth(0, 100);
-		//ImGui::SetColumnWidth(1, columnWidth);
+		ImGui::SetColumnWidth(0, columnWidth);
 		ImGui::TextUnformatted(label);
 		ImGui::NextColumn();
 		ImGui::SetNextItemWidth(-1);
@@ -20,11 +19,27 @@ namespace AnorEngine
 		ImGui::Separator();
 		ImGui::PopID();
 	}
-	static void DrawColorEdit4Control(const char* label, glm::vec4& color, float columnWidth = 200.0f)
+
+	static void DrawDragFloat2Control(const char* label, glm::vec2& value, float dragSensetivity = 0.01f, float minValue = 0.1f, float maxValue = 1.0f, float columnWidth = 100.0f)
 	{
 		ImGui::PushID(label);
 		ImGui::BeginColumns("Columns", 2);
-		//ImGui::SetColumnWidth(1, columnWidth);
+		ImGui::SetColumnWidth(0, columnWidth);
+		ImGui::TextUnformatted(label);
+		ImGui::NextColumn();
+		ImGui::SetNextItemWidth(-1);
+		ImGui::DragFloat2("", &value.x, dragSensetivity, minValue, maxValue);
+		ImGui::NextColumn();
+		ImGui::EndColumns();
+		ImGui::Separator();
+		ImGui::PopID();
+	}
+
+	static void DrawColorEdit4Control(const char* label, glm::vec4& color, float columnWidth = 100.0f)
+	{
+		ImGui::PushID(label);
+		ImGui::BeginColumns("Columns", 2);
+		ImGui::SetColumnWidth(0, columnWidth);
 		ImGui::TextUnformatted(label);
 		ImGui::NextColumn();
 		ImGui::SetNextItemWidth(-1);
@@ -120,13 +135,13 @@ namespace AnorEngine
 		//Create a local buffer and set its content to 0 so it is clear.
 		char buffer[256];
 		memset(buffer, 0, sizeof(buffer));
-		strcpy_s(buffer, sizeof(buffer), component.Tag.c_str());
+		strcpy_s(buffer, sizeof(buffer), component.Name.c_str());
 		//ImGui statements can be checked in an if statement cause they return booleans.
 		//ImGui::InputText returns true if the buffer you send in to that function was modified.
 		if (ImGui::InputText("##Tag", buffer, sizeof(buffer)))
 		{
 			//If the buffer was modified we change the tag component of the entity with the newly typed in tag.
-			component.Tag = std::string(buffer);
+			component.Name = std::string(buffer);
 		}
 		ImGui::SameLine();
 		ImGui::PushItemWidth(-1);
@@ -213,22 +228,14 @@ namespace AnorEngine
 		});
 		DrawComponent<ModelRendererComponent>("Model Editor", entity, [](auto& component)
 		{
-			DrawColorEdit4Control("Color", component.Color);
-
-			ImGui::PushID("Directional Light");
+			ImGui::PushID("Model Path");
 			ImGui::BeginColumns("Columns", 2);
-			ImGui::SetColumnWidth(0, 180);
-			ImGui::TextUnformatted("Cast Directional Light");
+			ImGui::SetColumnWidth(0, 120);
+			ImGui::TextUnformatted("Model Path");
 			ImGui::NextColumn();
 			ImGui::SetNextItemWidth(-1);
-			if (ImGui::Checkbox("", &component.CastDirectionalLightBool))
-			{
-				component.CastDirectionalLightBool ^= false;
-				if (component.CastDirectionalLightBool)
-					component.CastDirectionalLight = 1.0f;
-				else
-					component.CastDirectionalLight = 0.0f;
-			}
+			ImGui::Button(component.Model->GetPath().c_str());
+
 			ImGui::NextColumn();
 			ImGui::EndColumns();
 			ImGui::Separator();
@@ -296,8 +303,8 @@ namespace AnorEngine
 		DrawComponent<SpriteRendererComponent>("Sprite Renderer", entity, [](auto& component)
 		{
 			ImGui::Separator();
-			ImGui::ColorEdit4("Color", glm::value_ptr(component.Color));
-			ImGui::DragFloat2("Repeat Textures", glm::value_ptr(component.TextureSize));
+			DrawColorEdit4Control("Color", component.Color);
+			DrawDragFloat2Control("Repeat Textures", component.TextureSize, 0.5f, 0.0f, 10000.0f, 130.0f);
 			ImGui::Separator();
 		});
 		DrawComponent<PointLightComponent>("Point Light", entity, [](auto& component)
@@ -340,7 +347,6 @@ namespace AnorEngine
 			ImGui::Checkbox("Is Enabled", &component.isEnabled);
 			ImGui::Separator();
 		});
-
 	}
 	bool SceneHierarchyPanel::OnImGuiRender()
 	{
@@ -366,6 +372,7 @@ namespace AnorEngine
 				auto entity = m_Context->CreateEntity();
 				entity.AddComponent<MeshRendererComponent>(defaultMaterial);
 				entity.GetComponent<TagComponent>().Tag = "Cube";
+				entity.GetComponent<TagComponent>().Name = "Cube";
 			}
 			if (ImGui::MenuItem("Cube Light"))
 			{
@@ -378,6 +385,7 @@ namespace AnorEngine
 				entity.AddComponent<MeshRendererComponent>(defaultMaterial);
 				entity.AddComponent<PointLightComponent>();
 				entity.GetComponent<TagComponent>().Tag = "Point Light";
+				entity.GetComponent<TagComponent>().Name = "Cube Light";
 			}
 			ImGui::EndPopup();
 		}
@@ -387,16 +395,16 @@ namespace AnorEngine
 		//Check to see if there is something assigned to selection context, if so, draw its components.
 		if (m_SelectionContext)
 			DrawComponents(m_SelectionContext);
-
-		
+	
+		DrawVec3Control("Direction Light Position", Graphics::Renderer2D::GetDirectionalLightPosition(), 2, 0.0, 180);
 		ImGui::End();
 		return m_IsRuntime;
 	}
 	void SceneHierarchyPanel::DrawEntityNode(Entity entity)
 	{
-		auto& tag = entity.GetComponent<TagComponent>().Tag;
+		auto& name = entity.GetComponent<TagComponent>().Name;
 		ImGuiTreeNodeFlags flags = ((m_SelectionContext == entity) ?  ImGuiTreeNodeFlags_Selected : 0) | ImGuiTreeNodeFlags_OpenOnArrow | ImGuiTreeNodeFlags_SpanAvailWidth;
-		bool opened = ImGui::TreeNodeEx((void*)(uint64_t)(uint32_t)entity, flags, tag.c_str());
+		bool opened = ImGui::TreeNodeEx((void*)(uint64_t)(uint32_t)entity, flags, name.c_str());
 
 		if (ImGui::IsItemClicked())
 		{
@@ -414,7 +422,7 @@ namespace AnorEngine
 		if (opened)
 		{
 			ImGuiTreeNodeFlags flags = ImGuiTreeNodeFlags_OpenOnArrow | ImGuiTreeNodeFlags_SpanAvailWidth;
-			bool opened = ImGui::TreeNodeEx((void*)6846456, flags, tag.c_str());
+			bool opened = ImGui::TreeNodeEx((void*)6846456, flags, name.c_str());
 			if (opened)
 				ImGui::TreePop();
 			ImGui::TreePop();

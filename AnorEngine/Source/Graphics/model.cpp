@@ -2,15 +2,20 @@
 #include "model.h"
 namespace AnorEngine {
 	namespace Graphics {
+		Model::Model(const std::filesystem::path& filePath)
+		{
+			m_AbsolutePath = filePath.string();
+			std::string directory = filePath.string().substr(0, filePath.string().find_last_of("\\/"));
+			std::string folderName = directory.substr(directory.find_last_of("\\/") + 1, directory.length());
+			std::string objName = filePath.string().substr(filePath.string().find_last_of("\\/") + 1, filePath.string().length());
+			m_RelativePath = "Models\\" + folderName + "\\" + objName;
+
+			LoadModel(filePath);
+		}
 		void Model::Draw(const Ref<Shader>& shader)
 		{
 			for (unsigned int i = 0; i < m_Meshes.size(); i++)
 				m_Meshes[i].Draw(shader);
-		}
-		Model::Model(const std::filesystem::path& filePath)
-		{
-			m_AbsolutePath = filePath.string();
-			LoadModel(filePath);
 		}
 		void Model::LoadModel(const std::filesystem::path& filePath)
 		{
@@ -99,11 +104,12 @@ namespace AnorEngine {
 			{
 				aiString str;
 				mat->GetTexture(type, i, &str);
+				std::string relativePath = "Models\\" + folderName + "\\" + str.C_Str();			
 				bool skip = false;
 				for (unsigned int j = 0; j < m_Textures.size(); j++)
 				{
-					std::string absolutePath = "Models\\" + folderName + "\\" + str.C_Str();
-					if (std::strcmp(m_Textures[j]->GetPath().c_str(), absolutePath.c_str()) == 0)
+					
+					if (std::strcmp(m_Textures[j]->GetPath().c_str(), relativePath.c_str()) == 0)
 					{
 						textures.push_back(m_Textures[j]);
 						skip = true;

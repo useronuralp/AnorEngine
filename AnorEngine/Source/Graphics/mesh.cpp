@@ -12,8 +12,6 @@ namespace AnorEngine {
         }
         void Mesh::Draw(const Ref<Shader>& shader)
         {       
-            unsigned int diffuseNr = 1;
-            unsigned int specularNr = 1;
             shader->Enable();
             for (unsigned int i = 0; i < m_Textures.size(); i++)
             {
@@ -22,6 +20,7 @@ namespace AnorEngine {
             }
             for (auto& texture : m_Textures)
             {
+                //TODO: Handle the case where not all the maps are present in the model file. Example: Model is missing the specular map but has the diffuse. It should still reneder diffuse.
                 if (texture->GetType() == "texture_diffuse")
                     shader->UploadUniform("u_TextureSamplerDiffuse", sizeof(texture->GetTextureID()), &texture->GetTextureID());
                 else if (texture->GetType() == "texture_specular")
@@ -38,8 +37,8 @@ namespace AnorEngine {
         {
             BufferLayout BufferLayout = {
                 {ShaderDataType::vec3, "a_Position", 0},
-                {ShaderDataType::vec2, "a_UV", 1},
-                {ShaderDataType::vec3, "a_Normal", 2},
+                {ShaderDataType::vec3, "a_Normal", 1},
+                {ShaderDataType::vec2, "a_UV", 2},
             };
 
             std::vector<float> arr;
@@ -49,12 +48,13 @@ namespace AnorEngine {
                 arr.push_back(m_Vertices[i].Position.y);
                 arr.push_back(m_Vertices[i].Position.z);
 
-                arr.push_back(m_Vertices[i].TexCoords.x);
-                arr.push_back(m_Vertices[i].TexCoords.y);
-
                 arr.push_back(m_Vertices[i].Normal.x);
                 arr.push_back(m_Vertices[i].Normal.y);
                 arr.push_back(m_Vertices[i].Normal.z);
+
+                arr.push_back(m_Vertices[i].TexCoords.x);
+                arr.push_back(m_Vertices[i].TexCoords.y);
+
             }
             m_VAO = std::make_shared<VertexArray>();
             m_VAO->AddVertexBuffer(std::make_shared<VertexBuffer>(&arr[0], arr.size() * sizeof(float), BufferLayout));

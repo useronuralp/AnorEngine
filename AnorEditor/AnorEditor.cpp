@@ -105,8 +105,7 @@ namespace Game
 				ImGui::Image((void*)texture, { m_Framebuffer->GetDimensions().x, m_Framebuffer->GetDimensions().y }, { 0,1 }, { 1,0 });
 
 				if (ImGui::BeginDragDropTarget())
-				{
-					
+				{				
 					if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("CONTENT_BROWSER_ITEM"))
 					{
 						const wchar_t* path = (const wchar_t*)payload->Data;
@@ -118,8 +117,12 @@ namespace Game
 						{	
 
 							Ref<Model> model = std::make_shared<Model>(g_AssetPath / path);
-							auto entity = m_Layer->GetScene()->CreateEntity();
-							entity.GetComponent<TagComponent>().Tag = "Model";
+							auto entity = m_Layer->GetScene()->CreateEntity("Unnamed Entity", "Model");
+							Ref<Graphics::Material> defaultMaterial = std::make_shared<Graphics::Material>(Graphics::ShaderLibrary::GetShader("3DShader"));
+							defaultMaterial->Properties.Ambient = 0.05f;
+							defaultMaterial->Properties.Diffuse = 1.0f;
+							defaultMaterial->Properties.Specular = 1.0f;
+							entity.AddComponent<MeshRendererComponent>(defaultMaterial);
 							entity.AddComponent<ModelRendererComponent>(model);
 						}
 					}

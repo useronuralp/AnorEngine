@@ -75,13 +75,8 @@ namespace AnorEngine
 	struct ANOR_API ModelRendererComponent //Temporary
 	{
 		Ref<Graphics::Model> Model; //Self contains all the necessary textures.
-		glm::vec4 Color{ 1.0f, 1.0f, 1.0f, 1.0f };
-		bool CastDirectionalLightBool = true;
-		float CastDirectionalLight = 1.0f; //Treat this as a bool, this is the one being sent to the shader
 		ModelRendererComponent(Ref<Graphics::Model> model)
 			:Model(model){}
-		ModelRendererComponent(const Ref<Graphics::Model>& model, const glm::vec4& color, bool castDirectionalLightBool, float castDirectionalLight)
-			:Model(model), Color(color), CastDirectionalLightBool(castDirectionalLightBool), CastDirectionalLight(castDirectionalLight){}
 	};
 	//----------------
 
@@ -102,11 +97,11 @@ namespace AnorEngine
 	struct ANOR_API TagComponent
 	{
 		std::string Tag;
-
+		std::string Name = "Unnamed Entity";
 		TagComponent() = default;
 		TagComponent(const TagComponent&) = default;
-		TagComponent(const std::string& name)
-			: Tag(name) {}
+		TagComponent(const std::string& tag)
+			: Tag(tag) {}
 
 	};
 	struct ANOR_API CameraComponent

@@ -1,18 +1,21 @@
 #type vertex
 #version 450 core
 
+//Attributes
 layout (location = 0) in vec3 a_Position;
-layout (location = 1) in vec2 a_Uv; 
-layout (location = 2) in vec3 a_Normal;
+layout (location = 1) in vec3 a_Normal;
+layout (location = 2) in vec2 a_Uv; 
 
+//Varying OUTSs
+out vec3 v_Normal;
+out vec3 v_Position;
+out vec2 v_UV;
+out vec4 v_FragPosLightSpace;
+
+//Uniforms
 uniform mat4 u_Transform = mat4(1.0);
 uniform mat4 u_ViewProjMat = mat4(1.0);
 uniform mat4 u_DirectionalLightViewProjMatrix;
-
-out vec3 v_Normal;
-out vec2 v_UV;
-out vec3 v_Position;
-out vec4 v_FragPosLightSpace;
 
 void main()
 {	
@@ -25,11 +28,13 @@ void main()
 
 #type fragment
 #version 450 core
+//There is a limit to this define number in glsl.
 #define MAX_POINT_LIGHT_NUMBER 10
 
+
+//Attributes
 layout(location = 0) out vec4 Color;
 layout(location = 1) out int IntegerColorBuffer;
-
 
 //Custom variables
 struct Material {
@@ -56,15 +61,18 @@ struct PointLight {
 	float castShadow;
 };
 
+//Varying INs
 in vec3 v_Normal;
-in vec2 v_UV;
 in vec3 v_Position;
+in vec2 v_UV;
 in vec4 v_FragPosLightSpace;
 
+
+//Uniforms
 uniform vec3		u_CameraPos;
 uniform vec4		u_Color;
+uniform Material	u_Material;
 uniform samplerCube u_Skybox;
-uniform sampler2D	u_Sampler;
 uniform vec3		u_DirectionalLightPosition;
 uniform vec3		u_DirectionalLightColor;
 uniform sampler2D   u_DirectionalShadowMap;
@@ -77,8 +85,6 @@ uniform int		    u_EntityID;
 
 uniform sampler2D   u_TextureSamplerDiffuse;
 uniform sampler2D   u_TextureSamplerSpecular;
-
-vec3 directionalLight = vec3(0.0f, 0.0f, -1.0f);
 
 float PointShadowCalculation(vec3 fragPos, int index)
 {
@@ -138,20 +144,6 @@ float DirectionalShadowCalculation(vec4 fragPosLightSpace, vec3 fragPos, vec3 li
 	return shadow;
 }
 
-
-vec3 CalcDirectionalLight(vec3 Normal, vec3 viewDir, vec3 FragPosition, float shadow, vec4 specularTex)
-{
-	vec3 DirectionalLightDir = normalize(u_DirectionalLightPosition - FragPosition);
-	//Ambient
-	vec3 AmbientDirectional = vec3(0.1f) * u_DirectionalLightColor;
-	//Diffuse
-	vec3 DiffuseDirectional = max(dot(normalize(Normal), DirectionalLightDir), 0.0) * u_DirectionalLightColor * vec3(1.0f);
-	//Specular
-	vec3 SpecularDirectional = (vec3(u_DirectionalLightColor) * pow(max(dot(viewDir, reflect(-DirectionalLightDir, normalize(Normal))), 0.0), 100.0f)) * vec3(specularTex) * vec3(1.0f);
-
-	return ((1.0 - shadow) * (DiffuseDirectional + SpecularDirectional) + AmbientDirectional);
-}
-
 //Returns only the required intensity of the point light on the object. You need to multiply the texture or any other colors values seperately with the result of this function.
 vec3 CalcPointLight(PointLight light, vec3 Normal, vec3 FragPosition, vec3 viewDir, vec4 specularTex, float shadow)
 {
@@ -160,17 +152,17 @@ vec3 CalcPointLight(PointLight light, vec3 Normal, vec3 FragPosition, vec3 viewD
 	vec3 halfwayDir = normalize(lightDir + viewDir);
 
 	// ambient
-	vec3 ambient = vec3(light.color) * vec3(0.1f);
+	vec3 ambient = vec3(light.color) * vec3(u_Material.ambientIntensity);
 
 	// diffuse 
 	vec3 norm = normalize(Normal);
 	float diff = max(dot(norm, lightDir), 0.0);
-	vec3 diffuse = vec3(light.diffuse) * vec3(light.color) * diff;
+	vec3 diffuse = vec3(light.diffuse) * vec3(light.color) * diff * vec3(u_Material.diffuseIntensity);
 
 	// specular
 	vec3 reflectDir = reflect(-lightDir, norm);
-	float spec = pow(max(dot(norm, halfwayDir), 0.0), 100.0f);
-	vec3 specular = vec3(light.specular) * vec3(light.color) * spec * vec3(specularTex);
+	float spec = pow(max(dot(norm, halfwayDir), 0.0), u_Material.shininess);
+	vec3 specular = vec3(light.specular) * vec3(light.color) * spec * vec3(specularTex) * vec3(u_Material.specularIntensity);
 
 	// attenuation
 	float distance = length(light.position - FragPosition);
@@ -183,24 +175,52 @@ vec3 CalcPointLight(PointLight light, vec3 Normal, vec3 FragPosition, vec3 viewD
 	return (((shadow) * (diffuse + specular)) + (ambient * 0.0f)) * light.intensity;
 }
 
+vec3 CalcDirectionalLight(vec3 Normal, vec3 viewDir, vec3 FragPosition, float shadow, vec4 specularTex)
+{
+	vec3 DirectionalLightDir = normalize(u_DirectionalLightPosition - FragPosition);
+	//Ambient
+	vec3 AmbientDirectional = vec3(u_Material.ambientIntensity) * u_DirectionalLightColor;
+	//Diffuse
+	vec3 DiffuseDirectional = max(dot(normalize(Normal), DirectionalLightDir), 0.0) * u_DirectionalLightColor * vec3(u_Material.diffuseIntensity);
+	//Specular
+	vec3 SpecularDirectional = (vec3(u_DirectionalLightColor) * pow(max(dot(viewDir, reflect(-DirectionalLightDir, normalize(Normal))), 0.0), u_Material.shininess)) * vec3(specularTex) * vec3(u_Material.specularIntensity);
+
+	return ((1.0 - shadow) * (DiffuseDirectional + SpecularDirectional) + AmbientDirectional);
+}
+
 void main()
 {
-	float distance = length(vec3(2.0f, 2.0f, 0.0f) - v_Position);
+	//Refraction
+	float ratio = 1.00 / 1.52;
+	vec3 Irefract = normalize(v_Position - u_CameraPos);
+	vec3 Rrefract = refract(Irefract, normalize(v_Normal), ratio);
+	vec4 refraction = vec4(texture(u_Skybox, Rrefract).rgb, 1.0);
+
+	//Reflection
+	vec3 Ireflect = normalize(v_Position - u_CameraPos);
+	vec3 Rreflect = reflect(Ireflect, normalize(v_Normal));
+	vec4 reflection = vec4(texture(u_Skybox, Rreflect).rgb, 1.0);
 
 	vec4 diffuseTexColor = texture(u_TextureSamplerDiffuse, v_UV);
 	vec4 specularTexColor = texture(u_TextureSamplerSpecular, v_UV);
 
+	//Takes texture, object base color and metalness into acount.
+	vec3 ObjectProperties = vec3(diffuseTexColor) * vec3(u_Color) + (vec3(reflection) * u_Material.metalness);
 
 	vec3 viewDir = normalize(u_CameraPos - v_Position);
+
+	//Object looks completely dark when not lit.
 	vec3 FinalColor = { 0,0,0 };
 
-	vec3 ObjectProperties = vec3(diffuseTexColor) * vec3(u_Color);
 
+	//Directional Shadow
 	float directionalShadow = DirectionalShadowCalculation(v_FragPosLightSpace, v_Position, u_DirectionalLightPosition, v_Normal);
+
+	//Add directional light calculation to target pixel
 	if (u_CastDirectionalLight > 0.5f)
 		FinalColor += CalcDirectionalLight(v_Normal, viewDir, v_Position, directionalShadow, specularTexColor) * ObjectProperties ;
 
-
+	//Add point light calculation to target pixel. (Each point light contributes to the final color)
 	for (int i = 0; i < u_PointLightCount; i++)
 	{
 		//Point Light shadow

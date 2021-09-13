@@ -26,6 +26,7 @@ namespace AnorEngine
 			//Need deault shader.
 			Ref<Shader> Shader;
 			MaterialProperties Properties;
+			//TODO:Creating a new texture everytime an object is created causes a partial memory leak. Store these textures in a cache or something.
 			Ref<Graphics::Texture> Texture = std::make_shared<Graphics::Texture>("Textures\\WhiteTexture.PNG"); //default texture
 		};
 	}

@@ -73,7 +73,6 @@ uniform vec3		u_CameraPos;
 uniform vec4		u_Color;
 uniform Material	u_Material;
 uniform samplerCube u_Skybox;
-uniform sampler2D	u_Sampler;
 uniform vec3		u_DirectionalLightPosition;
 uniform vec3		u_DirectionalLightColor;
 uniform sampler2D   u_DirectionalShadowMap;
@@ -84,6 +83,7 @@ uniform int			u_PointLightCount;
 uniform float		u_PointLigthFarPlane;
 uniform int		    u_EntityID;
 
+uniform sampler2D   u_TextureSamplerDiffuse;
 
 float PointShadowCalculation(vec3 fragPos, int index)
 {
@@ -205,10 +205,10 @@ void main()
 	vec3 Rreflect = reflect(Ireflect, normalize(v_Normal));
 	vec4 reflection = vec4(texture(u_Skybox, Rreflect).rgb, 1.0);
 
-	vec4 texColor = texture(u_Sampler, v_UV);
+	vec4 diffuseColor = texture(u_TextureSamplerDiffuse, v_UV);
 
 	//Takes texture, object base color and metalness into acount.
-	vec3 ObjectProperties = vec3(texColor) * vec3(u_Color) + (vec3(reflection) * u_Material.metalness);
+	vec3 ObjectProperties = vec3(diffuseColor)  * vec3(u_Color) + (vec3(reflection) * u_Material.metalness);
 
 	vec3 viewDir = normalize(u_CameraPos - v_Position);
 

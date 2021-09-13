@@ -7,7 +7,7 @@ namespace AnorEngine {
         public:
             Model(const std::filesystem::path& filePath);
         private:
-            // model data
+            std::string               m_RelativePath = "Not initialized";
             std::string               m_AbsolutePath;
             std::vector<Mesh>         m_Meshes;
             std::string               m_Directory;
@@ -19,6 +19,7 @@ namespace AnorEngine {
             std::vector<Ref<Texture>> LoadMaterialTextures(aiMaterial* mat, aiTextureType type, std::string typeName);
         public:
             void Draw(const Ref<Shader>& shader);
+            const std::string& GetPath() { return m_RelativePath == "Not initialized" ? m_AbsolutePath : m_RelativePath; }
             const std::string& GetAbsolutePath() { return m_AbsolutePath; }
         };
     }

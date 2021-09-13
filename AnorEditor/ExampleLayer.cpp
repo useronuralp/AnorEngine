@@ -87,6 +87,7 @@ namespace AnorEngine
 		}
 		if (m_Entity3)
 		{
+			m_Entity3->GetComponent<TagComponent>().Tag = "Player";
 			m_Entity3->AddComponent<SpriteRendererComponent>(m_Color, m_Entity3TextureAtlas, glm::vec2{ 1.0f, 1.0f }, glm::vec2{ 0 ,1 }, glm::vec2{ 192.0f, 175.0f });
 			m_Entity3->AddComponent<NativeScriptComponent>(true).Bind<CharacterController>();
 		}
