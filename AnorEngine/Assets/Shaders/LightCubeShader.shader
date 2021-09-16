@@ -32,11 +32,11 @@ in flat int v_EntityID;
 in vec2 v_UV;
 //Uniforms
 uniform vec4 u_Color;
-uniform sampler2D u_Sampler;
+uniform sampler2D u_TextureSamplerDiffuse;
 
 void main()
 {
 						//Rocking a plain white texture atm.
-	FragColor = u_Color * texture(u_Sampler, v_UV);
+	FragColor = u_Color * texture(u_TextureSamplerDiffuse, v_UV);
 	color2 = v_EntityID;
 }

@@ -41,7 +41,7 @@ namespace AnorEngine
 	struct ANOR_API SpriteRendererComponent
 	{
 		glm::vec4 Color { 1.0f, 1.0f, 1.0f, 1.0f };
-		Ref<Graphics::Texture> Texture = std::make_shared<Graphics::Texture>("Textures\\WhiteTexture.PNG"); //default texture
+		Ref<Graphics::Texture> Texture = Graphics::Renderer2D::CreateTexture("Texture\\WhiteTexture.png"); //default texture
 		glm::vec2 TextureSize = {1.0f, 1.0f};
 		glm::vec2 SubTextureOffset = { 0.0f, 0.0f };
 		glm::vec2 PixelSizeOfEachCell = { Texture->GetHeight(), Texture->GetWidth() }; //default

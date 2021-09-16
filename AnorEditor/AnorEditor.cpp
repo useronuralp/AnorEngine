@@ -115,7 +115,6 @@ namespace Game
 						}
 						else if (std::wstring(path).find(L".obj") != std::wstring::npos)
 						{	
-
 							Ref<Model> model = std::make_shared<Model>(g_AssetPath / path);
 							auto entity = m_Layer->GetScene()->CreateEntity("Unnamed Entity", "Model");
 							Ref<Graphics::Material> defaultMaterial = std::make_shared<Graphics::Material>(Graphics::ShaderLibrary::GetShader("3DShader"));

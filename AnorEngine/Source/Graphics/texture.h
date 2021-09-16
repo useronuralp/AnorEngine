@@ -14,21 +14,21 @@ namespace AnorEngine {
 			std::string m_Type = "Not initialized";
 		private:
 			void SetupTexture();
-		public:
+		public: //Constructors / destructors
 			Texture(const std::filesystem::path& relativePath, const char* fileType = "Asset");
 			~Texture();
-
-			void CreateTextureWithRelativePath(std::filesystem::path relativePath);
-			void Bind(unsigned int slot) const;
+		public: // Member functions
+			void Bind(int slot) const;
 			void Unbind() const;
+		public: //Getters
 			inline int GetWidth() const { return m_Width; }
 			inline int GetHeight() const { return m_Height; }
-			inline const unsigned int& GetTextureID() const { return m_TextureID; }
-
-			inline void SetType(const std::string& type) { m_Type = type; }
 			inline std::string GetType() { return m_Type; }
-
 			inline std::string GetPath() { return m_RelativeFilePath == "Not initialized" ? m_AbsoluteFilePath : m_RelativeFilePath; }
+			inline const unsigned int& GetTextureID() const { return m_TextureID; }
+		public:// Setters
+			inline void SetType(const std::string& type) { m_Type = type; }
+		public:
 			bool operator == (const Texture& other) const
 			{
 				return m_TextureID == other.m_TextureID;
@@ -49,7 +49,7 @@ namespace AnorEngine {
 		public:
 			CubeMapTexture(std::vector<std::string> faces);
 			uint32_t GetTextureID() { return m_TextureID; }
-			void Bind(unsigned int slot) const;
+			void Bind() const;
 			void Unbind() const;
 		};
 	}

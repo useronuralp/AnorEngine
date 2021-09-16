@@ -196,9 +196,7 @@ namespace AnorEngine
 				{
 					const wchar_t* path = (const wchar_t*)payload->Data;
 					if (std::wstring(path).find(L"Textures\\") != std::wstring::npos)
-					{
-						component.Material->Texture->CreateTextureWithRelativePath(path);
-					}
+						component.Material->Texture = Graphics::Renderer2D::CreateTexture(std::filesystem::path(path));
 				}
 				ImGui::EndDragDropTarget();
 			}
@@ -366,8 +364,8 @@ namespace AnorEngine
 			if (ImGui::MenuItem("Create Entity"))
 				m_Context->CreateEntity();
 			if (ImGui::MenuItem("Cube"))
-			{
-				Ref<Graphics::Texture> texture = std::make_shared<Graphics::Texture>("Textures\\381f5a63791945.5abc4ccf1297d.png");
+			{			
+				Ref<Graphics::Texture> texture = Graphics::Renderer2D::CreateTexture("Textures\\381f5a63791945.5abc4ccf1297d.png");
 				Ref<Graphics::Material> defaultMaterial = std::make_shared<Graphics::Material>(Graphics::ShaderLibrary::GetShader("CubeShader"), texture);
 				auto entity = m_Context->CreateEntity();
 				entity.AddComponent<MeshRendererComponent>(defaultMaterial);

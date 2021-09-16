@@ -319,7 +319,10 @@ namespace AnorEngine
 					material->Properties.Specular =meshRendererComponent["Specular"].as<float>();
 					material->Properties.Shininess =meshRendererComponent["Shininess"].as<float>();
 					material->Properties.Metalness =meshRendererComponent["Metalness"].as<float>();
-					material->Texture->CreateTextureWithRelativePath(meshRendererComponent["Texture"].as<std::string>());
+
+
+					std::string path = meshRendererComponent["Texture"].as<std::string>();
+					material->Texture = Graphics::Renderer2D::CreateTexture(std::filesystem::path(path));
 					auto& src = deserializedEntity.AddComponent<MeshRendererComponent>(color, material);
 				}
 				auto pointLightComponent = entity["PointLightComponent"];

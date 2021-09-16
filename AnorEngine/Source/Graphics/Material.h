@@ -1,6 +1,7 @@
 #pragma once
 #include "Shader.h"
 #include "texture.h"
+#include "Renderer/renderer2D.h"
 namespace AnorEngine
 {
 	namespace Graphics
@@ -23,11 +24,10 @@ namespace AnorEngine
 				:Shader(shader), Texture(texture){}
 			Material(const Ref<Shader>& shader, MaterialProperties properties, const Ref<Graphics::Texture>& texture)
 			:Shader(shader), Properties(properties), Texture(texture){}
-			//Need deault shader.
+			//TODO : Need deault shader.
 			Ref<Shader> Shader;
 			MaterialProperties Properties;
-			//TODO:Creating a new texture everytime an object is created causes a partial memory leak. Store these textures in a cache or something.
-			Ref<Graphics::Texture> Texture = std::make_shared<Graphics::Texture>("Textures\\WhiteTexture.PNG"); //default texture
+			Ref<Graphics::Texture> Texture = Graphics::Renderer2D::CreateTexture("Textures\\WhiteTexture.png"); //default texture
 		};
 	}
 }

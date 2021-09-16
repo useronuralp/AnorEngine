@@ -22,14 +22,6 @@ namespace AnorEngine {
 				m_AbsoluteFilePath = g_ResourcesPath.string() + "\\" + relativePath.string();
 			SetupTexture();
 		}
-		void Texture::CreateTextureWithRelativePath(std::filesystem::path relativePath)
-		{
-			m_RelativeFilePath = relativePath.string();
-			m_AbsoluteFilePath = g_AssetPath.string() + "\\" + relativePath.string();
-			if (m_TextureID) //If the ID is not 0, then it means this framebuffer was already in use and we want to delete it and start the recreation fresh.
-				glDeleteTextures(1, &m_TextureID);
-			SetupTexture();
-		}
 		void Texture::SetupTexture()
 		{
 			int width, height, channels;
@@ -67,9 +59,9 @@ namespace AnorEngine {
 		{
 			glDeleteTextures(1, &m_TextureID);
 		}
-		void Texture::Bind(unsigned int slot) const
+		void Texture::Bind(int slot) const
 		{
-			glActiveTexture(GL_TEXTURE0 + slot); //allows you to speicfy a texture slot, usually on pc there are 32 texture.
+			glActiveTexture(GL_TEXTURE0 + (slot % 32)); //allows you to speicfy a texture slot, usually on pc there are 32 texture.
 			glBindTexture(GL_TEXTURE_2D, m_TextureID);
 		}
 		void Texture::Unbind() const
@@ -111,9 +103,9 @@ namespace AnorEngine {
 			glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
 			m_TextureID = textureID;
 		}
-		void CubeMapTexture::Bind(unsigned int slot) const
+		void CubeMapTexture::Bind() const
 		{
-			glActiveTexture(GL_TEXTURE0 + m_TextureID);
+			glActiveTexture(GL_TEXTURE0 + (m_TextureID % 32));
 			glBindTexture(GL_TEXTURE_CUBE_MAP, m_TextureID);
 		}
 		void CubeMapTexture::Unbind() const

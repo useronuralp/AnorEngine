@@ -45,7 +45,7 @@ namespace AnorEngine
 			QuadVertex*								  QuadVertexBufferBase = nullptr;
 			QuadVertex*								  QuadVertexBufferPtr = nullptr;
 
-			std::array<Ref<Texture>, MaxTextureSlots> TextureSlots;
+			std::array<Ref<Texture>, MaxTextureSlots> StoredTextures;
 			uint32_t								  TextureSlotIndex = 1; // 0 = white texture;
 
 			glm::vec4								  QuadVertexPositions[4] = {};
@@ -209,8 +209,8 @@ namespace AnorEngine
 
 			//Creating and adding a white texture. This is basically used when we only want to render a quad with its color. In that case, we multiply the color values with this white texture meaning 1. Therefore 
 			//getting the original colors on the screen.
-			s_Data.WhiteTexture = std::make_shared<Texture>("Textures\\WhiteTexture.PNG"); //TODO: Create this texture without a using a PNG.
-			s_Data.TextureSlots[0] = s_Data.WhiteTexture;
+			s_Data.WhiteTexture = std::make_shared<Texture>("Textures\\WhiteTexture.png"); //TODO: Create this texture without a using a PNG.
+			s_Data.StoredTextures[0] = s_Data.WhiteTexture;
 
 			std::vector<std::string> cubeMapFaces
 			{
@@ -435,6 +435,31 @@ namespace AnorEngine
 			int clearValue = -1;
 			glClearTexImage(4, 0, GL_RED_INTEGER, GL_INT, &clearValue);
 		}
+		Ref<Texture> Renderer2D::CreateTexture(const std::filesystem::path& relativePath)
+		{
+			for (uint32_t i = 0; i < s_Data.MaxTextureSlots; i++)
+			{
+				if (s_Data.StoredTextures[i])
+				{
+					//TODO : you should probably check for absolute / relative paths here.
+					if (s_Data.StoredTextures[i]->GetPath() == relativePath.string())
+					{
+						return s_Data.StoredTextures[i];
+					}
+				}
+			}
+			Ref<Texture> newTexture = std::make_shared<Texture>(relativePath);
+			for (uint32_t i = 0; i < s_Data.MaxTextureSlots; i++)
+			{
+				if (!s_Data.StoredTextures[i])
+				{
+					//Caching the newly created txture here.
+					s_Data.StoredTextures[i] = newTexture;
+					break;
+				}
+			}
+			return newTexture;
+		}
 		void Renderer2D::Submit(const TransformComponent& tc, SpriteRendererComponent& sc, int entityID)
 		{
 			if ((uint8_t*)s_Data.QuadVertexBufferPtr - (uint8_t*)s_Data.QuadVertexBufferBase == Renderer2DData::MaxQuads * sizeof(QuadVertex))
@@ -447,7 +472,7 @@ namespace AnorEngine
 			float textureIndex = 0.0f;
 			for (uint32_t i = 1; i < s_Data.TextureSlotIndex; i++)
 			{
-				if (*s_Data.TextureSlots[i].get() == *sc.Texture.get())
+				if (*s_Data.StoredTextures[i].get() == *sc.Texture.get())
 				{
 					textureIndex = (float)i;
 					break;
@@ -456,7 +481,7 @@ namespace AnorEngine
 			if (textureIndex == 0.0f)
 			{
 				textureIndex = (float)s_Data.TextureSlotIndex;
-				s_Data.TextureSlots[s_Data.TextureSlotIndex] = sc.Texture;
+				s_Data.StoredTextures[s_Data.TextureSlotIndex] = sc.Texture;
 				s_Data.TextureSlotIndex++;
 			}
 
@@ -498,7 +523,7 @@ namespace AnorEngine
 			uint32_t count = s_Data.QuadIndexCount ? s_Data.QuadIndexCount : 0;
 			for (uint32_t i = 0; i < s_Data.TextureSlotIndex; i++)
 			{
-				s_Data.TextureSlots[i]->Bind(i);
+				s_Data.StoredTextures[i]->Bind(i);
 			}
 			s_Data.NumberOfDrawCalls++;
 			s_Data.QuadVertexArray->Bind();
@@ -565,6 +590,10 @@ namespace AnorEngine
 		glm::vec3& Renderer2D::GetDirectionalLightPosition()
 		{
 			return s_Data.DirectionalLightPosition;
+		}
+		const std::array<Ref<Texture>, 32Ui64>& Renderer2D::GetStoredTextures()
+		{
+			return s_Data.StoredTextures;
 		}
 	}
 }

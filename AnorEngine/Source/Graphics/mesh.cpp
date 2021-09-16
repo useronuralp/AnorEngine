@@ -15,7 +15,7 @@ namespace AnorEngine {
             shader->Enable();
             for (unsigned int i = 0; i < m_Textures.size(); i++)
             {
-                glActiveTexture(GL_TEXTURE0 + m_Textures[i]->GetTextureID()); // activate proper texture unit before binding
+                glActiveTexture(GL_TEXTURE0 + m_Textures[i]->GetTextureID() % 32); // activate proper texture unit before binding
                 glBindTexture(GL_TEXTURE_2D, m_Textures[i]->GetTextureID());
             }
             for (auto& texture : m_Textures)

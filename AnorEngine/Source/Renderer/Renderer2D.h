@@ -16,6 +16,11 @@ namespace AnorEngine
 	class ModelRendererComponent;
 	class Scene;
 
+	enum class TextureNames
+	{
+		WHITE_TEXTURE = 0
+	};
+
 	namespace Graphics
 	{
 		class ANOR_API Renderer2D
@@ -35,6 +40,7 @@ namespace AnorEngine
 			//Will become deprecated soon.
 			static void SetOrthographicCamera(const Ref<OrthographicCamera> camera);
 			//---
+			static Ref<Texture> CreateTexture(const std::filesystem::path& relativePath);
 			static void Submit(const TransformComponent& tc, SpriteRendererComponent& sc, int entityID);
 			static void Flush();
 			static void SetEditorCamera(const Ref<EditorCamera> camera);
@@ -45,6 +51,7 @@ namespace AnorEngine
 			static uint32_t GetIndexCount();
 			static uint32_t GetNumberOfDrawCalls();
 			static glm::vec3& GetDirectionalLightPosition();
+			static const std::array<Ref<Texture>, 32Ui64>& GetStoredTextures();
 		private:
 			static void RenderScene(const Ref<Scene>& scene, const Ref<Shader>& shader, bool wannaCheckforPointLights = false);
 		};

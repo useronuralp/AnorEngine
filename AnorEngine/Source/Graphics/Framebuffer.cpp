@@ -38,7 +38,7 @@ namespace AnorEngine
 			}
 			return false;
 		}
-		static void BindTexture(bool multiSample, TextureType type ,uint32_t id)
+		static void BindTexture(bool multiSample, TextureType type, uint32_t id)
 		{
 			glBindTexture(TextureTarget(multiSample, type), id);
 		}
@@ -256,7 +256,6 @@ namespace AnorEngine
 			{
 				CRITICAL_ASSERT("Sizes dont match!");
 			}
-
 			glReadBuffer(GL_COLOR_ATTACHMENT0 + attachmentIndex);
 			int pixelData;
 			glReadPixels(x, y, 1, 1, GL_RED_INTEGER, GL_INT, &pixelData);
