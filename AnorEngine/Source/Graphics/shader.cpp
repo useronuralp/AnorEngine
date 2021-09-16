@@ -79,7 +79,7 @@ namespace AnorEngine {
 		Shader::Shader(std::string name, std::string relativeFilePath)
 			:m_Name(name)
 		{
-			m_AbsoluteFilePath = g_AssetPath.string() + relativeFilePath;
+			m_AbsoluteFilePath = g_AssetPath.string() + "\\" + relativeFilePath;
 			std::string source = ReadFile(m_AbsoluteFilePath);
 			std::unordered_map<GLenum, std::string> shaderSources = PreProcess(source);
 			Compile(shaderSources);

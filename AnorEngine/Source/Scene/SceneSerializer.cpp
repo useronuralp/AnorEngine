@@ -168,7 +168,7 @@ namespace AnorEngine
 			out << YAML::Key << "Texture" << YAML::Value << spriteRendererComponent.Texture->GetPath();
 			out << YAML::Key << "TextureSize" << spriteRendererComponent.TextureSize;
 			out << YAML::Key << "SubTextureOffset" << YAML::Value << spriteRendererComponent.SubTextureOffset;
-			out << YAML::Key << "SubTextureDimensions" << YAML::Value << spriteRendererComponent.SubTextureDimensions;
+			out << YAML::Key << "PixelSizeOfEachCell" << YAML::Value << spriteRendererComponent.PixelSizeOfEachCell;
 		
 			out << YAML::EndMap; // SpriteRendererComponent
 		}
@@ -305,8 +305,8 @@ namespace AnorEngine
 					glm::vec4 color = spriteRendererComponent["Color"].as<glm::vec4>();
 					glm::vec2 textureSize = spriteRendererComponent["TextureSize"].as<glm::vec2>();
 					glm::vec2 subTextureOffset = spriteRendererComponent["SubTextureOffset"].as<glm::vec2>();
-					glm::vec2 subTextureDimensions = spriteRendererComponent["SubTextureDimensions"].as<glm::vec2>();
-					auto& src = deserializedEntity.AddComponent<SpriteRendererComponent>(color, Texture, textureSize, subTextureOffset, subTextureDimensions);
+					glm::vec2 pixelSizeOfEachCell = spriteRendererComponent["PixelSizeOfEachCell"].as<glm::vec2>();
+					auto& src = deserializedEntity.AddComponent<SpriteRendererComponent>(color, Texture, textureSize, subTextureOffset, pixelSizeOfEachCell);
 				}
 				auto meshRendererComponent = entity["MeshRendererComponent"];
 				if (meshRendererComponent)

@@ -26,7 +26,7 @@ namespace AnorEngine
 		{
 			if (ImGui::ImageButton((void*)m_BackIcon->GetTextureID(), { 20.0f,20.0f }, {0,1}, {1,0}))
 			{
-				m_CurrentDirectory = std::filesystem::path((m_CurrentDirectory.parent_path().string() + "\\"));
+				m_CurrentDirectory = m_CurrentDirectory.parent_path();
 			}
 		}
 		static float padding = 16.0f;

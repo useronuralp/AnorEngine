@@ -4,8 +4,8 @@
 #include "../vendor/stb_image/stb_image.h"
 #include "texture.h"
 namespace AnorEngine {
-	extern const std::filesystem::path g_AssetPath = (std::string(__SOLUTION_DIR) + "AnorEngine\\Assets\\");
-	extern const std::filesystem::path g_ResourcesPath = (std::string(__SOLUTION_DIR) + "AnorEditor\\");
+	extern const std::filesystem::path g_AssetPath = (std::string(__SOLUTION_DIR) + "AnorEngine\\Assets");
+	extern const std::filesystem::path g_ResourcesPath = (std::string(__SOLUTION_DIR) + "AnorEditor");
 	//!!!! DEFAULT GLFW FRAMEBUFFER TEXTURE ID IS 0 !!!!!
 	//! 
 	//!!!! WHITE TEXTURE ID IS 1 !!!!!!
@@ -17,15 +17,15 @@ namespace AnorEngine {
 		{
 			m_RelativeFilePath = relativePath.string();
 			if (fileType == "Asset")
-				m_AbsoluteFilePath = g_AssetPath.string() + relativePath.string();
+				m_AbsoluteFilePath = g_AssetPath.string() + "\\" + relativePath.string();
 			else if(fileType == "Resource")
-				m_AbsoluteFilePath = g_ResourcesPath.string() + relativePath.string();
+				m_AbsoluteFilePath = g_ResourcesPath.string() + "\\" + relativePath.string();
 			SetupTexture();
 		}
 		void Texture::CreateTextureWithRelativePath(std::filesystem::path relativePath)
 		{
 			m_RelativeFilePath = relativePath.string();
-			m_AbsoluteFilePath = g_AssetPath.string() + relativePath.string();
+			m_AbsoluteFilePath = g_AssetPath.string() + "\\" + relativePath.string();
 			if (m_TextureID) //If the ID is not 0, then it means this framebuffer was already in use and we want to delete it and start the recreation fresh.
 				glDeleteTextures(1, &m_TextureID);
 			SetupTexture();
@@ -86,14 +86,14 @@ namespace AnorEngine {
 			{
 				//flipping images doesnt work!!
 				stbi_set_flip_vertically_on_load(true);
-				stbi_uc* data = stbi_load((g_AssetPath.string() + faces[i]).c_str(), &width, &height, &nrChannels, 0);
+				stbi_uc* data = stbi_load((g_AssetPath.string() + "\\" + faces[i]).c_str(), &width, &height, &nrChannels, 0);
 				if (data)
 				{
 					glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i,
 						0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data
 					);
 					m_Faces[i].m_Channels = nrChannels;
-					m_Faces[i].m_AbsoluteFilePath = g_AssetPath.string() + faces[i];
+					m_Faces[i].m_AbsoluteFilePath = g_AssetPath.string() + "\\" + faces[i];
 					m_Faces[i].m_Height = height;
 					m_Faces[i].m_Width = width;		
 					stbi_image_free(data);

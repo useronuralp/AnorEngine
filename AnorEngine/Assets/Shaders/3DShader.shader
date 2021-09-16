@@ -88,16 +88,17 @@ uniform sampler2D   u_TextureSamplerSpecular;
 
 float PointShadowCalculation(vec3 fragPos, int index)
 {
-	float shadow;
+	float shadow = 0.0;
+	float bias = 0.5;
 	//If the fragment is lit by a direct light, conclude that it is not occluded by shadow.
 	vec3 lightToFrag = fragPos - u_PointLights[index].position;
 	float depth = texture(u_PointLightShadowMap[index], lightToFrag).r;
 	depth *= u_PointLigthFarPlane;
-	float bias = 0.5;
 	shadow = (depth + bias) < length(lightToFrag) ? 0.0 : 1.0f;
 	if (shadow == 1.0f)
 		return 1.0f;
 	//--------------end of direct light check
+
 
 	for (int i = 0; i < u_PointLightCount; i++)
 	{
@@ -106,7 +107,6 @@ float PointShadowCalculation(vec3 fragPos, int index)
 		depth *= u_PointLigthFarPlane;
 		bias = 0.5;
 		shadow = (depth + bias) < length(lightToFrag) ? 0.0 : 1.0f;
-		//break if the fragment is occluded by any of the point lights in the scene, no need for further if checks.
 		if (shadow == 0.0f)
 			return 0.0f;
 	}
@@ -129,16 +129,16 @@ float DirectionalShadowCalculation(vec4 fragPosLightSpace, vec3 fragPos, vec3 li
 	// check whether current frag pos is in shadow
 	float shadow = 0.0;
 	vec2 texelSize = 1.0 / textureSize(u_DirectionalShadowMap, 0);
-	for (int x = -1; x <= 1; ++x)
+	for (int x = -1; x <= 8; ++x)
 	{
 		//Sampling from the same depth mat multiple times and averaging the shadows to have smooth shadows.
-		for (int y = -1; y <= 1; ++y)
+		for (int y = -1; y <= 8; ++y)
 		{
 			float pcfDepth = texture(u_DirectionalShadowMap, projCoords.xy + vec2(x, y) * texelSize).r;
 			shadow += currentDepth - bias > pcfDepth ? 1.0 : 0.0;
 		}
 	}
-	shadow /= 9.0;
+	shadow /= 100.0;
 	if (projCoords.z > 1.0)
 		shadow = 0.0;
 	return shadow;
@@ -148,21 +148,20 @@ float DirectionalShadowCalculation(vec4 fragPosLightSpace, vec3 fragPos, vec3 li
 vec3 CalcPointLight(PointLight light, vec3 Normal, vec3 FragPosition, vec3 viewDir, vec4 specularTex, float shadow)
 {
 	vec3 lightDir = normalize(light.position - FragPosition);
-	//Used for Blinn-Phong lighting model.
-	vec3 halfwayDir = normalize(lightDir + viewDir);
+	vec3 norm = normalize(Normal);
 
 	// ambient
 	vec3 ambient = vec3(light.color) * vec3(u_Material.ambientIntensity);
 
 	// diffuse 
-	vec3 norm = normalize(Normal);
 	float diff = max(dot(norm, lightDir), 0.0);
 	vec3 diffuse = vec3(light.diffuse) * vec3(light.color) * diff * vec3(u_Material.diffuseIntensity);
 
 	// specular
-	vec3 reflectDir = reflect(-lightDir, norm);
+	//Used for Blinn-Phong lighting model.
+	vec3 halfwayDir = normalize(lightDir + viewDir);
 	float spec = pow(max(dot(norm, halfwayDir), 0.0), u_Material.shininess);
-	vec3 specular = vec3(light.specular) * vec3(light.color) * spec * vec3(specularTex) * vec3(u_Material.specularIntensity);
+	vec3 specular = vec3(light.specular) * vec3(light.color) * (spec * vec3(specularTex)) * vec3(u_Material.specularIntensity);
 
 	// attenuation
 	float distance = length(light.position - FragPosition);
@@ -177,13 +176,20 @@ vec3 CalcPointLight(PointLight light, vec3 Normal, vec3 FragPosition, vec3 viewD
 
 vec3 CalcDirectionalLight(vec3 Normal, vec3 viewDir, vec3 FragPosition, float shadow, vec4 specularTex)
 {
-	vec3 DirectionalLightDir = normalize(u_DirectionalLightPosition - FragPosition);
+	vec3 norm = normalize(Normal);
+	vec3 lightDir = normalize(u_DirectionalLightPosition - FragPosition);
+
 	//Ambient
 	vec3 AmbientDirectional = vec3(u_Material.ambientIntensity) * u_DirectionalLightColor;
+
 	//Diffuse
-	vec3 DiffuseDirectional = max(dot(normalize(Normal), DirectionalLightDir), 0.0) * u_DirectionalLightColor * vec3(u_Material.diffuseIntensity);
+	float diff = max(dot(norm, lightDir), 0.0);
+	vec3 DiffuseDirectional = diff * u_DirectionalLightColor * vec3(u_Material.diffuseIntensity);
+
 	//Specular
-	vec3 SpecularDirectional = (vec3(u_DirectionalLightColor) * pow(max(dot(viewDir, reflect(-DirectionalLightDir, normalize(Normal))), 0.0), u_Material.shininess)) * vec3(specularTex) * vec3(u_Material.specularIntensity);
+	vec3 halfwayDir = normalize(lightDir + viewDir);
+	float spec = pow(max(dot(norm, halfwayDir), 0.0), u_Material.shininess);
+	vec3 SpecularDirectional = vec3(u_DirectionalLightColor) * (spec * vec3(specularTex)) * vec3(u_Material.specularIntensity);
 
 	return ((1.0 - shadow) * (DiffuseDirectional + SpecularDirectional) + AmbientDirectional);
 }
