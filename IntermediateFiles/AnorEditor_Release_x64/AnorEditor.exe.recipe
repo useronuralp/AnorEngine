@@ -2,7 +2,7 @@
 <Project>
   <ProjectOutputs>
     <ProjectOutput>
-      <FullPath>H:\ProgrammingProjects\repos\AnorEngine\bin\AnorEditor_Release_x64\AnorEditor.exe</FullPath>
+      <FullPath>C:\ProgrammingProjects\AnorEngine\bin\AnorEditor_Release_x64\AnorEditor.exe</FullPath>
     </ProjectOutput>
   </ProjectOutputs>
   <ContentFiles />

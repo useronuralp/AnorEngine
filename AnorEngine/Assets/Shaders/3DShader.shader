@@ -91,10 +91,10 @@ float PointShadowCalculation(vec3 fragPos, int index)
 	float shadow = 0.0;
 	float bias = 0.5;
 	//If the fragment is lit by a direct light, conclude that it is not occluded by shadow.
-	vec3 lightToFrag = fragPos - u_PointLights[index].position;
-	float depth = texture(u_PointLightShadowMap[index], lightToFrag).r;
+	vec3 lightPositionToFrag = fragPos - u_PointLights[index].position;
+	float depth = texture(u_PointLightShadowMap[index], lightPositionToFrag).z;
 	depth *= u_PointLigthFarPlane;
-	shadow = (depth + bias) < length(lightToFrag) ? 0.0 : 1.0f;
+	shadow = (depth + bias) < length(lightPositionToFrag) ? 0.0 : 1.0f;
 	if (shadow == 1.0f)
 		return 1.0f;
 	//--------------end of direct light check
@@ -102,11 +102,11 @@ float PointShadowCalculation(vec3 fragPos, int index)
 
 	for (int i = 0; i < u_PointLightCount; i++)
 	{
-		lightToFrag = fragPos - u_PointLights[i].position;
-		depth = texture(u_PointLightShadowMap[i], lightToFrag).r;
+		lightPositionToFrag = fragPos - u_PointLights[i].position;
+		depth = texture(u_PointLightShadowMap[i], lightPositionToFrag).z;
 		depth *= u_PointLigthFarPlane;
 		bias = 0.5;
-		shadow = (depth + bias) < length(lightToFrag) ? 0.0 : 1.0f;
+		shadow = (depth + bias) < length(lightPositionToFrag) ? 0.0 : 1.0f;
 		if (shadow == 0.0f)
 			return 0.0f;
 	}
@@ -120,7 +120,7 @@ float DirectionalShadowCalculation(vec4 fragPosLightSpace, vec3 fragPos, vec3 li
 	// transform to [0,1] range
 	projCoords = projCoords * 0.5 + 0.5;
 	// get closest depth value from light's perspective (using [0,1] range fragPosLight as coords)
-	float closestDepth = texture(u_DirectionalShadowMap, projCoords.xy).r;
+	float closestDepth = texture(u_DirectionalShadowMap, projCoords.xy).z;
 	// get depth of current fragment from light's perspective
 	float currentDepth = projCoords.z;
 	//Shadow bias to eliminate shadow acne, this bias might need tweaking in the future for each scene.

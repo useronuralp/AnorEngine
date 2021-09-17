@@ -60,12 +60,6 @@
     <ClCompile Include="Source\Graphics\Layers\ImGuiBase.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Source\ImGuiExampleBuilds\imgui_impl_glfw.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\ImGuiExampleBuilds\imgui_impl_opengl3.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="Source\Math\mat4.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -237,6 +231,12 @@
     <ClCompile Include="Source\Graphics\Material.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Vendor\ImGuiExampleBuilds\imgui_impl_glfw.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Vendor\ImGuiExampleBuilds\imgui_impl_opengl3.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Source\Events\Event.h">
@@ -288,12 +288,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Source\Graphics\Layers\ImGuiBase.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\ImGuiExampleBuilds\imgui_impl_glfw.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\ImGuiExampleBuilds\imgui_impl_opengl3.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Source\Math\mat4.h">
@@ -594,6 +588,12 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Source\Core\AnorColors.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Vendor\ImGuiExampleBuilds\imgui_impl_glfw.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Vendor\ImGuiExampleBuilds\imgui_impl_opengl3.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

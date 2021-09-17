@@ -1,8 +1,8 @@
 #pragma once
 #include <glm.hpp>
 #include <type_traits>
-#include <ImGuiExampleBuilds/imgui_impl_glfw.h>
-#include <ImGuiExampleBuilds/imgui_impl_opengl3.h>
+#include "imgui_impl_glfw.h"
+#include "imgui_impl_opengl3.h"
 namespace AnorEngine
 {
 	class ANOR_API ImGuiBase

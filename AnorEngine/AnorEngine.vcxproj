@@ -82,7 +82,7 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LinkIncremental>true</LinkIncremental>
-    <IncludePath>$(SolutionDir)AnorEngine\Source;$(SolutionDir)AnorEngine\Vendor\GLM;$(SolutionDir)AnorEngine\Vendor\FreeImage\include;$(SolutionDir)AnorEngine\Vendor\GLEW\include;$(SolutionDir)AnorEngine\Vendor\GLFW\includex64;$(SolutionDir)AnorEngine\Vendor\Assimp\assimp\include;$(SolutionDir)AnorEngine\Vendor\spdlog-1.x\include;$(SolutionDir)AnorEngine\Vendor\imgui;$(SolutionDir)AnorEngine\Vendor\Entt\include;$(SolutionDir)AnorEngine\Vendor\yaml-cpp\include;$(IncludePath)</IncludePath>
+    <IncludePath>$(SolutionDir)AnorEngine\Source;$(SolutionDir)AnorEngine\Vendor\GLM;$(SolutionDir)AnorEngine\Vendor\FreeImage\include;$(SolutionDir)AnorEngine\Vendor\GLEW\include;$(SolutionDir)AnorEngine\Vendor\GLFW\includex64;$(SolutionDir)AnorEngine\Vendor\Assimp\assimp\include;$(SolutionDir)AnorEngine\Vendor\spdlog-1.x\include;$(SolutionDir)AnorEngine\Vendor\imgui;$(SolutionDir)AnorEngine\Vendor\Entt\include;$(SolutionDir)AnorEngine\Vendor\yaml-cpp\include;$(SolutionDir)AnorEngine\Vendor\ImGuiBuildHelpers;$(IncludePath)</IncludePath>
     <LibraryPath>$(SolutionDir)AnorEngine\Vendor\FreeImage\lib;$(SolutionDir)AnorEngine\Vendor\GLEW\lib\x64;$(SolutionDir)AnorEngine\Vendor\GLFW\lib-vc2019x64;$(SolutionDir)AnorEngine\Vendor\Assimp\assimp\lib\Release;$(LibraryPath)</LibraryPath>
     <IntDir>$(SolutionDir)IntermediateFiles\$(ProjectName)_$(Configuration)_$(Platform)</IntDir>
     <OutDir>$(SolutionDir)bin\$(ProjectName)_$(Configuration)_$(Platform)</OutDir>
@@ -91,7 +91,7 @@
     <LinkIncremental>false</LinkIncremental>
     <OutDir>$(SolutionDir)bin\$(ProjectName)_$(Configuration)_$(Platform)</OutDir>
     <IntDir>$(SolutionDir)IntermediateFiles\$(ProjectName)_$(Configuration)_$(Platform)</IntDir>
-    <IncludePath>$(SolutionDir)AnorEngine\Source;$(SolutionDir)AnorEngine\Vendor\GLM;$(SolutionDir)AnorEngine\Vendor\FreeImage\include;$(SolutionDir)AnorEngine\Vendor\GLEW\include;$(SolutionDir)AnorEngine\Vendor\GLFW\includex64;$(SolutionDir)AnorEngine\Vendor\Assimp\assimp\include;$(SolutionDir)AnorEngine\Vendor\spdlog-1.x\include;$(SolutionDir)AnorEngine\Vendor\imgui;$(SolutionDir)AnorEngine\Vendor\Entt\include;$(SolutionDir)AnorEngine\Vendor\yaml-cpp\include;$(IncludePath)</IncludePath>
+    <IncludePath>$(SolutionDir)AnorEngine\Source;$(SolutionDir)AnorEngine\Vendor\GLM;$(SolutionDir)AnorEngine\Vendor\FreeImage\include;$(SolutionDir)AnorEngine\Vendor\GLEW\include;$(SolutionDir)AnorEngine\Vendor\GLFW\includex64;$(SolutionDir)AnorEngine\Vendor\Assimp\assimp\include;$(SolutionDir)AnorEngine\Vendor\spdlog-1.x\include;$(SolutionDir)AnorEngine\Vendor\imgui;$(SolutionDir)AnorEngine\Vendor\Entt\include;$(SolutionDir)AnorEngine\Vendor\yaml-cpp\include;$(SolutionDir)AnorEngine\Vendor\ImGuiBuildHelpers;$(IncludePath)</IncludePath>
     <LibraryPath>$(SolutionDir)AnorEngine\Vendor\FreeImage\lib;$(SolutionDir)AnorEngine\Vendor\GLEW\lib\x64;$(SolutionDir)AnorEngine\Vendor\GLFW\lib-vc2019x64;$(SolutionDir)AnorEngine\Vendor\Assimp\assimp\lib\Release;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
@@ -207,8 +207,6 @@
     <ClCompile Include="Source\Graphics\sprite.cpp" />
     <ClCompile Include="Source\Graphics\texture.cpp" />
     <ClCompile Include="Source\Graphics\OpenGLWindow.cpp" />
-    <ClCompile Include="Source\ImGuiExampleBuilds\imgui_impl_glfw.cpp" />
-    <ClCompile Include="Source\ImGuiExampleBuilds\imgui_impl_opengl3.cpp" />
     <ClCompile Include="Source\Graphics\Layers\ImGuiBase.cpp" />
     <ClCompile Include="Source\Math\mat4.cpp" />
     <ClCompile Include="Source\Math\vec2.cpp" />
@@ -216,6 +214,8 @@
     <ClCompile Include="Source\Math\vec4.cpp" />
     <ClCompile Include="Source\Utility\Logger.cpp" />
     <ClCompile Include="Source\Utility\WindowsUtils.cpp" />
+    <ClCompile Include="Vendor\ImGuiBuildHelpers\imgui_impl_glfw.cpp" />
+    <ClCompile Include="Vendor\ImGuiBuildHelpers\imgui_impl_opengl3.cpp" />
     <ClCompile Include="Vendor\ImGUI\imgui.cpp" />
     <ClCompile Include="Vendor\ImGUI\imgui_demo.cpp" />
     <ClCompile Include="Vendor\ImGUI\imgui_draw.cpp" />
@@ -284,8 +284,6 @@
     <ClInclude Include="Source\Renderer\Renderer.h" />
     <ClInclude Include="Source\Renderer\Renderer2D.h" />
     <ClInclude Include="Source\Renderer\RendererCommand.h" />
-    <ClInclude Include="Source\ImGuiExampleBuilds\imgui_impl_glfw.h" />
-    <ClInclude Include="Source\ImGuiExampleBuilds\imgui_impl_opengl3.h" />
     <ClInclude Include="Source\Graphics\Layers\ImGuiBase.h" />
     <ClInclude Include="Source\Utility\Logger.h" />
     <ClInclude Include="Source\Graphics\Buffers\Buffer.h" />
@@ -307,6 +305,8 @@
     <ClInclude Include="Source\Utility\fileutils.h" />
     <ClInclude Include="Source\Utility\Randomizer.h" />
     <ClInclude Include="Source\Utility\WindowsUtils.h" />
+    <ClInclude Include="Vendor\ImGuiBuildHelpers\imgui_impl_glfw.h" />
+    <ClInclude Include="Vendor\ImGuiBuildHelpers\imgui_impl_opengl3.h" />
     <ClInclude Include="Vendor\ImGUI\imconfig.h" />
     <ClInclude Include="Vendor\ImGUI\imgui.h" />
     <ClInclude Include="Vendor\ImGUI\imgui_internal.h" />
