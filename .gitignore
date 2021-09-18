@@ -88,6 +88,13 @@ StyleCopReport.xml
 *.svclog
 *.scc
 
+
+# Visual Studio solution, vcxproj, vcxproj.filters and vcxproj.users files
+*.sln
+*.vcxproj
+*.vcxproj.filters
+*.vcxproj.users
+
 # Chutzpah Test files
 _Chutzpah*
 
