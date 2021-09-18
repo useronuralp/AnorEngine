@@ -91,6 +91,7 @@ StyleCopReport.xml
 *.svclog
 *.scc
 
+!/AnorEngine/Assets/Models/*/*.obj
 
 # Visual Studio solution, vcxproj, vcxproj.filters and vcxproj.users files
 *.sln
