@@ -169,8 +169,8 @@ project "AnorEditor"
 
 	postbuildcommands
 	{
-		"XCOPY \"$(SolutionDir)/AnorEditor/imgui.ini\" \"%{cfg.targetdir}\" /y",
-		"XCOPY \"$(SolutionDir)AnorEngine/Vendor/Assimp/assimp/bin/Release/assimp-vc142-mt.dll\" \"%{cfg.targetdir}\" /y"
+		"XCOPY \"$(SolutionDir)AnorEditor\\imgui.ini\" \"%{cfg.targetdir}\" /y",
+		"XCOPY \"$(SolutionDir)AnorEngine\\Vendor\\Assimp\\assimp\\bin\\Release\\assimp-vc142-mt.dll\" \"%{cfg.targetdir}\" /y"
 
 	}
 
