@@ -189,71 +189,71 @@ project "AnorEditor"
 		optimize "on"
 
 
-project "Sandbox"
-	location "Sandbox"
-	kind "ConsoleApp"
-	language "C++"
-	cppdialect "C++17"
-	staticruntime "off"
-
-	targetdir ("$(SolutionDir)bin/" .. outputdir .. "/%{prj.name}")
-	objdir ("$(SolutionDir)bin-int/" .. outputdir .. "/%{prj.name}")
-
-	links
-	{
-		"AnorEngine"
-	}
-
-	files
-	{
-		"Sandbox/**.h",
-		"Sandbox/**.cpp"
-	}
-
-	includedirs
-	{
-		"$(SolutionDir)AnorEngine/Source",
-		"$(SolutionDir)%{IncludeDir.FreeImage}",
-		"$(SolutionDir)%{IncludeDir.ImGui}",
-		"$(SolutionDir)%{IncludeDir.GLEW}",
-		"$(SolutionDir)%{IncludeDir.spdlog}",
-		"$(SolutionDir)%{IncludeDir.GLFW}",
-		"$(SolutionDir)%{IncludeDir.GLM}",
-		"$(SolutionDir)%{IncludeDir.ENTT}",
-		"$(SolutionDir)%{IncludeDir.IMGUIBUILDHELPERS}",
-		"$(SolutionDir)%{IncludeDir.yaml}",
-		"$(SolutionDir)%{IncludeDir.assimp}"
-	}
-
-
-	defines
-	{
-		"GLFW_INCLUDE_NONE",
-		"GLEW_STATIC",
-		"WIN32",
-		"ENGINE_PLATFORM_WINDOWS",
-		"__SOLUTION_DIR=R\"($(SolutionDir))\"",
-		"_CRT_SECURE_NO_WARNINGS",
-		"_CONSOLE"
-	}
-
-	filter "system:windows"
-		systemversion "latest"
-		
-	filter "configurations:Debug"
-		defines "_DEBUG"
-		runtime "Debug"
-		symbols "on"
-
-	filter "configurations:Release"
-		defines "NDEBUG"
-		runtime "Release"
-		optimize "on"
-
-	filter "configurations:Dist"
-		defines	"NDEBUG"
-		runtime "Release"
-		optimize "on"
+--project "Sandbox"
+--	location "Sandbox"
+--	kind "ConsoleApp"
+--	language "C++"
+--	cppdialect "C++17"
+--	staticruntime "off"
+--
+--	targetdir ("$(SolutionDir)bin/" .. outputdir .. "/%{prj.name}")
+--	objdir ("$(SolutionDir)bin-int/" .. outputdir .. "/%{prj.name}")
+--
+--	links
+--	{
+--		"AnorEngine"
+--	}
+--
+--	files
+--	{
+--		"Sandbox/**.h",
+--		"Sandbox/**.cpp"
+--	}
+--
+--	includedirs
+--	{
+--		"$(SolutionDir)AnorEngine/Source",
+--		"$(SolutionDir)%{IncludeDir.FreeImage}",
+--		"$(SolutionDir)%{IncludeDir.ImGui}",
+--		"$(SolutionDir)%{IncludeDir.GLEW}",
+--		"$(SolutionDir)%{IncludeDir.spdlog}",
+--		"$(SolutionDir)%{IncludeDir.GLFW}",
+--		"$(SolutionDir)%{IncludeDir.GLM}",
+--		"$(SolutionDir)%{IncludeDir.ENTT}",
+--		"$(SolutionDir)%{IncludeDir.IMGUIBUILDHELPERS}",
+--		"$(SolutionDir)%{IncludeDir.yaml}",
+--		"$(SolutionDir)%{IncludeDir.assimp}"
+--	}
+--
+--
+--	defines
+--	{
+--		"GLFW_INCLUDE_NONE",
+--		"GLEW_STATIC",
+--		"WIN32",
+--		"ENGINE_PLATFORM_WINDOWS",
+--		"__SOLUTION_DIR=R\"($(SolutionDir))\"",
+--		"_CRT_SECURE_NO_WARNINGS",
+--		"_CONSOLE"
+--	}
+--
+--	filter "system:windows"
+--		systemversion "latest"
+--		
+--	filter "configurations:Debug"
+--		defines "_DEBUG"
+--		runtime "Debug"
+--		symbols "on"
+--
+--	filter "configurations:Release"
+--		defines "NDEBUG"
+--		runtime "Release"
+--		optimize "on"
+--
+--	filter "configurations:Dist"
+--		defines	"NDEBUG"
+--		runtime "Release"
+--		optimize "on"
 
 project "ImGui"
 	kind "StaticLib"
