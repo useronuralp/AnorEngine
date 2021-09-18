@@ -1,6 +1,5 @@
 #include "pch.h"
 #include "ContentBrowserPanel.h"
-
 #include "Core\AnorColors.h"
 #include <imgui.h>
 namespace AnorEngine
