@@ -73,6 +73,9 @@ StyleCopReport.xml
 *.pgc
 *.pgd
 *.rsp
+*.tlog
+*.recipe
+*.idb
 *.sbr
 *.tlb
 *.tli
