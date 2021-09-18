@@ -39,10 +39,14 @@ project "AnorEngine"
 
 	files
 	{
-		"%{prj.name}/Source/**.h",
-		"%{prj.name}/Source/**.cpp",
-		"%{prj.name}/vendor/ImGuiBuildHelpers/**.h",
-		"%{prj.name}/vendor/ImGuiBuildHelpers/**.cpp",
+		"AnorEngine/Source/**.h",
+		"AnorEngine/Source/**.cpp",
+		"AnorEngine/Vendor/ImGuiBuildHelpers/**.h",
+		"AnorEngine/Vendor/ImGuiBuildHelpers/**.cpp",
+		"AnorEngine/Vendor/Assimp/assimp/include/**.h",
+		"AnorEngine/Vendor/Assimp/assimp/include/**.hpp",
+		"AnorEngine/Vendor/Assimp/assimp/include/**.inl",
+		"AnorEngine/Vendor/Assimp/assimp/include/**.in"
 	}
 
 	defines
