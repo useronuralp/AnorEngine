@@ -1,7 +1,7 @@
 # Anor Engine
 Developing a game engine for practice
 
--Frst of all you need to run the 'GenerateProjects.bat' file to get windows specific visual studio files.
+-First of all you need to run the 'GenerateProjects.bat' file to get windows specific visual studio files.
 
 -After creating the projects, you also need to navigate to AnorEngie/Vendor/Assimp/assimp and run a cmake command on the file 'CMakeLists.txt' file using the command line and get project files for the assimp library.
 
