@@ -22,9 +22,11 @@ namespace AnorEngine {
             {
                 //TODO: Handle the case where not all the maps are present in the model file. Example: Model is missing the specular map but has the diffuse. It should still reneder diffuse.
                 if (texture->GetType() == "texture_diffuse")
-                    shader->UploadUniform("u_TextureSamplerDiffuse", sizeof(texture->GetTextureID()), &texture->GetTextureID());
+                    shader->UploadUniform("u_DiffuseMap", sizeof(texture->GetTextureID()), &texture->GetTextureID());
                 else if (texture->GetType() == "texture_specular")
-                    shader->UploadUniform("u_TextureSamplerSpecular", sizeof(texture->GetTextureID()), &texture->GetTextureID());
+                    shader->UploadUniform("u_SpecularMap", sizeof(texture->GetTextureID()), &texture->GetTextureID());
+                else if (texture->GetType() == "texture_normalMap")
+                    shader->UploadUniform("u_NormalMap", sizeof(texture->GetTextureID()), &texture->GetTextureID());
             }
             m_VAO->Bind();
 
@@ -39,6 +41,8 @@ namespace AnorEngine {
                 {ShaderDataType::vec3, "a_Position", 0},
                 {ShaderDataType::vec3, "a_Normal", 1},
                 {ShaderDataType::vec2, "a_UV", 2},
+                {ShaderDataType::vec3, "a_Tangnent", 3},
+                {ShaderDataType::vec3, "a_Bitangent", 4}
             };
 
             std::vector<float> arr;
@@ -53,8 +57,16 @@ namespace AnorEngine {
                 arr.push_back(m_Vertices[i].Normal.z);
 
                 arr.push_back(m_Vertices[i].TexCoords.x);
-                arr.push_back(m_Vertices[i].TexCoords.y);
+                //Since stbi doesnt let me flip the texture vertically upon loading, I do it here manually. (Texture needs to be flipped because OpenGL accepts flipped UVs on y-axis, weird I know.)
+                arr.push_back(1.0f - m_Vertices[i].TexCoords.y);
 
+                arr.push_back(m_Vertices[i].Tangent.x);
+                arr.push_back(m_Vertices[i].Tangent.y);
+                arr.push_back(m_Vertices[i].Tangent.z);
+
+                arr.push_back(m_Vertices[i].Bitangent.x);
+                arr.push_back(m_Vertices[i].Bitangent.y);
+                arr.push_back(m_Vertices[i].Bitangent.z);
             }
             m_VAO = std::make_shared<VertexArray>();
             m_VAO->AddVertexBuffer(std::make_shared<VertexBuffer>(&arr[0], arr.size() * sizeof(float), BufferLayout));

@@ -210,6 +210,7 @@ namespace AnorEngine
 			//Creating and adding a white texture. This is basically used when we only want to render a quad with its color. In that case, we multiply the color values with this white texture meaning 1. Therefore 
 			//getting the original colors on the screen.
 			s_Data.WhiteTexture = std::make_shared<Texture>("Textures\\WhiteTexture.png"); //TODO: Create this texture without a using a PNG.
+			s_Data.WhiteTexture->SetType("texture_diffuse");
 			s_Data.StoredTextures[0] = s_Data.WhiteTexture;
 
 			std::vector<std::string> cubeMapFaces
@@ -376,7 +377,7 @@ namespace AnorEngine
 		void Renderer2D::DrawCube(const TransformComponent& tc, const MeshRendererComponent& mc, const TagComponent& tagc)
 		{
 			//Component specific shader uniforms are set inside this funciton.
-			mc.Material->Shader->UploadUniform("u_TextureSamplerDiffuse", sizeof(mc.Material->Texture->GetTextureID()), &mc.Material->Texture->GetTextureID());
+			mc.Material->Shader->UploadUniform("u_DiffuseMap", sizeof(mc.Material->Texture->GetTextureID()), &mc.Material->Texture->GetTextureID());
 			mc.Material->Shader->UploadUniform("u_CastDirectionalLight", sizeof(mc.CastDirectionalLight), &mc.CastDirectionalLight);
 			mc.Material->Shader->UploadUniform("u_Transform", sizeof(tc.GetTransform()), &tc.GetTransform());
 

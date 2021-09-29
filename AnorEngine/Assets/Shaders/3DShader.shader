@@ -5,12 +5,15 @@
 layout (location = 0) in vec3 a_Position;
 layout (location = 1) in vec3 a_Normal;
 layout (location = 2) in vec2 a_Uv; 
+layout (location = 3) in vec3 a_Tangent;
+layout (location = 4) in vec3 a_Bitangent;
 
-//Varying OUTSs
+//Varying OUTs
 out vec3 v_Normal;
 out vec3 v_Position;
 out vec2 v_UV;
 out vec4 v_FragPosLightSpace;
+out mat3 v_TBN;
 
 //Uniforms
 uniform mat4 u_Transform = mat4(1.0);
@@ -24,6 +27,17 @@ void main()
 	v_Position = vec3(u_Transform * vec4(a_Position, 1.0f));
 	gl_Position = u_ViewProjMat * vec4(v_Position, 1.0f);
 	v_FragPosLightSpace = (u_DirectionalLightViewProjMatrix * vec4(v_Position, 1.0));
+
+
+	vec3 T = normalize(vec3(u_Transform * vec4(a_Tangent, 0.0)));
+	vec3 N = normalize(vec3(u_Transform * vec4(a_Normal, 0.0)));
+	// re-orthogonalize T with respect to N
+	T = normalize(T - dot(T, N) * N);
+	// then retrieve perpendicular vector B with the cross product of T and N
+	vec3 B = cross(N, T);
+	//mat3 TBN = mat3(T, B, N);
+	//v_TBN = transpose(mat3(T, B, N));
+	v_TBN = mat3(T, B, N);
 }
 
 #type fragment
@@ -66,7 +80,7 @@ in vec3 v_Normal;
 in vec3 v_Position;
 in vec2 v_UV;
 in vec4 v_FragPosLightSpace;
-
+in mat3 v_TBN;
 
 //Uniforms
 uniform vec3		u_CameraPos;
@@ -83,8 +97,9 @@ uniform int			u_PointLightCount;
 uniform float		u_PointLigthFarPlane;
 uniform int		    u_EntityID;
 
-uniform sampler2D   u_TextureSamplerDiffuse;
-uniform sampler2D   u_TextureSamplerSpecular;
+uniform sampler2D   u_DiffuseMap;
+uniform sampler2D   u_SpecularMap;
+uniform sampler2D   u_NormalMap;
 
 float PointShadowCalculation(vec3 fragPos, int index)
 {
@@ -145,10 +160,18 @@ float DirectionalShadowCalculation(vec4 fragPosLightSpace, vec3 fragPos, vec3 li
 }
 
 //Returns only the required intensity of the point light on the object. You need to multiply the texture or any other colors values seperately with the result of this function.
-vec3 CalcPointLight(PointLight light, vec3 Normal, vec3 FragPosition, vec3 viewDir, vec4 specularTex, float shadow)
+vec3 CalcPointLight(PointLight light, vec3 viewDir, vec4 specularTex, float shadow)
 {
-	vec3 lightDir = normalize(light.position - FragPosition);
-	vec3 norm = normalize(Normal);
+	//Normal mapping calculations
+	vec3 normal = texture(u_NormalMap, v_UV).rgb;
+	normal = normal * 2.0 - 1.0;
+	normal = normalize(v_TBN * normal);
+
+	vec3 lightDir = normalize(light.position - v_Position);
+	vec3 norm = normalize(v_Normal);
+
+	//Override default UVs here
+	norm = normal;
 
 	// ambient
 	vec3 ambient = vec3(light.color) * vec3(u_Material.ambientIntensity);
@@ -164,7 +187,7 @@ vec3 CalcPointLight(PointLight light, vec3 Normal, vec3 FragPosition, vec3 viewD
 	vec3 specular = vec3(light.specular) * vec3(light.color) * (spec * vec3(specularTex)) * vec3(u_Material.specularIntensity);
 
 	// attenuation
-	float distance = length(light.position - FragPosition);
+	float distance = length(light.position - v_Position);
 	float attenuation = 1.0 / (light.constant + light.Linear * distance + light.quadratic * (distance * distance));
 
 	ambient *= attenuation;
@@ -174,10 +197,19 @@ vec3 CalcPointLight(PointLight light, vec3 Normal, vec3 FragPosition, vec3 viewD
 	return (((shadow) * (diffuse + specular)) + (ambient * 0.0f)) * light.intensity;
 }
 
-vec3 CalcDirectionalLight(vec3 Normal, vec3 viewDir, vec3 FragPosition, float shadow, vec4 specularTex)
+vec3 CalcDirectionalLight(vec3 viewDir, float shadow, vec4 specularTex)
 {
-	vec3 norm = normalize(Normal);
-	vec3 lightDir = normalize(u_DirectionalLightPosition - FragPosition);
+	//Normal mapping calculations
+	vec3 normal = texture(u_NormalMap, v_UV).rgb;
+	normal = normal * 2.0 - 1.0;
+	normal = normalize(v_TBN * normal);
+
+	vec3 norm = normalize(v_Normal);
+
+	//Override default UVs here.
+	norm = normal;
+
+	vec3 lightDir = normalize(u_DirectionalLightPosition - v_Position);
 
 	//Ambient
 	vec3 AmbientDirectional = vec3(u_Material.ambientIntensity) * u_DirectionalLightColor;
@@ -207,8 +239,8 @@ void main()
 	vec3 Rreflect = reflect(Ireflect, normalize(v_Normal));
 	vec4 reflection = vec4(texture(u_Skybox, Rreflect).rgb, 1.0);
 
-	vec4 diffuseTexColor = texture(u_TextureSamplerDiffuse, v_UV);
-	vec4 specularTexColor = texture(u_TextureSamplerSpecular, v_UV);
+	vec4 diffuseTexColor = texture(u_DiffuseMap, v_UV);
+	vec4 specularTexColor = texture(u_SpecularMap, v_UV);
 
 	//Takes texture, object base color and metalness into acount.
 	vec3 ObjectProperties = vec3(diffuseTexColor) * vec3(u_Color) + (vec3(reflection) * u_Material.metalness);
@@ -224,7 +256,7 @@ void main()
 
 	//Add directional light calculation to target pixel
 	if (u_CastDirectionalLight > 0.5f)
-		FinalColor += CalcDirectionalLight(v_Normal, viewDir, v_Position, directionalShadow, specularTexColor) * ObjectProperties ;
+		FinalColor += CalcDirectionalLight(viewDir, directionalShadow, specularTexColor) * ObjectProperties;
 
 	//Add point light calculation to target pixel. (Each point light contributes to the final color)
 	for (int i = 0; i < u_PointLightCount; i++)
@@ -232,9 +264,9 @@ void main()
 		//Point Light shadow
 		float pointShadow = PointShadowCalculation(v_Position, i);
 		if (u_PointLights[i].castShadow > 0.5f)
-			FinalColor += CalcPointLight(u_PointLights[i], v_Normal, v_Position, viewDir, specularTexColor, pointShadow) * ObjectProperties;
+			FinalColor += CalcPointLight(u_PointLights[i], viewDir, specularTexColor, pointShadow) * ObjectProperties;
 		else
-			FinalColor += CalcPointLight(u_PointLights[i], v_Normal, v_Position, viewDir, specularTexColor, 1) * ObjectProperties;
+			FinalColor += CalcPointLight(u_PointLights[i], viewDir, specularTexColor, 1) * ObjectProperties;
 	}
 
 	//FinalColor = vec3(1.0f);

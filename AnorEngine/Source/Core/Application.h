@@ -9,7 +9,6 @@ namespace AnorEngine
 	{
 		//TODO: Remove these
 		class Event; // forward declaring.
-		class WindowResizeEvent;
 	}
 	class ANOR_API Application
 	{

@@ -66,7 +66,6 @@ namespace Game
 				float deltaTime = DeltaTime();
 
 				Renderer2D::RenderDirectionalLightShadowMap(m_Layer->GetScene());
-				//TODO: Need to render this for every point light source in the scene. Put it inside a loop.
 				Renderer2D::RenderPointLightShadowMaps(m_Layer->GetScene());
 
 				m_Framebuffer->Bind();
@@ -113,16 +112,24 @@ namespace Game
 						{
 							OpenScene(g_AssetPath / path);
 						}
-						else if (std::wstring(path).find(L".obj") != std::wstring::npos)
+						else
 						{	
-							Ref<Model> model = std::make_shared<Model>(g_AssetPath / path);
-							auto entity = m_Layer->GetScene()->CreateEntity("Unnamed Entity", "Model");
-							Ref<Graphics::Material> defaultMaterial = std::make_shared<Graphics::Material>(Graphics::ShaderLibrary::GetShader("3DShader"));
-							defaultMaterial->Properties.Ambient = 0.05f;
-							defaultMaterial->Properties.Diffuse = 1.0f;
-							defaultMaterial->Properties.Specular = 1.0f;
-							entity.AddComponent<MeshRendererComponent>(defaultMaterial);
-							entity.AddComponent<ModelRendererComponent>(model);
+							std::list<const wchar_t*> supportedFileTypes = { L".obj", L".fbx", L".gltf" };
+							for (auto& type : supportedFileTypes)
+							{
+								if (std::wstring(path).find(type) != std::wstring::npos) 
+								{
+									Ref<Model> model = std::make_shared<Model>(g_AssetPath / path);
+									auto entity = m_Layer->GetScene()->CreateEntity("Unnamed Entity", "Model");
+									Ref<Graphics::Material> defaultMaterial = std::make_shared<Graphics::Material>(Graphics::ShaderLibrary::GetShader("3DShader"));
+									defaultMaterial->Properties.Ambient = 0.05f;
+									defaultMaterial->Properties.Diffuse = 1.0f;
+									defaultMaterial->Properties.Specular = 1.0f;
+									entity.AddComponent<MeshRendererComponent>(defaultMaterial);
+									entity.AddComponent<ModelRendererComponent>(model);
+									break;
+								}
+							}
 						}
 					}
 					ImGui::EndDragDropTarget();

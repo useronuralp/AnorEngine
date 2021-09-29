@@ -14,7 +14,7 @@ namespace AnorEngine {
 	//!!!! THEN WILL COME THE TEXTURES YOU LOAD !!!!
 	namespace Graphics {
 		Texture::Texture(const std::filesystem::path& relativePath, const char* fileType)
-		{
+		{		
 			m_RelativeFilePath = relativePath.string();
 			if (fileType == "Asset")
 				m_AbsoluteFilePath = g_AssetPath.string() + "\\" + relativePath.string();
@@ -25,7 +25,6 @@ namespace AnorEngine {
 		void Texture::SetupTexture()
 		{
 			int width, height, channels;
-			stbi_set_flip_vertically_on_load(1); //in OpenGL the texture (0,0) starts at bottom left. Regular images you load need to be flipped in order to align with that rule.
 			stbi_uc* data = stbi_load(m_AbsoluteFilePath.c_str(), &width, &height, &channels, 0);
 			m_Width = width;
 			m_Channels = channels;
@@ -53,7 +52,14 @@ namespace AnorEngine {
 
 			glTextureSubImage2D(m_TextureID, 0, 0, 0, m_Width, m_Height, dataFormat, GL_UNSIGNED_BYTE, data);
 			if (data)
+			{
 				stbi_image_free(data);
+			}
+			else
+			{
+				CRITICAL_ASSERT("Textures failed to load from path: {0}", m_AbsoluteFilePath);
+				stbi_image_free(data);
+			}
 		}
 		Texture::~Texture()
 		{

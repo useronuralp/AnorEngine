@@ -256,7 +256,7 @@ namespace AnorEngine
 		{
 			for (auto entity : entities)
 			{
-				uint64_t uuid = entity["Entity"].as<uint64_t>(); // TODO
+				uint64_t uuid = entity["Entity"].as<uint64_t>();
 
 				std::string name;
 				std::string tag;
