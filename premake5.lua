@@ -41,6 +41,7 @@ project "AnorEngine"
 	{
 		"AnorEngine/Source/**.h",
 		"AnorEngine/Source/**.cpp",
+		"AnorEngine/Assets/Shaders/**.shader",
 		"AnorEngine/Vendor/ImGuiBuildHelpers/**.h",
 		"AnorEngine/Vendor/ImGuiBuildHelpers/**.cpp",
 		"AnorEngine/Vendor/Assimp/assimp/include/**.h",
