@@ -1,11 +1,10 @@
 #pragma once
-#include <Scene/Scene.h>
-#include <Scene/Entity.h>
-#include <imgui.h>
-#include <imgui_internal.h>
-#include "Graphics/Texture.h"
+#include "Scene/Entity.h"
 namespace AnorEngine
 {
+	//Forward declerations
+	class Scene;
+
 	class ANOR_API SceneHierarchyPanel
 	{
 	public:
@@ -13,7 +12,7 @@ namespace AnorEngine
 		SceneHierarchyPanel(const Ref<Scene>& scene);
 		void SetSelectionContext(int entityID) { m_SelectionContext = Entity{ (entt::entity)entityID, m_Context.get() }; }
 		void SetContext(const Ref<Scene>& scene);
-		bool OnImGuiRender();
+		void OnImGuiRender();
 	private:
 		void DrawEntityNode(Entity entity);
 		void DrawComponents(Entity entity);
@@ -55,7 +54,6 @@ namespace AnorEngine
 			}
 		}
 	private:
-		bool m_IsRuntime = false;
 		Ref<Scene> m_Context;
 		Entity m_SelectionContext;
 	};

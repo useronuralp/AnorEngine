@@ -1,6 +1,5 @@
 #pragma once
 #include "Graphics/Camera.h"
-
 namespace AnorEngine
 {
 	enum class ANOR_API ProjectionType

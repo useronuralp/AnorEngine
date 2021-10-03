@@ -1,8 +1,15 @@
 #include "pch.h"
 #include "SceneHierarchyPanel.h"
-#include <Scene/Components.h>
+#include "Scene/Entity.h"
+#include "Graphics/shader.h";
+#include "Graphics/Texture.h"
+#include "Renderer/renderer2D.h"
+#include "Scene/Components.h"
+#include "Scene/Scene.h"
 #include <imgui.h>
 #include <imgui_internal.h>
+#include <glm.hpp>
+#include <gtc/type_ptr.hpp>
 namespace AnorEngine
 {
 	static void DrawDragFloatControl(const char* label, float& value, float dragSensetivity = 0.01f, float minValue = 0.1f, float maxValue = 1.0f, float columnWidth = 100.0f)
@@ -177,11 +184,11 @@ namespace AnorEngine
 		DrawComponent<MeshRendererComponent>("Mesh Renderer", entity, [](auto& component)
 		{
 			DrawColorEdit4Control("Color", component.Color);
-			DrawDragFloatControl("Ambient", component.Material->Properties.Ambient, 0.01f, 0.0f, 1.0f);
-			DrawDragFloatControl("Diffuse", component.Material->Properties.Diffuse, 0.01f, 0.0f, 1.0f);
-			DrawDragFloatControl("Specular", component.Material->Properties.Specular, 0.01f, 0.0f, 1.0f);
-			DrawDragFloatControl("Shininess", component.Material->Properties.Shininess, 1.0f, 1.0f, 100.0f);
-			DrawDragFloatControl("Metalness", component.Material->Properties.Metalness, 0.01f, 0.0f, 1.0f);
+			DrawDragFloatControl("Ambient", component.Material->m_Properties.Ambient, 0.01f, 0.0f, 1.0f);
+			DrawDragFloatControl("Diffuse", component.Material->m_Properties.Diffuse, 0.01f, 0.0f, 1.0f);
+			DrawDragFloatControl("Specular", component.Material->m_Properties.Specular, 0.01f, 0.0f, 1.0f);
+			DrawDragFloatControl("Shininess", component.Material->m_Properties.Shininess, 1.0f, 1.0f, 100.0f);
+			DrawDragFloatControl("Metalness", component.Material->m_Properties.Metalness, 0.01f, 0.0f, 1.0f);
 
 			ImGui::PushID("Texture");
 			ImGui::BeginColumns("Columns", 2);
@@ -189,14 +196,14 @@ namespace AnorEngine
 			ImGui::TextUnformatted("Texture");
 			ImGui::NextColumn();
 			ImGui::SetNextItemWidth(-1);
-			ImGui::Button(component.Material->Texture->GetPath().c_str());	
+			ImGui::Button(component.Material->m_Texture->GetPath().c_str());	
 			if (ImGui::BeginDragDropTarget())
 			{
 				if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("CONTENT_BROWSER_ITEM"))
 				{
 					const wchar_t* path = (const wchar_t*)payload->Data;
 					if (std::wstring(path).find(L"Textures\\") != std::wstring::npos)
-						component.Material->Texture = Graphics::Renderer2D::CreateTexture(std::filesystem::path(path));
+						component.Material->m_Texture = Graphics::Renderer2D::CreateTexture(std::filesystem::path(path));
 				}
 				ImGui::EndDragDropTarget();
 			}
@@ -346,7 +353,7 @@ namespace AnorEngine
 			ImGui::Separator();
 		});
 	}
-	bool SceneHierarchyPanel::OnImGuiRender()
+	void SceneHierarchyPanel::OnImGuiRender()
 	{
 		ImGui::Begin("Scene Hierarchy");
 
@@ -375,9 +382,9 @@ namespace AnorEngine
 			if (ImGui::MenuItem("Cube Light"))
 			{
 				Ref<Graphics::Material> defaultMaterial = std::make_shared<Graphics::Material>(Graphics::ShaderLibrary::GetShader("LightCubeShader"));
-				defaultMaterial->Properties.Ambient = 0.2f;
-				defaultMaterial->Properties.Diffuse = 0.3f;
-				defaultMaterial->Properties.Specular = 1.0f;
+				defaultMaterial->m_Properties.Ambient = 0.2f;
+				defaultMaterial->m_Properties.Diffuse = 0.3f;
+				defaultMaterial->m_Properties.Specular = 1.0f;
 				auto entity = m_Context->CreateEntity();
 				entity.GetComponent<TransformComponent>().Scale = { 0.1f, 0.1f, 0.1f };
 				entity.AddComponent<MeshRendererComponent>(defaultMaterial);
@@ -390,13 +397,17 @@ namespace AnorEngine
 		ImGui::End();
 
 		ImGui::Begin("Properties");
+
 		//Check to see if there is something assigned to selection context, if so, draw its components.
 		if (m_SelectionContext)
 			DrawComponents(m_SelectionContext);
-	
-		DrawVec3Control("Direction Light Position", Graphics::Renderer2D::GetDirectionalLightPosition(), 2, 0.0, 180);
+
 		ImGui::End();
-		return m_IsRuntime;
+
+		ImGui::Begin("Global Settings");
+		DrawVec3Control("Directional Light Position", Graphics::Renderer2D::GetDirectionalLightPosition(), 2, 0.0, 200);
+		ImGui::End();
+
 	}
 	void SceneHierarchyPanel::DrawEntityNode(Entity entity)
 	{

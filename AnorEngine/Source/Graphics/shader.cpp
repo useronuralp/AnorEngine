@@ -1,9 +1,14 @@
 #include "pch.h"
 #include "shader.h"
+#include <glad/glad.h>
+#include <glm.hpp>
+#include <gtc/type_ptr.hpp>
+
+//Globals, defined in texture.h
+extern const std::filesystem::path g_AssetPath;
+extern const std::filesystem::path g_ResourcesPath;
+
 namespace AnorEngine {
-	//Globals, defined in texture.h
-	extern const std::filesystem::path g_AssetPath;
-	extern const std::filesystem::path g_ResourcesPath;
 
 	namespace Graphics {
 
@@ -66,7 +71,7 @@ namespace AnorEngine {
 				return GL_GEOMETRY_SHADER;
 		}
 
-		Shader::Shader(std::string name, std::string vertPath, std::string fragPath)
+		Shader::Shader(const std::string& name, const std::string& vertPath, const std::string& fragPath)
 			:m_Name(name)
 		{
 			std::unordered_map<GLenum, std::string> shaderSources;
@@ -76,7 +81,7 @@ namespace AnorEngine {
 			m_FragPath = fragPath;
 			Compile(shaderSources);
 		}
-		Shader::Shader(std::string name, std::string relativeFilePath)
+		Shader::Shader(const std::string& name, const std::string& relativeFilePath)
 			:m_Name(name)
 		{
 			m_AbsoluteFilePath = g_AssetPath.string() + "\\" + relativeFilePath;
@@ -186,7 +191,7 @@ namespace AnorEngine {
 			}
 			m_ShaderID = program;
 		}
-		std::string Shader::ReadFile(std::string absoluteFilePath)
+		std::string Shader::ReadFile(const std::string& absoluteFilePath)
 		{
 			std::string result;
 			std::ifstream in(absoluteFilePath, std::ios::in | std::ios::binary);
@@ -234,7 +239,7 @@ namespace AnorEngine {
 			}
 			return shaderSources;
 		}
-		void Shader::UploadUniform(std::string uniformName, size_t size, const void* data)
+		void Shader::UploadUniform(const std::string& uniformName, size_t size, const void* data)
 		{
 			if (m_UniformBuffer.find(uniformName) != m_UniformBuffer.end())
 			{
@@ -299,7 +304,7 @@ namespace AnorEngine {
 			}
 #endif
 		}
-		GLint Shader::GetUniformLocation(std::string name)
+		GLint Shader::GetUniformLocation(const std::string& name)
 		{
 			if (m_UniformLocationCache.find(name) != m_UniformLocationCache.end())
 				return m_UniformLocationCache[name];
@@ -308,47 +313,47 @@ namespace AnorEngine {
 			m_UniformLocationCache[name] = location;
 			return location;
 		}
-		void Shader::UploadFloat(const std::string name, const float value)
+		void Shader::UploadFloat(const std::string& name, const float value)
 		{
 			Enable();
 			glUniform1f(GetUniformLocation(name), value);
 		}
-		void Shader::UploadFloatArray(const std::string name, float* value, int count)
+		void Shader::UploadFloatArray(const std::string& name, float* value, int count)
 		{
 			Enable();
 			glUniform1fv(GetUniformLocation(name), count, value);
 		}
-		void Shader::UploadInteger(const std::string name, const int value)
+		void Shader::UploadInteger(const std::string& name, const int value)
 		{
 			Enable();
 			glUniform1i(GetUniformLocation(name), value);
 		}
-		void Shader::UploadFloat2(const std::string name, const glm::vec2& vector)
+		void Shader::UploadFloat2(const std::string& name, const glm::vec2& vector)
 		{
 			Enable();
 			glUniform2f(GetUniformLocation(name), vector.x, vector.y);
 		}
-		void Shader::UploadFloat3(const std::string name, const glm::vec3& vector)
+		void Shader::UploadFloat3(const std::string& name, const glm::vec3& vector)
 		{
 			Enable();
 			glUniform3f(GetUniformLocation(name), vector.x, vector.y, vector.z);
 		}
-		void Shader::UploadFloat4(const std::string name, const glm::vec4& vector)
+		void Shader::UploadFloat4(const std::string& name, const glm::vec4& vector)
 		{
 			Enable();
 			glUniform4f(GetUniformLocation(name), vector.x, vector.y, vector.z, vector.w);
 		}
-		void Shader::UploadMat4(const std::string name, const glm::mat4& matrix)
+		void Shader::UploadMat4(const std::string& name, const glm::mat4& matrix)
 		{
 			Enable();
 			glUniformMatrix4fv(GetUniformLocation(name), 1, GL_FALSE, glm::value_ptr(matrix));
 		}
-		void Shader::UploadMat4Array(const std::string name, const glm::mat4& matrix, const int& count)
+		void Shader::UploadMat4Array(const std::string& name, const glm::mat4& matrix, const int& count)
 		{
 			Enable();
 			glUniformMatrix4fv(GetUniformLocation(name), count, GL_FALSE, glm::value_ptr(matrix));
 		}
-		void Shader::UploadIntegerArray(const std::string name, int* values, uint32_t count)
+		void Shader::UploadIntegerArray(const std::string& name, int* values, uint32_t count)
 		{
 			Enable();
 			glUniform1iv(GetUniformLocation(name), count, values);

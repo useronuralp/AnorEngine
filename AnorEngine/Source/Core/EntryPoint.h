@@ -4,14 +4,13 @@
 #include "pch.h"
 #include "Application.h"
 #include "Graphics/Layers/LayerStack.h"
-namespace Game
-{
-	extern AnorEngine::Application* CreateApplication();
-}
+
+extern AnorEngine::Application* CreateApplication();
+
 
 int main()
 {	
-	auto app = Game::CreateApplication();
+	auto app = CreateApplication();
 	app->Run();
 	delete app;
 	system("pause");

@@ -1,10 +1,13 @@
 #pragma once
-#include <GL/glew.h>
-#include "../Utility/fileutils.h"
 #include <glm.hpp>
-#include <gtc/type_ptr.hpp>
+#include "Utility/fileutils.h"
 namespace AnorEngine {
 	namespace Graphics {
+
+		//Forward declerations:
+		using GLenum = unsigned int;
+		using GLint = int;
+		using GLuint = unsigned int;
 
 		struct UniformData
 		{
@@ -23,31 +26,31 @@ namespace AnorEngine {
 			std::unordered_map<std::string, GLint>       m_UniformLocationCache;
 			std::unordered_map<std::string, UniformData> m_UniformBuffer;
 		public:
-			Shader(std::string name, std::string vertPath, std::string fragPath);
-			Shader(std::string name, std::string relativeFilePath);
+			Shader(const std::string& name, const std::string& vertPath, const std::string& fragPath);
+			Shader(const std::string& name, const std::string& relativeFilePath);
 			~Shader();	
 		public:
 			inline const std::string& GetName() const { return m_Name; }
 		public:
-			void UploadUniform(std::string uniformName, size_t size, const void* data);
+			void UploadUniform(const std::string& uniformName, size_t size, const void* data);
 			void Enable();
 			void Disable() const;
 		public:
-			void UploadFloat(const std::string name, const float value);
-			void UploadFloatArray(const std::string name, float* value,int count);
-			void UploadInteger(const std::string name, const int value);
-			void UploadFloat2(const std::string name, const glm::vec2 &vector);
-			void UploadFloat3(const std::string name, const glm::vec3& vector);
-			void UploadFloat4(const std::string name, const glm::vec4& vector);
-			void UploadMat4(const std::string name, const glm::mat4& matrix);
-			void UploadMat4Array(const std::string name,const glm::mat4& matrix, const int& count);
-			void UploadIntegerArray(const std::string name, int* values, uint32_t count);
+			void UploadFloat(const std::string& name, const float value);
+			void UploadFloatArray(const std::string& name, float* value,int count);
+			void UploadInteger(const std::string& name, const int value);
+			void UploadFloat2(const std::string& name, const glm::vec2& vector);
+			void UploadFloat3(const std::string& name, const glm::vec3& vector);
+			void UploadFloat4(const std::string& name, const glm::vec4& vector);
+			void UploadMat4(const std::string& name, const glm::mat4& matrix);
+			void UploadMat4Array(const std::string& name,const glm::mat4& matrix, const int& count);
+			void UploadIntegerArray(const std::string& name, int* values, uint32_t count);
 		public:
 			void FillUniformBuffer();
-			std::string ReadFile(std::string filepath);
+			std::string ReadFile(const std::string& filepath);
 			std::unordered_map<GLenum, std::string> PreProcess(const std::string& source);
 			void Compile(const std::unordered_map<GLenum, std::string>& shaderSources);
-			GLint GetUniformLocation(std::string name);
+			GLint GetUniformLocation(const std::string& name);
 		public:
 			inline const std::string GetFilePath() const { return m_AbsoluteFilePath; }
 			inline GLuint getShaderID() const { return m_ShaderID; }

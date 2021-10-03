@@ -83,6 +83,7 @@ uniform int			u_PointLightCount;
 uniform float		u_PointLigthFarPlane;
 uniform int		    u_EntityID;
 
+uniform sampler2D   u_HDRBuffer;
 uniform sampler2D   u_DiffuseMap;
 
 float PointShadowCalculation(vec3 fragPos, int index)

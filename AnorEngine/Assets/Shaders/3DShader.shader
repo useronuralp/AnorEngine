@@ -97,9 +97,12 @@ uniform int			u_PointLightCount;
 uniform float		u_PointLigthFarPlane;
 uniform int		    u_EntityID;
 
+
+uniform sampler2D   u_HDRBuffer;
 uniform sampler2D   u_DiffuseMap;
 uniform sampler2D   u_SpecularMap;
 uniform sampler2D   u_NormalMap;
+//uniform sampler2D   u_DepthMap;
 
 float PointShadowCalculation(vec3 fragPos, int index)
 {
@@ -140,7 +143,7 @@ float DirectionalShadowCalculation(vec4 fragPosLightSpace, vec3 fragPos, vec3 li
 	float currentDepth = projCoords.z;
 	//Shadow bias to eliminate shadow acne, this bias might need tweaking in the future for each scene.
 	vec3 lightDir = normalize(lightPosition - fragPos);
-	float bias = max(0.0001 * (1.0 - dot(normal, lightDir)), 0.000001);
+	float bias = max(0.001 * (1.0 - dot(normal, lightDir)), 0.001);
 	// check whether current frag pos is in shadow
 	float shadow = 0.0;
 	vec2 texelSize = 1.0 / textureSize(u_DirectionalShadowMap, 0);
@@ -226,8 +229,21 @@ vec3 CalcDirectionalLight(vec3 viewDir, float shadow, vec4 specularTex)
 	return ((1.0 - shadow) * (DiffuseDirectional + SpecularDirectional) + AmbientDirectional);
 }
 
+//vec2 ParallaxMapping(vec2 texCoords, vec3 viewDir)
+//{
+//	float height_scale = 0.1;
+//	float height = texture(u_DepthMap, texCoords).r;
+//	vec2 p = viewDir.xy / viewDir.z * (height * height_scale);
+//	return texCoords - p;
+//}
+
 void main()
 {
+	//Used for parallax / displacement mapping
+	vec3 TangentLightPos = v_TBN * u_DirectionalLightPosition;
+	vec3 TangentViewPos = v_TBN * u_CameraPos;
+	vec3 TangentFragPos = v_TBN * v_Position;
+
 	//Refraction
 	float ratio = 1.00 / 1.52;
 	vec3 Irefract = normalize(v_Position - u_CameraPos);
@@ -245,16 +261,15 @@ void main()
 	//Takes texture, object base color and metalness into acount.
 	vec3 ObjectProperties = vec3(diffuseTexColor) * vec3(u_Color) + (vec3(reflection) * u_Material.metalness);
 
+	//View direcion, calculated from camera position.
 	vec3 viewDir = normalize(u_CameraPos - v_Position);
 
-	//Object looks completely dark when not lit.
+	//Initializing objects color to complete black.
 	vec3 FinalColor = { 0,0,0 };
 
-
-	//Directional Shadow
+	//Directional shadow
 	float directionalShadow = DirectionalShadowCalculation(v_FragPosLightSpace, v_Position, u_DirectionalLightPosition, v_Normal);
 
-	//Add directional light calculation to target pixel
 	if (u_CastDirectionalLight > 0.5f)
 		FinalColor += CalcDirectionalLight(viewDir, directionalShadow, specularTexColor) * ObjectProperties;
 
@@ -269,8 +284,20 @@ void main()
 			FinalColor += CalcPointLight(u_PointLights[i], viewDir, specularTexColor, 1) * ObjectProperties;
 	}
 
-	//FinalColor = vec3(1.0f);
+	const float gamma = 2.2;
+	vec3 hdrColor = texture(u_HDRBuffer, v_UV).rgb;
+
+	// reinhard tone mapping
+	vec3 mapped = hdrColor / (hdrColor + vec3(1.0));
+	// gamma correction 
+	mapped = pow(mapped, vec3(1.0 / gamma));
+
+	//Color = vec4(mapped, 1.0);
+
+
+	//Outputting to the primary color buffers
 	Color = vec4(FinalColor, 1.0);
+	//Outputting to the second buffer our entity ID
 	IntegerColorBuffer = u_EntityID;
 }
 

@@ -1,5 +1,9 @@
 #include "pch.h"
 #include "EventHandler.h"
+#include "Core/Application.h"
+#include "Graphics/OpenGLWindow.h"
+#include "Event.h"
+#include <GLFW/glfw3.h>
 namespace AnorEngine
 {
 	namespace Input
@@ -25,7 +29,7 @@ namespace AnorEngine
 			glfwGetCursorPos(windowPtr, &xpos, &ypos);
 			return ypos;
 		}
-		bool EventHandler::IsMousePressed(int button)
+		bool EventHandler::IsMouseButtonDown(int button)
 		{
 			return glfwGetMouseButton(s_TargetApplication->GetOpenGLWindow()->GetNativeWindow(), button);
 		}

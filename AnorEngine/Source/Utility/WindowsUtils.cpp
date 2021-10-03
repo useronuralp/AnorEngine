@@ -1,6 +1,7 @@
 #include "pch.h"
 #include "WindowsUtils.h"
 #include "Core/Application.h"
+#include "Graphics/OpenGLWindow.h"
 #include <commdlg.h>
 #include <GLFW/glfw3.h>
 #define GLFW_EXPOSE_NATIVE_WIN32

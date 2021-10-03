@@ -1,5 +1,15 @@
 #include "pch.h"
 #include "mesh.h"
+#include "shader.h"
+#include "EditorCamera.h"
+#include <gtc/matrix_transform.hpp>
+#include <gtc/type_ptr.hpp>
+#include <assimp/Importer.hpp>
+#include <assimp/scene.h>
+#include <assimp/postprocess.h>
+#include <Graphics/texture.h>
+#include <Graphics/Buffers/VertexArray.h>
+#include <stb_image.h>
 namespace AnorEngine {
     namespace Graphics {
         Mesh::Mesh(const std::vector<Vertex>& vertices, const std::vector<unsigned int>& indices, const std::vector<Ref<Texture>>& textures)
@@ -20,7 +30,6 @@ namespace AnorEngine {
             }
             for (auto& texture : m_Textures)
             {
-                //TODO: Handle the case where not all the maps are present in the model file. Example: Model is missing the specular map but has the diffuse. It should still reneder diffuse.
                 if (texture->GetType() == "texture_diffuse")
                     shader->UploadUniform("u_DiffuseMap", sizeof(texture->GetTextureID()), &texture->GetTextureID());
                 else if (texture->GetType() == "texture_specular")

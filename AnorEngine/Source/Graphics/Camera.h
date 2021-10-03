@@ -1,8 +1,5 @@
 #pragma once
-#include <GLFW/glfw3.h>
 #include <glm.hpp>
-#include <gtc/type_ptr.hpp>
-#include <gtc/matrix_transform.hpp>
 namespace AnorEngine
 {
 	namespace Graphics
@@ -47,7 +44,7 @@ namespace AnorEngine
 			glm::mat4 m_ProjectionMatrix;
 			glm::mat4 m_ViewMatrix;
 			PerspectiveCamera(float height, float weight);
-			double GetRenderTime() { return glfwGetTime(); }
+			double GetRenderTime();
 			void OnUpdate();
 		};
 
@@ -67,7 +64,7 @@ namespace AnorEngine
 			const glm::mat4& GetViewMatrix() { return m_ViewMatrix; }
 			const glm::mat4& GetViewProjectionMatrix() { return m_ViewProjectionMatrix; }
 
-			double GetRenderTime() { return glfwGetTime(); }
+			double GetRenderTime();
 		private:
 			void RecalculateViewProjectionMatrix();
 		private:

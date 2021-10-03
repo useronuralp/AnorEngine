@@ -14,7 +14,7 @@ namespace AnorEngine {
 			std::string m_Type = "Not initialized";
 		private:
 			void SetupTexture();
-		public: //Constructors / destructors
+		public: 
 			Texture(const std::filesystem::path& relativePath, const char* fileType = "Asset");
 			~Texture();
 		public: // Member functions

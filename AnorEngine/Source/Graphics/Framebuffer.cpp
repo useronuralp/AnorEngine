@@ -11,7 +11,8 @@ namespace AnorEngine
 			switch (format)
 			{
 				case FramebufferTextureFormat::RED_INTEGER:	return GL_RED_INTEGER; break;
-				case FramebufferTextureFormat::RGBA8:       return GL_RGBA8;        break;
+				case FramebufferTextureFormat::RGBA8:       return GL_RGBA8;       break;
+				case FramebufferTextureFormat::RGBA16F:     return GL_RGBA16F;     break;
 			}
 			return GL_INVALID_ENUM;
 		}
@@ -127,11 +128,11 @@ namespace AnorEngine
 			if (m_Specs.FramebufferID) //If the ID is not 0, then it means this framebuffer was already in use and we want to delete it and start the recreation fresh.
 			{
 				glDeleteFramebuffers(1, &m_Specs.FramebufferID);
-				glDeleteTextures(m_ColorAttachments.size(), m_ColorAttachments.data());
-				glDeleteTextures(1, &m_DepthAttachment);
+				glDeleteTextures(m_ColorAttachmentTextureIDs.size(), m_ColorAttachmentTextureIDs.data());
+				glDeleteTextures(1, &m_DepthAttachmentTextureID);
 				
-				m_ColorAttachments.clear();
-				m_DepthAttachment = 0;
+				m_ColorAttachmentTextureIDs.clear();
+				m_DepthAttachmentTextureID = 0;
 			}
 
 			glCreateFramebuffers(1, &m_Specs.FramebufferID);
@@ -142,20 +143,23 @@ namespace AnorEngine
 			//Attachments
 			if(m_ColorAttachmentsSpecs.size()) // Check if there is any attachments in here.
 			{
-				m_ColorAttachments.resize(m_ColorAttachmentsSpecs.size());
-				//Passing a pointer to the empty m_ColorAttachments to the CreateTextures. Memory block of m_ColorAttachments will be filled by CreateTextures.
-				CreateTextures(multisample, m_Specs.Texture_Type, m_ColorAttachments.data(), m_ColorAttachments.size());
-				for(size_t i = 0; i < m_ColorAttachments.size(); i++)
+				m_ColorAttachmentTextureIDs.resize(m_ColorAttachmentsSpecs.size());
+				//Passing a pointer to the empty m_ColorAttachmentTextureIDs to the CreateTextures. Memory block of m_ColorAttachmentTextureIDs will be filled by CreateTextures.
+				CreateTextures(multisample, m_Specs.Texture_Type, m_ColorAttachmentTextureIDs.data(), m_ColorAttachmentTextureIDs.size());
+				for(size_t i = 0; i < m_ColorAttachmentTextureIDs.size(); i++)
 				{
-					BindTexture(multisample, m_Specs.Texture_Type, m_ColorAttachments[i]);
+					BindTexture(multisample, m_Specs.Texture_Type, m_ColorAttachmentTextureIDs[i]);
 					switch(m_ColorAttachmentsSpecs[i].TextureFormat)
 					{
 						//This switch is where you extend this code path when there is more types to add.
 						case FramebufferTextureFormat::RGBA8:
-							AttachColorTexture(m_ColorAttachments[i], m_Specs.Samples, GL_RGBA8, GL_RGBA, m_Specs.Texture_Type, GL_UNSIGNED_BYTE, m_Specs.Width, m_Specs.Height, i);
+							AttachColorTexture(m_ColorAttachmentTextureIDs[i], m_Specs.Samples, GL_RGBA8, GL_RGBA, m_Specs.Texture_Type, GL_UNSIGNED_BYTE, m_Specs.Width, m_Specs.Height, i);
 							break;
 						case FramebufferTextureFormat::RED_INTEGER:
-							AttachColorTexture(m_ColorAttachments[i], m_Specs.Samples, GL_R32I, GL_RED_INTEGER, m_Specs.Texture_Type, GL_INT, m_Specs.Width, m_Specs.Height, i);
+							AttachColorTexture(m_ColorAttachmentTextureIDs[i], m_Specs.Samples, GL_R32I, GL_RED_INTEGER, m_Specs.Texture_Type, GL_INT, m_Specs.Width, m_Specs.Height, i);
+							break;
+						case FramebufferTextureFormat::RGBA16F:
+							AttachColorTexture(m_ColorAttachmentTextureIDs[i], m_Specs.Samples, GL_RGBA16F, GL_RGBA, m_Specs.Texture_Type, GL_FLOAT, m_Specs.Width, m_Specs.Height, i);
 							break;
 					}
 				}
@@ -163,21 +167,21 @@ namespace AnorEngine
 			
 			if (m_DepthAttachmentSpec.TextureFormat != FramebufferTextureFormat::None)
 			{
-				CreateTextures(multisample, m_Specs.Texture_Type, &m_DepthAttachment, 1);
-				BindTexture(multisample, m_Specs.Texture_Type, m_DepthAttachment);
+				CreateTextures(multisample, m_Specs.Texture_Type, &m_DepthAttachmentTextureID, 1);
+				BindTexture(multisample, m_Specs.Texture_Type, m_DepthAttachmentTextureID);
 				switch (m_DepthAttachmentSpec.TextureFormat)
 				{
 					case FramebufferTextureFormat::DEPTH24STENCIL8:
-						AttachDepthTexture(m_DepthAttachment, m_Specs.Samples, GL_DEPTH24_STENCIL8, m_Specs.Texture_Type, GL_DEPTH_STENCIL_ATTACHMENT, m_Specs.Width, m_Specs.Height);
+						AttachDepthTexture(m_DepthAttachmentTextureID, m_Specs.Samples, GL_DEPTH24_STENCIL8, m_Specs.Texture_Type, GL_DEPTH_STENCIL_ATTACHMENT, m_Specs.Width, m_Specs.Height);
 						break;
 				}
 			}
 			
-			if (m_ColorAttachments.size() > 1)
+			if (m_ColorAttachmentTextureIDs.size() > 1)
 			{
 				//Currently supporting max 4 color attachments.
 				GLenum buffers[4] = { GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1, GL_COLOR_ATTACHMENT2, GL_COLOR_ATTACHMENT3 };
-				if (m_ColorAttachments.size() > 4)
+				if (m_ColorAttachmentTextureIDs.size() > 4)
 				{
 					CRITICAL_ASSERT("Buffer size overflowed!");
 				}
@@ -185,9 +189,9 @@ namespace AnorEngine
 				// a second layout(location = 1) out vec4 color2; like this.
 				
 				//The default value for this call is glDrawBuffers(GL_COLOR_ATTACHMENT0); That is why you don't need to specify a color attachment when you draw using only the default one. It calls this function itself.
-				glDrawBuffers(m_ColorAttachments.size(), buffers);
+				glDrawBuffers(m_ColorAttachmentTextureIDs.size(), buffers);
 			}
-			else if (m_ColorAttachments.empty())
+			else if (m_ColorAttachmentTextureIDs.empty())
 			{
 				// Only depth-pass
 				glDrawBuffer(GL_NONE);
@@ -203,8 +207,8 @@ namespace AnorEngine
 		Framebuffer::~Framebuffer()
 		{
 			glDeleteFramebuffers(1, &m_Specs.FramebufferID);
-			glDeleteTextures(m_ColorAttachments.size(), m_ColorAttachments.data());
-			glDeleteTextures(1, &m_DepthAttachment);
+			glDeleteTextures(m_ColorAttachmentTextureIDs.size(), m_ColorAttachmentTextureIDs.data());
+			glDeleteTextures(1, &m_DepthAttachmentTextureID);
 		}
 		void Framebuffer::Bind()
 		{
@@ -216,19 +220,19 @@ namespace AnorEngine
 			auto format = FromAnorFormatToOpenGLFormat(m_ColorAttachmentsSpecs[colorAttachmentID].TextureFormat);
 			
 			//Since the clear value is int in the function paramater, the type is hard coded to GL_INT for now.
-			glClearTexImage(m_ColorAttachments[colorAttachmentID], 0, format, GL_INT, &clearValue);
+			glClearTexImage(m_ColorAttachmentTextureIDs[colorAttachmentID], 0, format, GL_INT, &clearValue);
 		}
 		void Framebuffer::BindDepthAttachmentTexture()
 		{
 			switch (m_Specs.Texture_Type)
 			{
 				case TextureType::TEXTURE_2D:
-					glActiveTexture(GL_TEXTURE0 + m_DepthAttachment % 32); //allows you to speicfy a texture slot, usually on pc there are 32 texture.
-					glBindTexture(GL_TEXTURE_2D, m_DepthAttachment);
+					glActiveTexture(GL_TEXTURE0 + m_DepthAttachmentTextureID % 32); //allows you to speicfy a texture slot, usually on pc there are 32 texture.
+					glBindTexture(GL_TEXTURE_2D, m_DepthAttachmentTextureID);
 					break;
 				case TextureType::CUBEMAP:
-					glActiveTexture(GL_TEXTURE0 + m_DepthAttachment % 32); //allows you to speicfy a texture slot, usually on pc there are 32 texture.
-					glBindTexture(GL_TEXTURE_CUBE_MAP, m_DepthAttachment);
+					glActiveTexture(GL_TEXTURE0 + m_DepthAttachmentTextureID % 32); //allows you to speicfy a texture slot, usually on pc there are 32 texture.
+					glBindTexture(GL_TEXTURE_CUBE_MAP, m_DepthAttachmentTextureID);
 					break;
 			}
 		}
@@ -252,7 +256,7 @@ namespace AnorEngine
 
 		int Framebuffer::ReadPixel(uint32_t attachmentIndex, int x, int y)
 		{
-			if (attachmentIndex > m_ColorAttachments.size())
+			if (attachmentIndex > m_ColorAttachmentTextureIDs.size())
 			{
 				CRITICAL_ASSERT("Sizes dont match!");
 			}

@@ -5,225 +5,65 @@
 #include "Utility/WindowsUtils.h"
 #include "ExampleLayer.h"
 #include "Panels/ContentBrowserPanel.h"
-#include "Graphics/Mesh.h"
-namespace AnorEngine
+
+using namespace AnorEngine;
+using namespace Graphics;
+
+
+//Defined in texture.cpp
+extern const std::filesystem::path g_AssetPath;
+extern const std::filesystem::path g_ResourcesPath;
+
+class AnorEditor : public Application
 {
-	extern const std::filesystem::path g_AssetPath;
-	extern const std::filesystem::path g_ResourcesPath;
-}
-namespace Game
-{
-	using namespace AnorEngine;
-	using namespace Graphics;
-	class AnorEditor : public Application
+private:
+	Ref<SceneHierarchyPanel>          m_SceneHierarchyPanel;
+	Ref<ContentBrowserPanel>          m_ContentBrowserPanel;
+	LayerStack						  m_LayerStack;
+	Ref<OrthographicCamera>			  m_OrthoCamera;
+	Ref<EditorCamera>				  m_EditorCamera;
+	Ref<ExampleLayer>				  m_Layer;
+	ViewportVariables				  m_ViewportVariables;
+	float							  m_LastFrameRenderTime;
+	bool							  m_Minimized = false;
+	bool							  m_IsRuntime = false; 
+public:
+	AnorEditor(const char* appName)
+		:Application(appName), m_OrthoCamera(std::make_shared<OrthographicCamera>(-1280.0f / 720.0f * (5), 1280.0f / 720.0f * (5), -1 * (5), 1 * (5)))
 	{
-	private:
-		Ref<SceneHierarchyPanel>          m_SceneHierarchyPanel;
-		Ref<ContentBrowserPanel>          m_ContentBrowserPanel;
-		LayerStack						  m_LayerStack;
-		Ref<OrthographicCamera>			  m_OrthoCamera;
-		Ref<EditorCamera>				  m_EditorCamera;
-		Ref<PerspectiveCamera>			  m_PersCamera;
-		Ref<ExampleLayer>				  m_Layer;
-		Ref<Framebuffer>				  m_Framebuffer;
-		//Ref<Scene>						  m_ActiveScene;
-		glm::vec2						  m_ViewportSize;
-		glm::vec2						  m_MousePositionRelativeToRenderViewport;
-		glm::vec2						  m_ViewportBounds[2];
-		float							  m_LastFrameRenderTime;
-		bool							  m_Minimized = false;
-		bool							  m_ViewportHovered = false;
-		bool							  m_ViewportFocused = false;
-		bool							  m_BlockEvents = false;
-		bool							  m_IsRuntime = false; 
-		int								  m_HoveredPixel = -1;
-		std::vector<ProfileResult>		  m_ProfileResults;
-	public:
-		AnorEditor(const char* appName)
-			:Application(appName), m_OrthoCamera(std::make_shared<OrthographicCamera>(-1280.0f / 720.0f * (5), 1280.0f / 720.0f * (5), -1 * (5), 1 * (5))), m_PersCamera(std::make_shared<PerspectiveCamera>(1280, 720))
+		Input::EventHandler::SetTargetApplication(this); //Important to set this to the active Application else, you won't get your input processed.	
+		//Camera////////////////////////////////////////
+		m_EditorCamera = std::make_shared<EditorCamera>();
+		//Layer Creation////////////////////////////////
+		m_Layer = std::make_shared<ExampleLayer>(m_EditorCamera);
+		//Panels////////////////////////////////
+		m_ContentBrowserPanel = std::make_shared<ContentBrowserPanel>();
+		m_SceneHierarchyPanel = std::make_shared<SceneHierarchyPanel>(m_Layer->GetScene());
+		//Layer insertion/////////////////////////////////
+		PushLayer(m_Layer);
+	}
+public:
+	virtual void Run() override
+	{
+		while (!m_OpenGLWindow->IsClosed())
 		{
-			Input::EventHandler::SetTargetApplication(this); //Important to set this to the active Application else, you won't get your input processed.	
-			//Framebuffer////////////////////////////////////////
-			FramebufferSpecifications fbSpecs;
-			fbSpecs.Texture_Type = TextureType::TEXTURE_2D;
-			fbSpecs.Attachments = { {FramebufferTextureFormat::RGBA8}, {FramebufferTextureFormat::RED_INTEGER}, {FramebufferTextureFormat::DEPTH24STENCIL8} };
-			m_Framebuffer = std::make_shared<Framebuffer>(fbSpecs);
-			//Camera////////////////////////////////////////
-			m_EditorCamera = std::make_shared<EditorCamera>();
-			//Layer Creation////////////////////////////////
-			m_Layer = std::make_shared<ExampleLayer>(m_EditorCamera);
-			//Panels////////////////////////////////
-			m_ContentBrowserPanel = std::make_shared<ContentBrowserPanel>();
-			m_SceneHierarchyPanel = std::make_shared<SceneHierarchyPanel>(m_Layer->GetScene());
-			//Layer insertion/////////////////////////////////
-			PushLayer(m_Layer);
-		}
-	public:
-		virtual void Run() override
-		{
-			while (!m_OpenGLWindow->IsClosed())
+			float deltaTime = DeltaTime();
+
+			Renderer2D::RenderDirectionalLightShadowMap(m_Layer->GetScene());
+			Renderer2D::RenderPointLightShadowMaps(m_Layer->GetScene());
+
+			Renderer2D::PreRender();
+			if (!m_Minimized) //We don't want to render if the window is minimized.
 			{
-				float deltaTime = DeltaTime();
-
-				Renderer2D::RenderDirectionalLightShadowMap(m_Layer->GetScene());
-				Renderer2D::RenderPointLightShadowMaps(m_Layer->GetScene());
-
-				m_Framebuffer->Bind();
-				Renderer2D::ClearColor(glm::vec4(0.1f, 0.1f, 0.1f, 1));
-				Renderer2D::Clear();
-				m_Framebuffer->ClearTextureAttachmentWithIntegerValue(1, -1);
-				if (!m_Minimized) //We don't want to render if the window is minimized.
-				{
-					for (Ref<Layer> layer : m_LayerStack)
-					{
-						layer->OnUpdate(m_IsRuntime, deltaTime);
-					}
-				}
-				m_Framebuffer->Unbind();
-				ImGuiBase::Begin(); //-----------------------ImGui Beginning-------------------------
-
-				//ImGui::ShowDemoWindow();
-				ImGuiDockspaceSetup();
-				m_IsRuntime = m_SceneHierarchyPanel->OnImGuiRender();
-				m_ContentBrowserPanel->OnImGuiRender();
-				//Frames of the scene will be rendered to this panel. Every frame will be rendered to a framebuffer and ImGui will read that data in here and render it to one of its viewport window objects as a texture. 
-				ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0, 0));
-				ImGui::Begin("Viewport");
-				m_ViewportFocused = ImGui::IsWindowFocused();
-				m_ViewportHovered = ImGui::IsWindowHovered();
-				m_BlockEvents = !m_ViewportFocused || !m_ViewportHovered;
-				//Saving the viewport size in m_ViewportSize.
-				m_ViewportSize.x = ImGui::GetContentRegionAvail().x;
-				m_ViewportSize.y = ImGui::GetContentRegionAvail().y;
-
-				//Mouse picking calculations.
-				ReadDataFromMousePos();
-
-				int depthBuffer = 12;
-				uint32_t texture = m_Framebuffer->GetColorAttachmentID();
-				ImGui::Image((void*)texture, { m_Framebuffer->GetDimensions().x, m_Framebuffer->GetDimensions().y }, { 0,1 }, { 1,0 });
-
-				if (ImGui::BeginDragDropTarget())
-				{				
-					if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("CONTENT_BROWSER_ITEM"))
-					{
-						const wchar_t* path = (const wchar_t*)payload->Data;
-						if (std::wstring(path).find(L"Scenes\\") != std::wstring::npos)
-						{
-							OpenScene(g_AssetPath / path);
-						}
-						else
-						{	
-							std::list<const wchar_t*> supportedFileTypes = { L".obj", L".fbx", L".gltf" };
-							for (auto& type : supportedFileTypes)
-							{
-								if (std::wstring(path).find(type) != std::wstring::npos) 
-								{
-									Ref<Model> model = std::make_shared<Model>(g_AssetPath / path);
-									auto entity = m_Layer->GetScene()->CreateEntity("Unnamed Entity", "Model");
-									Ref<Graphics::Material> defaultMaterial = std::make_shared<Graphics::Material>(Graphics::ShaderLibrary::GetShader("3DShader"));
-									defaultMaterial->Properties.Ambient = 0.05f;
-									defaultMaterial->Properties.Diffuse = 1.0f;
-									defaultMaterial->Properties.Specular = 1.0f;
-									entity.AddComponent<MeshRendererComponent>(defaultMaterial);
-									entity.AddComponent<ModelRendererComponent>(model);
-									break;
-								}
-							}
-						}
-					}
-					ImGui::EndDragDropTarget();
-				}
-
-				ImGui::End();
-				ImGui::PopStyleVar();
-
-				ImGuiBase::End(); //-----------------------ImGui END -------------------------------
-
-				//Try to resize the framebuffer at the end. Otherwise it causes weird flickering problems.
-				UpdateScreenBoundaries();
-
-				m_EditorCamera->OnUpdate(deltaTime, m_ViewportHovered);
-				m_ProfileResults.clear();
-				m_OpenGLWindow->Update();
+				for (Ref<Layer> layer : m_LayerStack)
+					Renderer2D::RenderScene(layer, m_IsRuntime, deltaTime);
 			}
-		}
-		void ReadDataFromMousePos()
-		{
-			auto viewPortOffset = ImGui::GetCursorPos();
-			auto windowSize = ImGui::GetWindowSize();
-			auto minBound = ImGui::GetWindowPos();
-			ImVec2 maxBound = { minBound.x + windowSize.x, minBound.y + windowSize.y };
-			minBound.x += viewPortOffset.x;
-			minBound.y += viewPortOffset.y;
-			m_ViewportBounds[0] = { minBound.x, minBound.y };
-			m_ViewportBounds[1] = { maxBound.x, maxBound.y };
-			auto [mx, my] = ImGui::GetMousePos();
-			mx -= m_ViewportBounds[0].x;
-			my -= m_ViewportBounds[0].y;
-			my = m_ViewportSize.y - my;
-			int mouseX = (int)mx;
-			int mouseY = (int)my;
-			m_MousePositionRelativeToRenderViewport.x = mouseX;
-			m_MousePositionRelativeToRenderViewport.y = mouseY;
-			if (mouseX >= 0 && mouseY >= 0 && mouseX < (int)m_ViewportSize.x && mouseY < (int)m_ViewportSize.y)
-			{
-				m_Framebuffer->Bind();
-				int pixelData = m_Framebuffer->ReadPixel(1, mouseX, mouseY);
-				WARN(pixelData);
-				m_HoveredPixel = pixelData;
-				m_Framebuffer->Unbind();
-			}
-		}
-		void UpdateScreenBoundaries()
-		{
-			//Resizing the framebuffer if the ImGui panel happens to get resized. (Framebuffer and the panel sizes should be equal.)
-			if (m_Framebuffer->GetDimensions().x != m_ViewportSize.x || m_Framebuffer->GetDimensions().y != m_ViewportSize.y)
-			{
-				m_Framebuffer->Resize(m_ViewportSize.x, m_ViewportSize.y);
-				for (auto layerIterator = m_LayerStack.rbegin(); layerIterator != m_LayerStack.rend(); layerIterator++)
-				{
-					layerIterator->get()->OnResizeViewport(m_ViewportSize.x, m_ViewportSize.y);
-				}
-				m_EditorCamera->SetViewportSize(m_ViewportSize.x, m_ViewportSize.y);
-			}
-		}
-		void ImGuiDockspaceSetup()
-		{
-			static bool dockspaceOpen = true;
-			static bool opt_fullscreen = true;
-			static bool opt_padding = false;
-			static ImGuiDockNodeFlags dockspace_flags = ImGuiDockNodeFlags_None;
-			ImGuiWindowFlags window_flags = ImGuiWindowFlags_MenuBar | ImGuiWindowFlags_NoDocking;
-			if (opt_fullscreen)
-			{
-				const ImGuiViewport* viewport = ImGui::GetMainViewport();
-				ImGui::SetNextWindowPos(viewport->WorkPos);
-				ImGui::SetNextWindowSize(viewport->WorkSize);
-				ImGui::SetNextWindowViewport(viewport->ID);
-				ImGui::PushStyleVar(ImGuiStyleVar_WindowRounding, 0.0f);
-				ImGui::PushStyleVar(ImGuiStyleVar_WindowBorderSize, 0.0f);
-				window_flags |= ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove;
-				window_flags |= ImGuiWindowFlags_NoBringToFrontOnFocus | ImGuiWindowFlags_NoNavFocus;
-			}
-			else
-			{
-				dockspace_flags &= ~ImGuiDockNodeFlags_PassthruCentralNode;
-			}
-			if (dockspace_flags & ImGuiDockNodeFlags_PassthruCentralNode)
-				window_flags |= ImGuiWindowFlags_NoBackground;
+			Renderer2D::PostRender();
 
-			if (!opt_padding)
-				ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0.0f, 0.0f));
-
-			ImGui::Begin("DockSpace Demo", &dockspaceOpen, window_flags);
-
-			if (!opt_padding)
-				ImGui::PopStyleVar();
-
-			if (opt_fullscreen)
-				ImGui::PopStyleVar(2);
-
+			//-----------------------ImGui Beginning-------------------------
+			ImGuiBase::Begin(); 
+			//ImGui::ShowDemoWindow();
+			ImGuiBase::BeginDockSpace();
 			if (ImGui::BeginMenuBar())
 			{
 				if (ImGui::BeginMenu("File"))
@@ -238,22 +78,80 @@ namespace Game
 				}
 				ImGui::EndMenuBar();
 			}
-			// DockSpace
-			auto& style = ImGui::GetStyle();
-			//float minWinSizeX = style.WindowMinSize.x;
-			//style.WindowMinSize.x = 420.0f;
-			ImGuiIO& io = ImGui::GetIO();
-			if (io.ConfigFlags & ImGuiConfigFlags_DockingEnable)
-			{
-				ImGuiID dockspace_id = ImGui::GetID("MyDockSpace");
-				ImGui::DockSpace(dockspace_id, ImVec2(0.0f, 0.0f), dockspace_flags);
-			}
-			//style.WindowMinSize.x = minWinSizeX;
+			ImGuiBase::EndDockSpace();
 
-			static bool show = true;
+
+
+			ImGuiBase::BeginViewport(m_ViewportVariables);
+			//First thing first, paste the framebuffer texture onto ImGui::Image.
+			uint32_t texture = Renderer2D::GetMainFramebuffer()->GetColorAttachmentTextureID(0);
+			ImGui::Image((void*)texture, { Renderer2D::GetMainFramebuffer()->GetDimensions().x, Renderer2D::GetMainFramebuffer()->GetDimensions().y }, { 0,1 }, { 1,0 });
+
+			if (ImGui::BeginDragDropTarget())
+			{
+				if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("CONTENT_BROWSER_ITEM"))
+				{
+					const wchar_t* path = (const wchar_t*)payload->Data;
+					if (std::wstring(path).find(L"Scenes\\") != std::wstring::npos)
+					{
+						OpenScene(g_AssetPath / path);
+					}
+					else
+					{
+						std::list<const wchar_t*> supportedFileTypes = { L".obj", L".fbx", L".gltf" };
+						for (auto& type : supportedFileTypes)
+						{
+							if (std::wstring(path).find(type) != std::wstring::npos)
+							{
+								Ref<Model> model = std::make_shared<Model>(g_AssetPath / path);
+								auto entity = m_Layer->GetScene()->CreateEntity("Unnamed Entity", "Model");
+								Ref<Graphics::Material> defaultMaterial = std::make_shared<Graphics::Material>(Graphics::ShaderLibrary::GetShader("3DShader"));
+								defaultMaterial->m_Properties.Ambient = 0.05f;
+								defaultMaterial->m_Properties.Diffuse = 1.0f;
+								defaultMaterial->m_Properties.Specular = 1.0f;
+								entity.AddComponent<MeshRendererComponent>(defaultMaterial);
+								entity.AddComponent<ModelRendererComponent>(model);
+								break;
+							}
+						}
+					}
+				}
+				ImGui::EndDragDropTarget();
+			}
+
+			m_SceneHierarchyPanel->OnImGuiRender();
+			m_ContentBrowserPanel->OnImGuiRender();
+
+			ImGuiBase::EndViewport();
+
+			ImGui::Begin("Off Screen Render Target");
+			// Continue here !! Give HDRBuffer its own shader and render the scene to it.
+			int depthBuffer = 12;
+			texture = Renderer2D::GetMainFramebuffer()->GetColorAttachmentTextureID();
+			ImGui::Image((void*)depthBuffer, { ImGui::GetWindowSize().x, ImGui::GetWindowSize().y - 50 }, { 0,1 }, { 1,0 });
 			ImGui::End();
+
+			ImGuiBase::End(); 
+			//-----------------------ImGui END -------------------------------
+			
+			//Try to resize the framebuffer at the end. Otherwise it causes weird flickering problems.
+			//Resizing the framebuffer if the ImGui panel happens to get resized. (Framebuffer and the panel sizes should be equal.)
+			if (Renderer2D::GetMainFramebuffer()->GetDimensions().x != m_ViewportVariables.ViewportSize.x || Renderer2D::GetMainFramebuffer()->GetDimensions().y != m_ViewportVariables.ViewportSize.y)
+			{
+				Renderer2D::GetMainFramebuffer()->Resize(m_ViewportVariables.ViewportSize.x, m_ViewportVariables.ViewportSize.y);
+				for (auto layerIterator = m_LayerStack.rbegin(); layerIterator != m_LayerStack.rend(); layerIterator++)
+				{
+					layerIterator->get()->OnResizeViewport(m_ViewportVariables.ViewportSize.x, m_ViewportVariables.ViewportSize.y);
+				}
+				m_EditorCamera->SetViewportSize(m_ViewportVariables.ViewportSize.x, m_ViewportVariables.ViewportSize.y);
+			}
+
+			m_EditorCamera->OnUpdate(deltaTime, m_ViewportVariables.ViewportHovered);
+			m_OpenGLWindow->Update();
 		}
-		virtual void OnEvent(Ref<Input::Event> e) override
+	}
+
+	virtual void OnEvent(Ref<Input::Event> e) override
 		{
 			//e->Log();
 			//Handle events for editor camera.
@@ -270,7 +168,7 @@ namespace Game
 				else if (castEvent->GetHeight() > 0 || castEvent->GetWidth() > 0)
 					m_Minimized = false;
 			}
-			if (!m_BlockEvents)
+			if (!m_ViewportVariables.BlockEvents)
 			{
 				m_EditorCamera->OnEvent(e);
 				for (auto layerIterator = m_LayerStack.rbegin(); layerIterator != m_LayerStack.rend(); layerIterator++)
@@ -282,25 +180,25 @@ namespace Game
 				if (e->GetEventType() == Input::EventType::MouseClickEvent)
 				{
 					auto castEvent = std::static_pointer_cast<Input::MouseClickEvent>(e);
-					if (castEvent->GetMouseCode() == ANOR_MOUSE_BUTTON_LEFT)
+					if (castEvent->GetMouseCode() == ANOR_MOUSE_BUTTON_LEFT && !Input::EventHandler::IsKeyDown(ANOR_KEY_LEFT_CONTROL))
 					{
-						if (m_HoveredPixel != -1)
-							m_SceneHierarchyPanel->SetSelectionContext(m_HoveredPixel);
+						if (m_ViewportVariables.HoveredPixel != -1)
+							m_SceneHierarchyPanel->SetSelectionContext(m_ViewportVariables.HoveredPixel);
 					}
 				}
 			}
 		}
-		void PushLayer(Ref<Layer> Layer)
+	void PushLayer(Ref<Layer> Layer)
 		{
 			m_LayerStack.pushLayer(Layer);
 			Layer->OnAttach();
 		}
-		void PopLayer()
+	void PopLayer()
 		{
 			//Add OnDetach();
 			m_LayerStack.popLayer();
 		}
-		float DeltaTime()
+	float DeltaTime()
 		{
 			float currentFrameRenderTime, deltaTime;
 			currentFrameRenderTime = m_OpenGLWindow->GetRenderTime();
@@ -308,7 +206,7 @@ namespace Game
 			m_LastFrameRenderTime = currentFrameRenderTime;
 			return deltaTime;
 		}
-		void OpenScene(const std::filesystem::path& filePath )
+	void OpenScene(const std::filesystem::path& filePath)
 		{
 			if (!filePath.empty())
 			{
@@ -318,10 +216,10 @@ namespace Game
 
 				SceneSerializer serializer(activeScene);
 				serializer.Deserialize(filePath.string());
-				activeScene->OnResizeViewport(m_ViewportSize.x, m_ViewportSize.y);
+				activeScene->OnResizeViewport(m_ViewportVariables.ViewportSize.x, m_ViewportVariables.ViewportSize.y);
 			}
 		}
-		void OpenScene()
+	void OpenScene()
 		{
 			std::string filepath = FileDialogs::OpenFile("Anor Scene (*.anor)\0*.anor\0");
 			if (!filepath.empty())
@@ -329,13 +227,13 @@ namespace Game
 				OpenScene(filepath);
 			}
 		}
-		void CreateScene()
+	void CreateScene()
 		{
 			auto& activeScene = m_Layer->GetScene();
 			activeScene = std::make_shared<Scene>();
 			m_SceneHierarchyPanel->SetContext(m_Layer->GetScene());
 		}
-		void SaveSceneAs()
+	void SaveSceneAs()
 		{
 			std::string filepath = FileDialogs::SaveFile("Anor Scene (*.anor)\0*.anor\0");
 			if (!filepath.empty())
@@ -344,16 +242,16 @@ namespace Game
 				serializer.Serialize(filepath);
 			}
 		}
-	protected:
-		virtual ~AnorEditor()
-		{
-			WARN("SandboxApp destructor completed!!!");
-		}
-	};
-	AnorEngine::Application* CreateApplication()
+protected:
+	virtual ~AnorEditor()
 	{
-		return new AnorEditor("Anor Editor");
+		WARN("SandboxApp destructor completed!!!");
 	}
+};
+AnorEngine::Application* CreateApplication()
+{
+	return new AnorEditor("Anor Editor");
 }
+
 
 

@@ -1,5 +1,7 @@
 #include "pch.h"
 #include "SceneCamera.h"
+#include <gtc/type_ptr.hpp>
+#include <gtc/matrix_transform.hpp>
 namespace AnorEngine
 {
 	SceneCamera::SceneCamera()

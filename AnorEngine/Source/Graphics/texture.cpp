@@ -1,11 +1,12 @@
 #include "pch.h"
-#include <GL/glew.h>
-#define STB_IMAGE_IMPLEMENTATION
-#include "../vendor/stb_image/stb_image.h"
+#include <glad/glad.h>
 #include "texture.h"
+#define STB_IMAGE_IMPLEMENTATION
+#include <stb_image.h>
+
+extern const std::filesystem::path g_AssetPath = (std::string(__SOLUTION_DIR) + "AnorEngine\\Assets");
+extern const std::filesystem::path g_ResourcesPath = (std::string(__SOLUTION_DIR) + "AnorEditor");
 namespace AnorEngine {
-	extern const std::filesystem::path g_AssetPath = (std::string(__SOLUTION_DIR) + "AnorEngine\\Assets");
-	extern const std::filesystem::path g_ResourcesPath = (std::string(__SOLUTION_DIR) + "AnorEditor");
 	//!!!! DEFAULT GLFW FRAMEBUFFER TEXTURE ID IS 0 !!!!!
 	//! 
 	//!!!! WHITE TEXTURE ID IS 1 !!!!!!

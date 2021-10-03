@@ -1,7 +1,6 @@
 #pragma once
 #include "Scene.h"
 #include "entt.h"
-#include <glm.hpp>
 namespace AnorEngine
 {
 	class ANOR_API Entity

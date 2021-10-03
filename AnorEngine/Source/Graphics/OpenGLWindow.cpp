@@ -1,6 +1,15 @@
 #include "pch.h"
 #include "OpenGLWindow.h"
-#include "../Events/EventHandler.h"
+#include "Events/EventHandler.h"
+#include "Camera.h"
+#include "Layers/Layer.h"
+#include "Events/Event.h"
+#include "Core/EngineKeyCodes.h"
+#include "Core/MouseButtonCodes.h"
+#include <GLFW/glfw3.h>
+#include <glad/glad.h>
+#include <glm.hpp>
+
 namespace AnorEngine {
 	namespace Graphics {
 
@@ -99,6 +108,16 @@ namespace AnorEngine {
 			glfwTerminate();
 		}
 
+		inline void OpenGLWindow::SetInputMode(int Mode, int Value)
+		{
+			glfwSetInputMode(m_Window, Mode, Value);
+		}
+
+		inline int OpenGLWindow::GetInputMode(int Mode)
+		{
+			return glfwGetInputMode(m_Window, Mode);
+		}
+
 		void OpenGLWindow::GetWindowSize(int* width, int* height)
 		{
 			glfwGetWindowSize(m_Window, width, height);
@@ -113,11 +132,11 @@ namespace AnorEngine {
 			}
 			glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, true);
 			m_Window = glfwCreateWindow(m_Width, m_Height , m_Title , NULL, NULL);
-			int flags; glGetIntegerv(GL_CONTEXT_FLAGS, &flags);
-			if (flags & GL_CONTEXT_FLAG_DEBUG_BIT)
-			{
-				// initialize debug output 
-			}
+			//int flags; glGetIntegerv(GL_CONTEXT_FLAGS, &flags);
+			//if (flags & GL_CONTEXT_FLAG_DEBUG_BIT)
+			//{
+			//	// initialize debug output 
+			//}
 			if (!m_Window) {
 				glfwTerminate();
 				std::cout << "Failed to create GLFW OpenGLWindow." << std::endl;
@@ -125,10 +144,10 @@ namespace AnorEngine {
 
 			glfwMakeContextCurrent(m_Window);
 
-			if (glewInit() != GLEW_OK)
+			int status = gladLoadGLLoader((GLADloadproc)glfwGetProcAddress);
+			if (!status)
 			{
-				std::cout << "Could not initialize GLEW!" << std::endl;
-				return false;
+				CRITICAL_ASSERT("Could not initialize GLAD!");
 			}
 			
 			glDebugMessageCallback(openglErrorCallbackFunction, nullptr);
@@ -170,16 +189,6 @@ namespace AnorEngine {
 		void OpenGLWindow::Close()
 		{
 			glfwTerminate();
-		}
-
-		void OpenGLWindow::drawRightAngledTriangle()
-		{	
-			//Legacy OpenGL, this is an old way of drawing stuff on the screen.
-			glBegin(GL_TRIANGLES);
-			glVertex2f(-0.5f, -0.5f);
-			glVertex2f( 0.0f,  0.5f);
-			glVertex2f( 0.5f, -0.5f);
-			glEnd();
 		}
 	}
 }

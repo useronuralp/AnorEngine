@@ -1,10 +1,5 @@
 #pragma once
-#include "Graphics/Buffers/VertexArray.h"
-#include "Graphics/Shader.h"
-#include "Graphics/Texture.h"
-#include "Graphics/Camera.h"
-#include "Graphics/EditorCamera.h"
-
+#include <glm.hpp>
 namespace AnorEngine
 {
 	//Forward declerations.
@@ -16,6 +11,7 @@ namespace AnorEngine
 	class ModelRendererComponent;
 	class Scene;
 
+
 	enum class TextureNames
 	{
 		WHITE_TEXTURE = 0
@@ -23,6 +19,18 @@ namespace AnorEngine
 
 	namespace Graphics
 	{
+		
+		//Forward declerations.
+		class Framebuffer;
+		class Layer;
+		class Texture;
+		class m_Shader;
+		class OrthographicCamera;
+		class EditorCamera;
+		class Camera;
+		class Shader;
+
+
 		class ANOR_API Renderer2D
 		{
 			struct Statistics
@@ -31,6 +39,9 @@ namespace AnorEngine
 			};
 		public:
 			static void Init();
+			static void RenderScene(Ref<Layer> layer, bool isRuntime, float deltaTime);
+			static void PreRender();
+			static void PostRender();
 			static void RenderDirectionalLightShadowMap(const Ref<Scene>& scene);
 			static void RenderPointLightShadowMaps(const Ref<Scene>& scene);
 			static void DrawCube(const TransformComponent& tc, const MeshRendererComponent& mc, const TagComponent& tagc);
@@ -48,10 +59,11 @@ namespace AnorEngine
 			static void EndScene();
 			static void Clear();
 			static void ClearColor(const glm::vec4& color);
-			static uint32_t GetIndexCount();
-			static uint32_t GetNumberOfDrawCalls();
-			static glm::vec3& GetDirectionalLightPosition();
-			static const std::array<Ref<Texture>, 32Ui64>& GetStoredTextures();
+			static uint32_t									GetIndexCount();
+			static uint32_t									GetNumberOfDrawCalls();
+			static glm::vec3&								GetDirectionalLightPosition();
+			static const std::array<Ref<Texture>, 32Ui64>&	GetStoredTextures();
+			static Ref<Framebuffer>							GetMainFramebuffer();
 		private:
 			static void RenderScene(const Ref<Scene>& scene, const Ref<Shader>& shader, bool wannaCheckforPointLights = false);
 		};

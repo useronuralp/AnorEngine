@@ -1,18 +1,14 @@
 #pragma once
-#include "shader.h"
 #include <glm.hpp>
-#include <../Vendor/stb_image/stb_image.h>
-#include <gtc/matrix_transform.hpp>
-#include <gtc/type_ptr.hpp>
-#include <assimp/Importer.hpp>
-#include <assimp/scene.h>
-#include <assimp/postprocess.h>
-#include <Graphics/Buffers/VertexArray.h>
-#include <Graphics/texture.h>
-#include "EditorCamera.h"
-
 namespace AnorEngine {
     namespace Graphics {
+
+        //Forward declerations
+        class Shader;
+        class Texture;
+        class VertexArray;
+        class Vertex;
+
         struct ANOR_API Vertex {
             glm::vec3 Position;
             glm::vec2 TexCoords;
@@ -28,7 +24,6 @@ namespace AnorEngine {
             std::vector<unsigned int> m_Indices;
             std::vector<Ref<Texture>> m_Textures;
             glm::mat4                 m_ModelMatrix;
-        private:
             Ref<VertexArray>          m_VAO;
         private:
             void SetupMesh();

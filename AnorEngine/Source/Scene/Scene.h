@@ -1,17 +1,20 @@
 #pragma once
 #include "entt.h"
-#include "Renderer/Renderer2D.h"
-#include "Graphics/Camera.h"
-#include "Graphics/EditorCamera.h"
-#include "Graphics/Model.h"
 namespace AnorEngine
 {
+	//Forward declerations
+	class Entity;
+	class Camera;
+	namespace Graphics
+	{
+		class EditorCamera;
+	}
+
 	struct Position2D
 	{
 		float x;
 		float y;
 	};
-	class Entity;
 	class ANOR_API Scene
 	{
 	public:

@@ -1,10 +1,18 @@
 #pragma once
 #include <glm.hpp>
-#include <type_traits>
-#include "imgui_impl_glfw.h"
-#include "imgui_impl_opengl3.h"
 namespace AnorEngine
 {
+	struct ANOR_API ViewportVariables
+	{
+		bool ViewportFocused = false;
+		bool ViewportHovered = false;
+		bool BlockEvents = false;
+		int HoveredPixel = -1;
+		glm::vec2 ViewportSize;
+		glm::vec2 ViewportBounds[2];
+		glm::vec2 MousePositionRelativeToRenderViewport;
+	};
+
 	class ANOR_API ImGuiBase
 	{
 		
@@ -12,10 +20,12 @@ namespace AnorEngine
 		ImGuiBase() {};
 	public:
 		static void Begin();
+		static void BeginDockSpace();
+		static void BeginViewport(ViewportVariables& status);
+		static void EndViewport();
+		static void EndDockSpace();
 		static void End();
 		static bool Init();
 		static void SetDarkThemeColors();
-	private:
-		static float m_Time;
 	};
 }

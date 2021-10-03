@@ -1,9 +1,14 @@
 #pragma once
 #include "Camera.h"
-#include "Events/Event.h"
-
 namespace AnorEngine 
 {
+	//Forward declerations
+	namespace Input
+	{
+		class Event;
+		class MouseScrollEvent;
+	}
+
 	namespace Graphics
 	{
 		//This camera is 3D because of its nature. 2D games will also use this camera.

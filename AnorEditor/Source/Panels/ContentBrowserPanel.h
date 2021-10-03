@@ -1,7 +1,11 @@
 #pragma once
-#include "Graphics/texture.h"
 namespace AnorEngine
 {	
+	//Forward declerations
+	namespace Graphics
+	{
+		class Texture;
+	}
 	class ANOR_API ContentBrowserPanel
 	{
 	public:

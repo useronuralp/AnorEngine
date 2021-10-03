@@ -1,6 +1,10 @@
 #pragma once
-#include <Events/Event.h>
 namespace AnorEngine {
+	//Forward declerations
+	namespace Input
+	{
+		class Event;
+	}
 	namespace Graphics
 	{
 		class Camera;

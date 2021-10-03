@@ -1,8 +1,14 @@
 #pragma once
-#include <Events/EventHandler.h>
+#include "Events/EventHandler.h"
 #include "Camera.h"
 namespace AnorEngine
 {
+	namespace Input
+	{
+		class WindowResizeEvent;
+		class MouseScrollEvent;
+	}
+
 	namespace Graphics
 	{
 		struct OrthographicCameraBounds

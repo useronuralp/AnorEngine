@@ -1,12 +1,15 @@
 #include "pch.h"
 #include "ContentBrowserPanel.h"
+#include "Graphics/texture.h"
 #include "Core\AnorColors.h"
 #include <imgui.h>
+
+//Initialized in texture.h 
+extern const std::filesystem::path g_AssetPath;
+extern const std::filesystem::path g_ResourcesPath;
+
 namespace AnorEngine
 {
-	//Initialized in texture.h 
-	extern const std::filesystem::path g_AssetPath;
-	extern const std::filesystem::path g_ResourcesPath;
 
 	ContentBrowserPanel::ContentBrowserPanel()
 		: m_CurrentDirectory(g_AssetPath)

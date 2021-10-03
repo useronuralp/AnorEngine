@@ -2,7 +2,11 @@
 #include "Renderer2D.h"
 #include "Scene/Components.h"
 #include "Graphics/Framebuffer.h"
-
+#include "Graphics/Layers/Layer.h"
+#include "Graphics/Texture.h"
+#include "Graphics/Shader.h"
+#include "Graphics/Buffers/VertexArray.h"
+#include "Graphics/EditorCamera.h"
 namespace AnorEngine
 {
 	namespace Graphics
@@ -60,11 +64,13 @@ namespace AnorEngine
 			Ref<VertexArray>						  CubeVertexArray;
 			Ref<VertexBuffer>						  CubeVertexBuffer;
 			Ref<CubeMapTexture>						  SkyboxTexture;
+			Ref<Framebuffer>						  MainFramebuffer;
+			Ref<Framebuffer>						  HDRBuffer; // Not in use atm.
 
 			//Directional light
 			Ref<Framebuffer>					      DirectionalLightShadowBuffer;
 			glm::vec3								  DirectionalLightPosition = { 120.0f, 200.0f, -200.0f };
-			glm::vec3								  DirectionalLightColor = { 1.0f, 1.0f, 1.0f };
+			glm::vec3								  DirectionalLightColor = { 0.788, 0.886, 1 };
 
 			//Point lights
 			Ref<Framebuffer>						  PointLightShadowBuffers[MAX_POINT_LIGHT_COUNT];
@@ -74,31 +80,17 @@ namespace AnorEngine
 
 		//Instance the s_Data here for only once.
 		static Renderer2DData s_Data;
-		static Ref<Framebuffer> GenerateDirectionalLightFramebuffer()
-		{
-			FramebufferSpecifications specs;
-			specs.Height = 7680;
-			specs.Width = 7680;
-			specs.Attachments = { {FramebufferTextureFormat::Depth} };
-			specs.Texture_Type = TextureType::TEXTURE_2D;
-
-			return std::make_shared<Framebuffer>(specs);
-		}
-		static Ref<Framebuffer> GeneratePointLightFramebuffer()
-		{
-			FramebufferSpecifications specs;
-			specs.Height = 1024;
-			specs.Width = 1024;
-			specs.Attachments = { {FramebufferTextureFormat::Depth} };
-			specs.Texture_Type = TextureType::CUBEMAP;
-
-			return std::make_shared<Framebuffer>(specs);
-		}
 		void Renderer2D::Init()
 		{
 			glEnable(GL_BLEND);
 			glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 			glEnable(GL_DEPTH_TEST);
+
+			//Initialize main framebuffer with desired specifications.
+			FramebufferSpecifications fbSpecs;
+			fbSpecs.Texture_Type = TextureType::TEXTURE_2D;
+			fbSpecs.Attachments = { {FramebufferTextureFormat::RGBA8}, {FramebufferTextureFormat::RED_INTEGER}, {FramebufferTextureFormat::DEPTH24STENCIL8} };
+			s_Data.MainFramebuffer = std::make_shared<Framebuffer>(fbSpecs);
 
 			s_Data.DirectionalLightShadowBuffer = nullptr;
 			for (int i = 0; i < s_Data.MAX_POINT_LIGHT_COUNT; i++)
@@ -209,7 +201,7 @@ namespace AnorEngine
 
 			//Creating and adding a white texture. This is basically used when we only want to render a quad with its color. In that case, we multiply the color values with this white texture meaning 1. Therefore 
 			//getting the original colors on the screen.
-			s_Data.WhiteTexture = std::make_shared<Texture>("Textures\\WhiteTexture.png"); //TODO: Create this texture without a using a PNG.
+			s_Data.WhiteTexture = std::make_shared<Texture>("Textures\\WhiteTexture.png");
 			s_Data.WhiteTexture->SetType("texture_diffuse");
 			s_Data.StoredTextures[0] = s_Data.WhiteTexture;
 
@@ -233,6 +225,41 @@ namespace AnorEngine
 			s_Data.QuadVertexPositions[2] = {  0.5f,  0.5f, 0.0f, 1.0f };
 			s_Data.QuadVertexPositions[3] = { -0.5f,  0.5f, 0.0f, 1.0f };
 
+		}
+		static Ref<Framebuffer> GenerateDirectionalLightFramebuffer()
+		{
+			FramebufferSpecifications specs;
+			specs.Height = 7680;
+			specs.Width = 7680;
+			specs.Attachments = { {FramebufferTextureFormat::Depth} };
+			specs.Texture_Type = TextureType::TEXTURE_2D;
+
+			return std::make_shared<Framebuffer>(specs);
+		}
+		static Ref<Framebuffer> GeneratePointLightFramebuffer()
+		{
+			FramebufferSpecifications specs;
+			specs.Height = 1024;
+			specs.Width = 1024;
+			specs.Attachments = { {FramebufferTextureFormat::Depth} };
+			specs.Texture_Type = TextureType::CUBEMAP;
+
+			return std::make_shared<Framebuffer>(specs);
+		}
+		void Renderer2D::PreRender()
+		{
+			s_Data.MainFramebuffer->Bind();
+			Renderer2D::ClearColor(glm::vec4(0.1f, 0.1f, 0.1f, 1));
+			Renderer2D::Clear();
+			s_Data.MainFramebuffer->ClearTextureAttachmentWithIntegerValue(1, -1);
+		}
+		void Renderer2D::PostRender()
+		{
+			s_Data.MainFramebuffer->Unbind();
+		}
+		void Renderer2D::RenderScene(Ref<Layer> layer, bool isRuntime, float deltaTime)
+		{
+			layer->OnUpdate(isRuntime, deltaTime);
 		}
 		void Renderer2D::RenderScene(const Ref<Scene>& scene, const Ref<Shader>& shader, bool wannaCheckforPointLights)
 		{
@@ -292,9 +319,9 @@ namespace AnorEngine
 					shader->UploadUniform("u_PointLights[" + std::to_string(PointLightCount) + "].Linear", sizeof(pointLightComponent.Linear), &pointLightComponent.Linear);
 					shader->UploadUniform("u_PointLights[" + std::to_string(PointLightCount) + "].quadratic", sizeof(pointLightComponent.Quadratic), &pointLightComponent.Quadratic);
 					shader->UploadUniform("u_PointLights[" + std::to_string(PointLightCount) + "].intensity", sizeof(pointLightComponent.Intensity), &pointLightComponent.Intensity);
-					shader->UploadUniform("u_PointLights[" + std::to_string(PointLightCount) + "].ambient", sizeof(meshRendererComponent.Material->Properties.Ambient), &meshRendererComponent.Material->Properties.Ambient);
-					shader->UploadUniform("u_PointLights[" + std::to_string(PointLightCount) + "].diffuse", sizeof(meshRendererComponent.Material->Properties.Diffuse), &meshRendererComponent.Material->Properties.Diffuse); 
-					shader->UploadUniform("u_PointLights[" + std::to_string(PointLightCount) + "].specular", sizeof(meshRendererComponent.Material->Properties.Specular), &meshRendererComponent.Material->Properties.Specular);
+					shader->UploadUniform("u_PointLights[" + std::to_string(PointLightCount) + "].ambient", sizeof(meshRendererComponent.Material->m_Properties.Ambient), &meshRendererComponent.Material->m_Properties.Ambient);
+					shader->UploadUniform("u_PointLights[" + std::to_string(PointLightCount) + "].diffuse", sizeof(meshRendererComponent.Material->m_Properties.Diffuse), &meshRendererComponent.Material->m_Properties.Diffuse); 
+					shader->UploadUniform("u_PointLights[" + std::to_string(PointLightCount) + "].specular", sizeof(meshRendererComponent.Material->m_Properties.Specular), &meshRendererComponent.Material->m_Properties.Specular);
 					shader->UploadUniform("u_PointLights[" + std::to_string(PointLightCount) + "].castShadow", sizeof(pointLightComponent.CastPointLightShadow), &pointLightComponent.CastPointLightShadow);
 				}
 				PointLightProperties props(transformComponent, meshRendererComponent, pointLightComponent, PointLightCount);
@@ -334,7 +361,7 @@ namespace AnorEngine
 				ShaderLibrary::GetShader("PointLightShadowShader")->UploadUniform("u_Far_plane", sizeof(far_plane), &far_plane);
 				ShaderLibrary::GetShader("PointLightShadowShader")->UploadUniform("u_LightPos", sizeof(s_Data.PointLights[i].tc.Translation), &s_Data.PointLights[i].tc.Translation);
 				for (auto& [shaderName, shader] : ShaderLibrary::GetLibrary())
-					shader->UploadInteger("u_PointLightShadowMap[" + std::to_string(i) + "]", s_Data.PointLightShadowBuffers[i]->GetDepthAttachmentID());
+					shader->UploadInteger("u_PointLightShadowMap[" + std::to_string(i) + "]", s_Data.PointLightShadowBuffers[i]->GetDepthAttachmentTextureID());
 
 				for (auto& [shaderName, shader] : ShaderLibrary::GetLibrary())
 				{
@@ -360,7 +387,7 @@ namespace AnorEngine
 			for (auto& [shaderName, shader] : ShaderLibrary::GetLibrary())
 			{
 				//Directional light should be single and fixed. And thus, I am storing the properties of it here in the renderer.
-				shader->UploadUniform("u_DirectionalShadowMap", sizeof(s_Data.DirectionalLightShadowBuffer->GetDepthAttachmentID()), &s_Data.DirectionalLightShadowBuffer->GetDepthAttachmentID());
+				shader->UploadUniform("u_DirectionalShadowMap", sizeof(s_Data.DirectionalLightShadowBuffer->GetDepthAttachmentTextureID()), &s_Data.DirectionalLightShadowBuffer->GetDepthAttachmentTextureID());
 				shader->UploadUniform("u_DirectionalLightPosition", sizeof(s_Data.DirectionalLightPosition), &s_Data.DirectionalLightPosition);
 				shader->UploadUniform("u_DirectionalLightColor", sizeof(s_Data.DirectionalLightColor), &s_Data.DirectionalLightColor);
 				//Upload directional light view projection matrix.
@@ -377,46 +404,46 @@ namespace AnorEngine
 		void Renderer2D::DrawCube(const TransformComponent& tc, const MeshRendererComponent& mc, const TagComponent& tagc)
 		{
 			//Component specific shader uniforms are set inside this funciton.
-			mc.Material->Shader->UploadUniform("u_DiffuseMap", sizeof(mc.Material->Texture->GetTextureID()), &mc.Material->Texture->GetTextureID());
-			mc.Material->Shader->UploadUniform("u_CastDirectionalLight", sizeof(mc.CastDirectionalLight), &mc.CastDirectionalLight);
-			mc.Material->Shader->UploadUniform("u_Transform", sizeof(tc.GetTransform()), &tc.GetTransform());
+			mc.Material->m_Shader->UploadUniform("u_DiffuseMap", sizeof(mc.Material->m_Texture->GetTextureID()), &mc.Material->m_Texture->GetTextureID());
+			mc.Material->m_Shader->UploadUniform("u_CastDirectionalLight", sizeof(mc.CastDirectionalLight), &mc.CastDirectionalLight);
+			mc.Material->m_Shader->UploadUniform("u_Transform", sizeof(tc.GetTransform()), &tc.GetTransform());
 
-			mc.Material->Shader->UploadUniform("u_Color", sizeof(mc.Color), &mc.Color);
-			mc.Material->Shader->UploadUniform("u_EntityID", sizeof(tc.EntityID), &tc.EntityID);
+			mc.Material->m_Shader->UploadUniform("u_Color", sizeof(mc.Color), &mc.Color);
+			mc.Material->m_Shader->UploadUniform("u_EntityID", sizeof(tc.EntityID), &tc.EntityID);
 
-			mc.Material->Shader->UploadUniform("u_Material.diffuseIntensity", sizeof(mc.Material->Properties.Diffuse), &mc.Material->Properties.Diffuse);
-			mc.Material->Shader->UploadUniform("u_Material.ambientIntensity", sizeof(mc.Material->Properties.Ambient), &mc.Material->Properties.Ambient);
-			mc.Material->Shader->UploadUniform("u_Material.specularIntensity", sizeof(mc.Material->Properties.Specular), &mc.Material->Properties.Specular);
-			mc.Material->Shader->UploadUniform("u_Material.shininess", sizeof(mc.Material->Properties.Shininess), &mc.Material->Properties.Shininess);
-			mc.Material->Shader->UploadUniform("u_Material.metalness", sizeof(mc.Material->Properties.Metalness), &mc.Material->Properties.Metalness);
+			mc.Material->m_Shader->UploadUniform("u_Material.diffuseIntensity", sizeof(mc.Material->m_Properties.Diffuse), &mc.Material->m_Properties.Diffuse);
+			mc.Material->m_Shader->UploadUniform("u_Material.ambientIntensity", sizeof(mc.Material->m_Properties.Ambient), &mc.Material->m_Properties.Ambient);
+			mc.Material->m_Shader->UploadUniform("u_Material.specularIntensity", sizeof(mc.Material->m_Properties.Specular), &mc.Material->m_Properties.Specular);
+			mc.Material->m_Shader->UploadUniform("u_Material.shininess", sizeof(mc.Material->m_Properties.Shininess), &mc.Material->m_Properties.Shininess);
+			mc.Material->m_Shader->UploadUniform("u_Material.metalness", sizeof(mc.Material->m_Properties.Metalness), &mc.Material->m_Properties.Metalness);
 
-			mc.Material->Texture->Bind(mc.Material->Texture->GetTextureID());
-			mc.Material->Shader->Enable();
+			mc.Material->m_Texture->Bind(mc.Material->m_Texture->GetTextureID());
+			mc.Material->m_Shader->Enable();
 			s_Data.CubeVertexArray->Bind();
 
 			glDrawArrays(GL_TRIANGLES, 0, 36);
 
 			s_Data.CubeVertexArray->Unbind();
-			mc.Material->Shader->Disable();
-			mc.Material->Texture->Unbind();
+			mc.Material->m_Shader->Disable();
+			mc.Material->m_Texture->Unbind();
 		}
 		void Renderer2D::DrawModel(const TransformComponent& tc, const ModelRendererComponent& model, const MeshRendererComponent& mc, const TagComponent& tagc, const Ref<Shader>& differentShader)
 		{
-			mc.Material->Shader->UploadUniform("u_Transform", sizeof(tc.GetTransform()), &tc.GetTransform());
-			mc.Material->Shader->UploadUniform("u_EntityID", sizeof(tc.EntityID), &tc.EntityID);
-			mc.Material->Shader->UploadUniform("u_Color", sizeof(mc.Color), &mc.Color);
-			mc.Material->Shader->UploadUniform("u_CastDirectionalLight", sizeof(mc.CastDirectionalLight), &mc.CastDirectionalLight);
+			mc.Material->m_Shader->UploadUniform("u_Transform", sizeof(tc.GetTransform()), &tc.GetTransform());
+			mc.Material->m_Shader->UploadUniform("u_EntityID", sizeof(tc.EntityID), &tc.EntityID);
+			mc.Material->m_Shader->UploadUniform("u_Color", sizeof(mc.Color), &mc.Color);
+			mc.Material->m_Shader->UploadUniform("u_CastDirectionalLight", sizeof(mc.CastDirectionalLight), &mc.CastDirectionalLight);
 
-			mc.Material->Shader->UploadUniform("u_Material.diffuseIntensity", sizeof(mc.Material->Properties.Diffuse), &mc.Material->Properties.Diffuse);
-			mc.Material->Shader->UploadUniform("u_Material.ambientIntensity", sizeof(mc.Material->Properties.Ambient), &mc.Material->Properties.Ambient);
-			mc.Material->Shader->UploadUniform("u_Material.specularIntensity", sizeof(mc.Material->Properties.Specular), &mc.Material->Properties.Specular);
-			mc.Material->Shader->UploadUniform("u_Material.shininess", sizeof(mc.Material->Properties.Shininess), &mc.Material->Properties.Shininess);
-			mc.Material->Shader->UploadUniform("u_Material.metalness", sizeof(mc.Material->Properties.Metalness), &mc.Material->Properties.Metalness);
+			mc.Material->m_Shader->UploadUniform("u_Material.diffuseIntensity", sizeof(mc.Material->m_Properties.Diffuse), &mc.Material->m_Properties.Diffuse);
+			mc.Material->m_Shader->UploadUniform("u_Material.ambientIntensity", sizeof(mc.Material->m_Properties.Ambient), &mc.Material->m_Properties.Ambient);
+			mc.Material->m_Shader->UploadUniform("u_Material.specularIntensity", sizeof(mc.Material->m_Properties.Specular), &mc.Material->m_Properties.Specular);
+			mc.Material->m_Shader->UploadUniform("u_Material.shininess", sizeof(mc.Material->m_Properties.Shininess), &mc.Material->m_Properties.Shininess);
+			mc.Material->m_Shader->UploadUniform("u_Material.metalness", sizeof(mc.Material->m_Properties.Metalness), &mc.Material->m_Properties.Metalness);
 
 			if (differentShader) // this "differentShader" ususally refers to a shadow map shader. And can be passed to this function by either "RenderDirectionalShadowMap()" or "RenderPointLightShadowMaps()" functions.
 				model.Model->Draw(differentShader);
 			else // If you're not using an external shader, use the shader that is stored inside the material of the object.
-				model.Model->Draw(mc.Material->Shader);
+				model.Model->Draw(mc.Material->m_Shader);
 		}
 		void Renderer2D::DrawSkybox()
 		{
@@ -431,10 +458,9 @@ namespace AnorEngine
 
 			s_Data.CubeVertexArray->Unbind();
 			ShaderLibrary::GetShader("SkyboxShader")->Disable();
-			//THIS IS GONNA CAUSE PROBLEMS CLEAR THE CORRECT FRAMEBUFFER ATTACHMENT
-			//TODO: Hard coded the color attachment index as 4 because it is known at the moment.
 			int clearValue = -1;
-			glClearTexImage(4, 0, GL_RED_INTEGER, GL_INT, &clearValue);
+			uint32_t ID = s_Data.MainFramebuffer->GetColorAttachmentTextureID(1); // For now, we know that the second (index 1) color attachment of our framebuffer will be the red_integer buffer and thats what contains our entityIDs.
+			glClearTexImage(ID, 0, GL_RED_INTEGER, GL_INT, &clearValue);
 		}
 		Ref<Texture> Renderer2D::CreateTexture(const std::filesystem::path& relativePath)
 		{
@@ -591,6 +617,10 @@ namespace AnorEngine
 		glm::vec3& Renderer2D::GetDirectionalLightPosition()
 		{
 			return s_Data.DirectionalLightPosition;
+		}
+		Ref<Framebuffer> Renderer2D::GetMainFramebuffer()
+		{
+			return s_Data.MainFramebuffer;
 		}
 		const std::array<Ref<Texture>, 32Ui64>& Renderer2D::GetStoredTextures()
 		{

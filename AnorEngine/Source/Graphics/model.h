@@ -1,7 +1,14 @@
 #pragma once
 #include "mesh.h"
+#include <assimp/Importer.hpp>
+#include <assimp/scene.h>
+#include <assimp/postprocess.h>
 namespace AnorEngine {
     namespace Graphics {
+
+        //Forward declarations
+        class Texture;
+
         class ANOR_API Model
         {
         public:
@@ -20,7 +27,7 @@ namespace AnorEngine {
             void LoadModel(const std::filesystem::path& filePath);
             void ProcessNode(aiNode* node, const aiScene* scene);
             Mesh ProcessMesh(aiMesh* mesh, const aiScene* scene);
-            std::vector<Ref<Texture>> LoadMaterialTextures(aiMaterial* mat, aiTextureType type, std::string typeName);
+            std::vector<Ref<Texture>> LoadMaterialTextures(aiMaterial* mat, aiTextureType type, const std::string& typeName);
         public:
             void Draw(const Ref<Shader>& shader);
             const std::string& GetPath() { return m_RelativePath == "Not initialized" ? m_AbsolutePath : m_RelativePath; }

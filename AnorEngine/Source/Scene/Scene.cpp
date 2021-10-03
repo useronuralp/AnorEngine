@@ -1,7 +1,11 @@
 #include "pch.h"
+#include "Renderer/Renderer2D.h"
 #include "Scene.h"
 #include "Entity.h"
 #include "Components.h"
+#include "Graphics/Model.h"
+#include "Graphics/EditorCamera.h"
+
 namespace AnorEngine
 {
 	Scene::Scene()
@@ -32,6 +36,7 @@ namespace AnorEngine
 		}
 		//----- Models
 
+		//TODO: Z-Testing sometimes doesnt work when drawing cubes right after models. Check.
 		//----- Cubes
 		auto viewCube = m_Registry.view<TransformComponent, MeshRendererComponent, TagComponent>();
 		for (auto& entity : viewCube)
@@ -41,7 +46,6 @@ namespace AnorEngine
 				Graphics::Renderer2D::DrawCube(transformComponent, meshRendererComponent, tagComponent);
 		}
 		//----- Cubes
-
 
 		Graphics::Renderer2D::EndScene();
 	}

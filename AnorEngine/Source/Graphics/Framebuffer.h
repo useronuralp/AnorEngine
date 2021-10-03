@@ -1,4 +1,4 @@
-#include <GL/glew.h>
+#include <glad/glad.h>
 #include <glm.hpp>
 namespace AnorEngine
 {
@@ -61,8 +61,8 @@ namespace AnorEngine
 			std::vector<FramebufferTextureSpecification> m_ColorAttachmentsSpecs;
 			FramebufferTextureSpecification m_DepthAttachmentSpec;
 
-			std::vector<uint32_t> m_ColorAttachments;
-			uint32_t m_DepthAttachment;
+			std::vector<uint32_t> m_ColorAttachmentTextureIDs;
+			uint32_t m_DepthAttachmentTextureID;
 		public:
 			Framebuffer(const FramebufferSpecifications& specs);
 			~Framebuffer();
@@ -75,8 +75,8 @@ namespace AnorEngine
 			void UnbindDepthAttachmentTexture();
 			void Bind();
 			void Unbind();
-			inline uint32_t GetColorAttachmentID(uint32_t index = 0) const { return m_ColorAttachments[index]; }
-			const inline uint32_t& GetDepthAttachmentID() const { return m_DepthAttachment; }
+			inline uint32_t GetColorAttachmentTextureID(uint32_t index = 0) const { return m_ColorAttachmentTextureIDs[index]; }
+			const inline uint32_t& GetDepthAttachmentTextureID() const { return m_DepthAttachmentTextureID; }
 		private:
 			void SetupFramebuffer();
 		};

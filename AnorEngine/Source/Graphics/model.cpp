@@ -1,5 +1,6 @@
 #include "pch.h"
 #include "model.h"
+#include "Graphics/texture.h"
 namespace AnorEngine {
 	namespace Graphics {
 		Model::Model(const std::filesystem::path& filePath)
@@ -87,7 +88,7 @@ namespace AnorEngine {
 				else
 					vertex.TexCoords = glm::vec2(0.0f, 0.0f);	
 			
-				//TODO: Handle the case where the tangents cannot be calculated for the loaded model.
+				//TODO: Handle the case where the tangents cannot be calculated for the loaded model. That case would be models that don't have UV coordinates.
 				//Tangnet
 				vector.x = mesh->mTangents[i].x;
 				vector.y = mesh->mTangents[i].y;
@@ -130,7 +131,7 @@ namespace AnorEngine {
 			}
 			return Mesh(vertices, indices, textures);
 		}
-		std::vector<Ref<Texture>> Model::LoadMaterialTextures(aiMaterial* mat, aiTextureType type, std::string typeName)
+		std::vector<Ref<Texture>> Model::LoadMaterialTextures(aiMaterial* mat, aiTextureType type, const std::string& typeName)
 		{
 			std::vector<Ref<Texture>> textures;
 			std::string folderName = m_Directory.substr(m_Directory.find_last_of("\\/") + 1, m_Directory.length());

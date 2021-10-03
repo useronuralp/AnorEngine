@@ -1,11 +1,12 @@
 #pragma once
-#include "Shader.h"
-#include "texture.h"
-#include "Renderer/renderer2D.h"
 namespace AnorEngine
 {
 	namespace Graphics
 	{
+		//Forward declerations
+		class Shader;
+		class Texture;
+
 		struct ANOR_API MaterialProperties
 		{
 			float Ambient =  0.1f;
@@ -16,18 +17,16 @@ namespace AnorEngine
 		};
 		struct ANOR_API Material
 		{
-			Material() = default;
+			Material();
 			Material(const Material& material) = default;
-			Material(Ref<Shader> shader)
-				:Shader(shader) {}
-			Material(const Ref<Shader>& shader, const Ref<Graphics::Texture>& texture)
-				:Shader(shader), Texture(texture){}
-			Material(const Ref<Shader>& shader, MaterialProperties properties, const Ref<Graphics::Texture>& texture)
-			:Shader(shader), Properties(properties), Texture(texture){}
+			Material(Ref<Shader> shader);
+			Material(const Ref<Shader>& shader, const Ref<Graphics::Texture>& texture);
+			Material(const Ref<Shader>& shader, MaterialProperties properties, const Ref<Graphics::Texture>& texture);
+			void Init();
 			//TODO : Need deault shader.
-			Ref<Shader> Shader;
-			MaterialProperties Properties;
-			Ref<Graphics::Texture> Texture = Graphics::Renderer2D::CreateTexture("Textures\\WhiteTexture.png"); //default texture
+			Ref<Shader> m_Shader;
+			MaterialProperties m_Properties;
+			Ref<Graphics::Texture> m_Texture;
 		};
 	}
 }

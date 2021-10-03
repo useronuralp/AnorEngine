@@ -1,12 +1,11 @@
 #include "pch.h"
-#include "Events/EventHandler.h"
 #include "EditorCamera.h"
-
-
+#include "Events/EventHandler.h"
+#include "Core/Application.h"
+#include "Graphics/OpenGLWindow.h"
+#include "Events/Event.h"
 #include "Core/EngineKeyCodes.h"
 #include "Core/MouseButtonCodes.h"
-
-
 #define GLM_ENABLE_EXPERIMENTAL
 #include <gtx/quaternion.hpp>
 namespace AnorEngine
@@ -29,11 +28,11 @@ namespace AnorEngine
 					glm::vec2 delta = (mouse - m_InitialMousePosition) * 0.003f;
 					m_InitialMousePosition = mouse;
 
-					if (Input::EventHandler::IsMousePressed(ANOR_MOUSE_BUTTON_MIDDLE))
+					if (Input::EventHandler::IsMouseButtonDown(ANOR_MOUSE_BUTTON_MIDDLE))
 						MousePan(delta);
-					else if (Input::EventHandler::IsMousePressed(ANOR_MOUSE_BUTTON_LEFT))
+					else if (Input::EventHandler::IsMouseButtonDown(ANOR_MOUSE_BUTTON_LEFT))
 						MouseRotate(delta);
-					else if (Input::EventHandler::IsMousePressed(ANOR_MOUSE_BUTTON_RIGHT))
+					else if (Input::EventHandler::IsMouseButtonDown(ANOR_MOUSE_BUTTON_RIGHT))
 						MouseZoom(delta.y);
 				}
 			}

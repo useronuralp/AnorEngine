@@ -4,6 +4,8 @@
 #include "SceneCamera.h"
 #include "ScriptableEntity.h"
 #include "Graphics/Material.h"
+#include "Graphics/model.h"
+#include "Renderer/renderer2D.h"
 #define GLM_ENABLE_EXPERIMENTAL
 #include <gtx/quaternion.hpp>
 
@@ -41,7 +43,7 @@ namespace AnorEngine
 	struct ANOR_API SpriteRendererComponent
 	{
 		glm::vec4 Color { 1.0f, 1.0f, 1.0f, 1.0f };
-		Ref<Graphics::Texture> Texture = Graphics::Renderer2D::CreateTexture("Texture\\WhiteTexture.png"); //default texture
+		Ref<Graphics::Texture> Texture = Graphics::Renderer2D::CreateTexture("Textures\\WhiteTexture.png"); //default texture
 		glm::vec2 TextureSize = {1.0f, 1.0f};
 		glm::vec2 SubTextureOffset = { 0.0f, 0.0f };
 		glm::vec2 PixelSizeOfEachCell = { Texture->GetHeight(), Texture->GetWidth() }; //default
@@ -67,7 +69,7 @@ namespace AnorEngine
 		MeshRendererComponent() = default;
 		MeshRendererComponent(Ref<Graphics::Material> material)
 			:Material(material) {}
-		MeshRendererComponent(glm::vec4 color, Ref<Graphics::Material> material)
+		MeshRendererComponent(const glm::vec4& color, Ref<Graphics::Material> material)
 			:Color(color), Material(material){}
 	};
 
@@ -90,8 +92,8 @@ namespace AnorEngine
 		float CastPointLightShadow = 1.0f;
 
 		PointLightComponent() = default;
-		PointLightComponent(float Lin, float Con, float Quad, float In)
-			:Linear(Lin), Constant(Con), Quadratic(Quad), Intensity(In){}
+		PointLightComponent(float Linear, float Constant, float Quadratic, float Intensity)
+			:Linear(Linear), Constant(Constant), Quadratic(Quadratic), Intensity(Intensity){}
 	};
 
 	struct ANOR_API TagComponent

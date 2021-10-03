@@ -1,14 +1,15 @@
 #pragma once
-#include "Graphics/OpenGLWindow.h"
-#include "Renderer/Renderer.h"
-#include "Renderer/Renderer2D.h"
-#include "Graphics/Layers/ImGuiBase.h"
 namespace AnorEngine
 {	
+	//Forward declarataions
+	namespace Graphics
+	{
+		class OpenGLWindow;
+	}
+	//Forward declarataions
 	namespace Input
 	{
-		//TODO: Remove these
-		class Event; // forward declaring.
+		class Event; 
 	}
 	class ANOR_API Application
 	{

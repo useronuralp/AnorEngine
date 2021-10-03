@@ -1,14 +1,10 @@
 #pragma once 
-#include <GL/glew.h>
-#include "Camera.h"
-#include <glm.hpp>
-#include "Layers/Layer.h"
-#include <Core/EngineKeyCodes.h>
-#include <Core/MouseButtonCodes.h>
-#include <map>
+//Forward declerations
+class GLFWwindow;
 
 namespace AnorEngine {
 	namespace Graphics {
+
 		class ANOR_API OpenGLWindow{
 		private:
 			GLFWwindow* m_Window = nullptr;
@@ -23,13 +19,12 @@ namespace AnorEngine {
 			void Close();
 			void Update();
 			bool IsClosed() const;
-			void drawRightAngledTriangle();
 			inline int GetHeight() { return m_Height; }
 			inline int GetWidth() { return m_Width; }
 			inline GLFWwindow* GetNativeWindow() { return m_Window; }
 			inline double  GetRenderTime() { return m_Time; }
-			inline void SetInputMode(int Mode, int Value) { glfwSetInputMode(m_Window, Mode, Value); }
-			inline int GetInputMode(int Mode) { return glfwGetInputMode(m_Window, Mode); }
+			inline void SetInputMode(int Mode, int Value);
+			inline int GetInputMode(int Mode);
 			void GetWindowSize(int* width, int* height);
 		private:
 			bool init();
